@@ -59,11 +59,23 @@ class _MyButtonState extends State<MyButton> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(widget.icono, size: 40, color: Colors.white),
+            const SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.inversePrimary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+
+              child: Icon(
+                widget.icono,
+                size: 40,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
 
             const SizedBox(height: 10),
 
-            Text(widget.texto, style: const TextStyle(color: Colors.white)),
+            Text(widget.texto, style: const TextStyle(color: Colors.white70)),
           ],
         ),
       ),
