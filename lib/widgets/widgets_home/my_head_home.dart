@@ -25,7 +25,7 @@ class MyHeadHome extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "SZ Regalos",
+                  "SZ Regalos Personalizados",
                   style: TextStyle(
                     fontSize: 25,
                     color: Colors.white,
@@ -33,7 +33,7 @@ class MyHeadHome extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Regalos Personalizados",
+                  "@szsublimaciones",
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
