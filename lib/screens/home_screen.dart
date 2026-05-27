@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/widgets/mi_resumen.dart';
-import 'package:mi_app/widgets/my_bar_bottom.dart';
-import 'package:mi_app/widgets/my_botonera.dart';
-import 'package:mi_app/widgets/my_head_home.dart';
+import 'package:mi_app/widgets/widgets_home/mi_resumen.dart';
+import 'package:mi_app/widgets/widgets_home/my_bar_bottom.dart';
+import 'package:mi_app/widgets/widgets_home/my_botonera.dart';
+import 'package:mi_app/widgets/widgets_home/my_head_home.dart';
 
 class MyHomeScreen extends StatelessWidget {
   const MyHomeScreen({super.key});

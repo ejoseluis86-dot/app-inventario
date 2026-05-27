@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/widgets/my_button.dart';
+import 'package:mi_app/widgets/widgets_home/my_button.dart';
 
 class MyBotonera extends StatelessWidget {
   const MyBotonera({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/widgets/my_button_resumen.dart';
+import 'package:mi_app/widgets/widgets_home/my_button_resumen.dart';
 
 class MiResumen extends StatelessWidget {
   const MiResumen({super.key});
