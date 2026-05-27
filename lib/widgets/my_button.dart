@@ -75,7 +75,14 @@ class _MyButtonState extends State<MyButton> {
 
             const SizedBox(height: 10),
 
-            Text(widget.texto, style: const TextStyle(color: Colors.white70)),
+            Text(
+              widget.texto,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryFixed,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),

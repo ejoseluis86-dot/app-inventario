@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/widgets/my_button.dart';
+import 'package:mi_app/widgets/mi_resumen.dart';
+import 'package:mi_app/widgets/my_bar_bottom.dart';
+import 'package:mi_app/widgets/my_botonera.dart';
+import 'package:mi_app/widgets/my_head_home.dart';
 
 class MyHomeScreen extends StatelessWidget {
   const MyHomeScreen({super.key});
@@ -7,81 +10,20 @@ class MyHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("holaaa")),
-      body: Column(
-        //alineacion vertical (espacio entre los hijos)
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //alineacion Horizontal
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Center(
-                  child: MyButton(
-                    icono: Icons.person,
-                    texto: "mi cuenta",
-                    onPressed: () {},
-                  ),
-                ),
-                Center(
-                  child: MyButton(
-                    icono: Icons.person,
-                    texto: "mi cuenta",
-                    onPressed: () {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Center(
-                  child: MyButton(
-                    icono: Icons.person,
-                    texto: "mi cuenta",
-                    onPressed: () {},
-                  ),
-                ),
-                Center(
-                  child: MyButton(
-                    icono: Icons.person,
-                    texto: "mi cuenta",
-                    onPressed: () {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Center(
-                  child: MyButton(
-                    icono: Icons.person,
-                    texto: "mi cuenta",
-                    onPressed: () {},
-                  ),
-                ),
-                Center(
-                  child: MyButton(
-                    icono: Icons.person,
-                    texto: "mi cuenta",
-                    onPressed: () {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      appBar: AppBar(title: MyHeadHome(), toolbarHeight: 85, titleSpacing: 15),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            MiResumen(),
+            const SizedBox(height: 10),
+            MyBotonera(),
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.add),
+      bottomNavigationBar: BottomAppBar(
+        child: SizedBox(height: 60, child: MyBottomBar()),
       ),
     );
   }
