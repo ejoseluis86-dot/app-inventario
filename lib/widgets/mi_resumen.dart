@@ -8,7 +8,7 @@ class MiResumen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: Theme.of(context).focusColor,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(

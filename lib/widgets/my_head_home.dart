@@ -27,7 +27,7 @@ class MyHeadHome extends StatelessWidget {
                 Text(
                   "SZ Regalos",
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 25,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -35,7 +35,7 @@ class MyHeadHome extends StatelessWidget {
                 Text(
                   "Regalos Personalizados",
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

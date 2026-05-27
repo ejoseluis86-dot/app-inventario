@@ -45,8 +45,8 @@ class _MyButtonState extends State<MyButton> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 170),
 
-        width: 120,
-        height: 120,
+        width: 150,
+        height: 150,
 
         decoration: BoxDecoration(
           color: presionado

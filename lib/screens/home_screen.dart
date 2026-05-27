@@ -11,7 +11,7 @@ class MyHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      appBar: AppBar(title: MyHeadHome(), toolbarHeight: 85, titleSpacing: 15),
+      appBar: AppBar(title: MyHeadHome(), toolbarHeight: 90, titleSpacing: 15),
       body: SingleChildScrollView(
         child: Column(
           children: [

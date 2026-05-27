@@ -49,10 +49,10 @@ class _MyButtonState extends State<MyButtonResumen> {
       },
 
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 170),
+        duration: const Duration(milliseconds: 150),
 
-        width: 130,
-        height: 70,
+        width: 160,
+        height: 80,
 
         decoration: BoxDecoration(
           color: presionado
@@ -63,7 +63,7 @@ class _MyButtonState extends State<MyButtonResumen> {
         ),
 
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
               decoration: BoxDecoration(
@@ -77,16 +77,16 @@ class _MyButtonState extends State<MyButtonResumen> {
               children: [
                 Text(
                   widget.texto1,
-                  style: const TextStyle(
-                    color: Colors.white70,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryFixed,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   widget.texto2,
-                  style: const TextStyle(
-                    color: Colors.white70,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryFixed,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
