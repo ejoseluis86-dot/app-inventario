@@ -1,13 +1,14 @@
 class Producto {
-  int idProducto;
+  int producto_id;
   String nombre;
   double precio;
-  String proveedor;
+  String marca;
+  
 
   Producto({
-    required this.idProducto,
+    required this.producto_id,
     required this.nombre,
     required this.precio,
-    required this.proveedor,
+    required this.marca,
   });
 }
