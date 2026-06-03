@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/widgets/widgets_home/my_button.dart';
 
 class MyBotonera extends StatelessWidget {
@@ -39,7 +40,7 @@ class MyBotonera extends StatelessWidget {
                   icono: Icons.inventory_2,
                   texto: "Productos",
                   onPressed: () {
-                    print("estoy precionando mi botom2");
+                    Navigator.pushNamed(context, AppRutas.nuevoProducto);
                   },
                 ),
               ),

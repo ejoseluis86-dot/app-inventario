@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/theme/app_themes.dart';
-import 'screens/home_screen.dart';
 
 void main() => runApp(const MainApp());
 
@@ -14,7 +14,8 @@ class MainApp extends StatelessWidget {
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      home: const MyHomeScreen(),
+      initialRoute: AppRutas.home,
+      routes: AppRutas.rutas,
     );
   }
 }
