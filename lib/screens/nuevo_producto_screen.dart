@@ -11,7 +11,6 @@ class NuevoProductoScreen extends StatefulWidget {
 class _NuevoProductoScreenState extends State<NuevoProductoScreen> {
   final _nombreController = TextEditingController();
   final _precioController = TextEditingController();
-
   final List<String> categorias = [
     'Bebidas',
     'Comida',
@@ -122,8 +121,11 @@ class _NuevoProductoScreenState extends State<NuevoProductoScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            AsociarRecetaScreen(nombreProducto: _nombreController.text),
+        builder: (_) => AsociarRecetaScreen(
+          nombreProducto: _nombreController.text,
+          precioProducto: double.tryParse(_precioController.text) ?? 0,
+          categoria: categoriaSeleccionada ?? '',
+        ),
       ),
     );
   }

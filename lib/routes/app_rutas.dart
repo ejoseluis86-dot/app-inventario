@@ -11,6 +11,10 @@ class AppRutas {
   static Map<String, WidgetBuilder> rutas = {
     home: (context) => const MyHomeScreen(),
     nuevoProducto: (context) => const NuevoProductoScreen(),
-    nuevaReceta: (context) => const AsociarRecetaScreen(nombreProducto: ''),
+    nuevaReceta: (context) => const AsociarRecetaScreen(
+      nombreProducto: '',
+      precioProducto: 0,
+      categoria: '',
+    ),
   };
 }

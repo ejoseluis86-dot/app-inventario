@@ -1,26 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/models/detalle_receta.dart';
+import 'package:mi_app/models/insumo.dart';
+import 'package:mi_app/models/producto.dart';
 
 class AsociarRecetaScreen extends StatefulWidget {
   final String nombreProducto;
-
-  const AsociarRecetaScreen({super.key, required this.nombreProducto});
+  final double precioProducto;
+  final String categoria;
+  const AsociarRecetaScreen({
+    super.key,
+    required this.nombreProducto,
+    required this.precioProducto,
+    required this.categoria,
+  });
 
   @override
   State<AsociarRecetaScreen> createState() => _AsociarRecetaScreenState();
 }
 
 class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
-  final TextEditingController cantidadController = TextEditingController();
+  late final TextEditingController cantidadController = TextEditingController();
 
-  final List<String> insumos = [
-    'Harina',
-    'Azúcar',
-    'Leche',
-    'Huevos',
-    'Chocolate',
+  final List<Insumo> insumosBD = [
+    Insumo(id: 1, nombre: 'Harina', categoria: '', stock: 5, ubicacion: ''),
+    Insumo(id: 2, nombre: 'Azúcar', categoria: '', stock: 10, ubicacion: ''),
+    Insumo(id: 3, nombre: 'Huevos', categoria: '', stock: 15, ubicacion: ''),
+    Insumo(id: 4, nombre: 'Chocolate', categoria: '', stock: 3, ubicacion: ''),
+    Insumo(id: 5, nombre: 'Leche', categoria: '', stock: 6, ubicacion: ''),
   ];
 
-  String? insumoSeleccionado;
+  final List<String> insumos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    for (var insumo in insumosBD) {
+      insumos.add(insumo.nombre);
+    }
+  }
+
+  Insumo? insumoSeleccionado;
+
   //esta es un alista de detalles que se usa para mostrar
   final List<DetalleReceta> detalles = [];
 
@@ -39,8 +59,8 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
       detalles.add(
         //aca estoy creando un nuevo detalle de receta con el insumo seleccionado y la cantidad ingresada, y lo agrego a la lista de detalles
         DetalleReceta(
-          insumo: insumoSeleccionado!,
-          cantidad: double.parse(cantidadController.text),
+          cantidadTeorica: int.parse(cantidadController.text),
+          insumoId: insumoSeleccionado!.id!,
         ),
       );
       cantidadController.clear();
@@ -56,9 +76,13 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
 
   //esto no iria hay que modificar
   void guardarReceta() {
-    for (var detalle in detalles) {
-      print('${detalle.insumo} - ${detalle.cantidad}');
-    }
+    final Producto nuevoProducto = Producto(
+      nombre: widget.nombreProducto,
+      precio: widget.precioProducto,
+      categoria: widget.categoria,
+      detalles: detalles,
+    );
+    print('Producto a guardar: ${nuevoProducto.toJson()}');
   }
 
   @override
@@ -86,7 +110,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
             const SizedBox(height: 20),
 
             DropdownButtonFormField<String>(
-              initialValue: insumoSeleccionado,
+              initialValue: insumoSeleccionado?.nombre,
               decoration: const InputDecoration(
                 labelText: 'SeleccionarInsumo Base',
                 border: OutlineInputBorder(),
@@ -96,7 +120,9 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  insumoSeleccionado = value;
+                  insumoSeleccionado = insumosBD.firstWhere(
+                    (insumo) => insumo.nombre == value,
+                  );
                 });
               },
             ),
@@ -137,8 +163,16 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
 
                         return Card(
                           child: ListTile(
-                            title: Text(detalle.insumo),
-                            subtitle: Text('Cantidad: ${detalle.cantidad}'),
+                            title: Text(
+                              insumosBD
+                                  .firstWhere(
+                                    (insumo) => insumo.id == detalle.insumoId,
+                                  )
+                                  .nombre,
+                            ),
+                            subtitle: Text(
+                              'Cantidad: ${detalle.cantidadTeorica}',
+                            ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () => eliminarDetalle(index),
@@ -162,11 +196,4 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
       ),
     );
   }
-}
-
-class DetalleReceta {
-  final String insumo;
-  final double cantidad;
-
-  DetalleReceta({required this.insumo, required this.cantidad});
 }
