@@ -13,4 +13,23 @@ class Insumo {
     required this.stock,
     required this.ubicacion,
   });
+
+  factory Insumo.fromJson(Map<String, dynamic> json) {
+    return Insumo(
+      id: json['id'],
+      nombre: json['nombre'],
+      categoria: json['categoria'],
+      stock: json['stock'],
+      ubicacion: json['ubicacion'],
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nombre': nombre,
+      'categoria': categoria,
+      'stock': stock,
+      'ubicacion': ubicacion,
+    };
+  }
 }

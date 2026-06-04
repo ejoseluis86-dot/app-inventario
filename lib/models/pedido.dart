@@ -11,4 +11,22 @@ class Pedido {
     required this.cliente,
     required this.usuarioId, //FK
   });
+
+  factory Pedido.fromJson(Map<String, dynamic> json) {
+    return Pedido(
+      id: json['id'],
+      fecha: DateTime.parse(json['fecha']),
+      cliente: json['cliente'],
+      usuarioId: json['usuarioId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'fecha': fecha.toIso8601String(),
+      'cliente': cliente,
+      'usuarioId': usuarioId,
+    };
+  }
 }
