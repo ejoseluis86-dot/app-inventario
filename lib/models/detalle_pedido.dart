@@ -1,15 +1,15 @@
 class DetallePedido {
-  final int id; //PK
+  final int? id; //PK
   final int cantidad;
   final double precioUnitario;
   final double descuento;
-  final int pedidoId; //FK
+  final int? pedidoId; //FK
   final int productoId; //FK
 
-  DetallePedido(
-    this.descuento, {
-    required this.id,
-    required this.pedidoId,
+  DetallePedido({
+    required this.descuento,
+    this.id,
+    this.pedidoId,
     required this.productoId,
     required this.cantidad,
     required this.precioUnitario,
@@ -18,7 +18,7 @@ class DetallePedido {
   //esto es para convertir el json del backend a un objeto DetallePedido
   factory DetallePedido.fromJson(Map<String, dynamic> json) {
     return DetallePedido(
-      json['descuento'].toDouble(),
+      descuento: json['descuento']?.toDouble() ?? 0.0,
       id: json['id'],
       pedidoId: json['pedido_id'],
       productoId: json['producto_id'],

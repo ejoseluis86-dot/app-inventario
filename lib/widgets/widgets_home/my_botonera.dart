@@ -57,7 +57,7 @@ class MyBotonera extends StatelessWidget {
                   icono: Icons.shopping_cart,
                   texto: "Pedidos",
                   onPressed: () {
-                    print("estoy precionando mi botom 3");
+                    Navigator.pushNamed(context, AppRutas.crearPedido);
                   },
                 ),
               ),

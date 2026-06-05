@@ -41,7 +41,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
 
   Insumo? insumoSeleccionado;
 
-  //esta es un alista de detalles que se usa para mostrar
+  //esta es un alista de detalles que se usa para mostrar y crear la receta
   final List<DetalleReceta> detalles = [];
 
   @override
