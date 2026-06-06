@@ -87,7 +87,9 @@ class MyBotonera extends StatelessWidget {
                 child: MyButton(
                   icono: Icons.inbox,
                   texto: "Insumos",
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRutas.insumos);
+                  },
                 ),
               ),
             ],

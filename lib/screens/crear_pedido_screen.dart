@@ -11,11 +11,10 @@ class CrearPedidoScreen extends StatefulWidget {
 }
 
 class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
-  late final TextEditingController cantidadController = TextEditingController();
-  late final TextEditingController descuentoController =
-      TextEditingController();
-  late final TextEditingController nombreController = TextEditingController();
-  late final List<ProductoLite> productos = [
+  final TextEditingController cantidadController = TextEditingController();
+  final TextEditingController descuentoController = TextEditingController();
+  final TextEditingController nombreController = TextEditingController();
+  final List<ProductoLite> productos = [
     ProductoLite(id: 1, nombre: "Producto 1", precio: 10.0),
     ProductoLite(id: 2, nombre: "Producto 2", precio: 20.0),
     ProductoLite(id: 3, nombre: "Producto 3", precio: 30.0),
