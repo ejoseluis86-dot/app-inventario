@@ -14,12 +14,14 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
   final TextEditingController cantidadController = TextEditingController();
   final TextEditingController descuentoController = TextEditingController();
   final TextEditingController nombreController = TextEditingController();
+
   final List<ProductoLite> productos = [
     ProductoLite(id: 1, nombre: "Producto 1", precio: 10.0),
     ProductoLite(id: 2, nombre: "Producto 2", precio: 20.0),
     ProductoLite(id: 3, nombre: "Producto 3", precio: 30.0),
   ];
 
+  //creo una lista de nombres de productos para elegir
   List<String> nombresProductos = [];
   @override
   void initState() {

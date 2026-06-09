@@ -38,7 +38,7 @@ class MyBotonera extends StatelessWidget {
               Center(
                 child: MyButton(
                   icono: Icons.inventory_2,
-                  texto: "Productos",
+                  texto: "Producto Nuevo",
                   onPressed: () {
                     Navigator.pushNamed(context, AppRutas.nuevoProducto);
                   },
@@ -55,7 +55,7 @@ class MyBotonera extends StatelessWidget {
               Center(
                 child: MyButton(
                   icono: Icons.shopping_cart,
-                  texto: "Pedidos",
+                  texto: "Crear Pedido",
                   onPressed: () {
                     Navigator.pushNamed(context, AppRutas.crearPedido);
                   },

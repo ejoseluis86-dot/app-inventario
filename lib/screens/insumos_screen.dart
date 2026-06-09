@@ -136,9 +136,9 @@ class _ProductosScreenState extends State<InsumosScreen> {
                   child: ListTile(
                     title: Text(insumo.nombre),
                     subtitle: Text(
-                      'Categoria: \$${insumo.categoria}\n'
-                      'Stock: \$${insumo.stock}\n'
-                      'Ubicacion: ${insumo.ubicacion}',
+                      'Categoria: ${insumo.categoria}\n'
+                      'Stock: ${insumo.stock}\n'
+                      'Ubicacion:${insumo.ubicacion}',
                     ),
                   ),
                 );
