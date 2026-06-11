@@ -46,7 +46,7 @@ class _MyButtonState extends State<MyButton> {
         duration: const Duration(milliseconds: 170),
 
         width: 150,
-        height: 150,
+        height: 140,
 
         decoration: BoxDecoration(
           color: presionado

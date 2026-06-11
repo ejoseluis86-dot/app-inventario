@@ -65,10 +65,9 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
           pedidoId: null,
         ),
       );
-      //aca limpio los campos
+      //limpio los campos
       cantidadController.clear();
       descuentoController.clear();
-      productoSeleccionado = null;
     });
   }
 
@@ -78,15 +77,22 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
     });
   }
 
-  //crea el pedido con todos los detalles incluidos
+  //crea el pedido con todos los detalles incluidos este pedido se guardara en la base de datos
   void guardarPedido() {
-    final Pedido nuevoPedido = Pedido(
-      fecha: DateTime.now(),
-      cliente: nombreController.text,
-      usuarioId: 1, //acase irá un id de usuario de la BD
-      detalles: detallesPedido,
-    );
-    print('Pedido a guardar: ${nuevoPedido.toJson()}');
+    if (nombreController.text.isNotEmpty && detallesPedido.isNotEmpty) {
+      final Pedido nuevoPedido = Pedido(
+        fecha: DateTime.now(),
+        cliente: nombreController.text,
+        usuarioId: 1, //acase irá un id de usuario de la BD
+        detalles: detallesPedido,
+        terminado: false,
+      );
+      print('Pedido guardado: ${nuevoPedido.toJson()}');
+      nombreController.clear();
+      cantidadController.clear();
+      descuentoController.clear();
+      setState(() {});
+    }
   }
 
   @override
