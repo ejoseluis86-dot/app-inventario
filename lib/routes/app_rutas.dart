@@ -4,6 +4,7 @@ import 'package:mi_app/screens/crear_pedido_screen.dart';
 import 'package:mi_app/screens/home_screen.dart';
 import 'package:mi_app/screens/insumos_screen.dart';
 import 'package:mi_app/screens/nuevo_producto_screen.dart';
+import 'package:mi_app/screens/trabajo_pedidos_screen.dart';
 
 class AppRutas {
   static const String home = '/';
@@ -11,6 +12,7 @@ class AppRutas {
   static const String nuevaReceta = '/nueva_receta';
   static const String crearPedido = '/crear_pedido';
   static const String insumos = '/insumos';
+  static const String trabajo = '/trabajo';
 
   static Map<String, WidgetBuilder> rutas = {
     home: (context) => const MyHomeScreen(),
@@ -22,5 +24,6 @@ class AppRutas {
     ),
     crearPedido: (context) => const CrearPedidoScreen(),
     insumos: (context) => const InsumosScreen(),
+    trabajo: (context) => const TrabajoPedidosScreen(),
   };
 }

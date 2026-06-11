@@ -64,8 +64,10 @@ class MyBotonera extends StatelessWidget {
               Center(
                 child: MyButton(
                   icono: Icons.assignment,
-                  texto: "Reportes",
-                  onPressed: () {},
+                  texto: "Area de Trabajo",
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRutas.trabajo);
+                  },
                 ),
               ),
             ],
@@ -95,6 +97,7 @@ class MyBotonera extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 10),
       ],
     );
   }

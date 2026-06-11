@@ -130,7 +130,7 @@ class _ProductosScreenState extends State<InsumosScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: Text('Stock de  ${miInsumo.nombre}'),
+              title: Text('Agregar mas Stock a  ${miInsumo.nombre}'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -143,16 +143,16 @@ class _ProductosScreenState extends State<InsumosScreen> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        miInsumo.stock = int.tryParse(stockController.text);
+                        if (stockController.text.isNotEmpty) {
+                          //debe ser modificado en la base de datos el insumo que tenga el mismo id que miInsumo o el mismo nombre
+                          //se debe agregar en realidad a lo que ya habia
+                          miInsumo.stock = int.tryParse(stockController.text);
+                        }
                         setState(() {});
                         Navigator.pop(context);
                         print(
-                          "el insumo a modificar se llama" +
-                              miInsumo.nombre +
-                              " y tiene como id : " +
-                              miInsumo.id.toString(),
+                          "el insumo a modificar se llama" + miInsumo.nombre,
                         );
-                        //este insumo miInsumo debe ser modificado en la mase de datos ya sea por miInsumo.id o miInsumo.nombre y miInsumo.categoria
                       },
                       child: Text("modificar"),
                     ),
@@ -194,7 +194,7 @@ class _ProductosScreenState extends State<InsumosScreen> {
                           subtitle: Text(
                             'Categoria: ${insumo.categoria}\n'
                             'Stock: ${insumo.stock}\n'
-                            'Ubicacion:${insumo.ubicacion}',
+                            'Ubicacion: ${insumo.ubicacion}',
                           ),
                         ),
                       ),
@@ -204,7 +204,7 @@ class _ProductosScreenState extends State<InsumosScreen> {
                             _mostrarDialogmodificarStock(insumo);
                           });
                         },
-                        child: Text("modificar"),
+                        child: Text("Agregar"),
                       ),
                     ],
                   ),

@@ -5,12 +5,14 @@ class Pedido {
   final DateTime fecha;
   final String cliente;
   final int usuarioId;
+  final bool terminado;
   List<DetallePedido> detalles =
       []; //se crea al momento de crear el pedido con todo y sus detalles no pude ser nulo
   //por el momento sacamos sucursalId porque no lo vamos a usar, pero si lo necesitamos despues lo agregamos
 
   Pedido({
     this.id, //PK
+    required this.terminado,
     required this.fecha,
     required this.cliente,
     required this.usuarioId, //FK
@@ -26,6 +28,7 @@ class Pedido {
       detalles: (json['detalles'] as List)
           .map((detalle) => DetallePedido.fromJson(detalle))
           .toList(),
+      terminado: json['terminado'],
     );
   }
 
@@ -36,6 +39,7 @@ class Pedido {
       'cliente': cliente,
       'usuarioId': usuarioId,
       'detalles': detalles.map((detalle) => detalle.toJson()).toList(),
+      'terminado': terminado,
     };
   }
 }
