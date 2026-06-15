@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/models/consumo_real_insumo.dart';
 import 'package:mi_app/models/detalle_pedido.dart';
 import 'package:mi_app/models/detalle_receta.dart';
 import 'package:mi_app/models/insumo.dart';
@@ -241,6 +242,12 @@ class _AreaTrabajoState extends State<AreaTrabajo> {
                       int valor = int.parse(entry.value.text);
                       //modificar el Stock del insumo con id  igual a insumoId de la calve del controller
                       //se debera restar el stock
+                      //y tambien debo crear un consumoReal y guaradarlo en la base
+                      ConsumoRealInsumo consumo = ConsumoRealInsumo(
+                        cantidadReal: 5,
+                        detallePedidoId: widget.pedidoLite.id,
+                        insumoId: insumoId,
+                      );
                       print('Insumo: $insumoId');
                       print('Cantidad: $valor');
                     }

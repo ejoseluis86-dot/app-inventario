@@ -15,7 +15,7 @@ class _TrabajoPedidosScreen extends State<TrabajoPedidosScreen> {
   //final response = await http.get(...);
   //final List<dynamic> jsonData = jsonDecode(response.body);
   //List<PedidoSimple> pedidos = jsonData.map((json) => PedidoSimple.fromJson(json)).toList();
-  //TODOS los pedidos
+  //TODOS los pedidos sin terminar
   final List<PedidoLite> pedidos = [
     PedidoLite(id: 1, cliente: "Gabriela", fecha: DateTime.now()),
     PedidoLite(id: 5, cliente: "Matias", fecha: DateTime.now()),
@@ -29,7 +29,7 @@ class _TrabajoPedidosScreen extends State<TrabajoPedidosScreen> {
       body: pedidos.isEmpty
           ? const Center(
               child: Text(
-                'No hay pedidos registrados',
+                'No hay pedidos pendientes',
                 style: TextStyle(fontSize: 18),
               ),
             )
@@ -52,7 +52,9 @@ class _TrabajoPedidosScreen extends State<TrabajoPedidosScreen> {
                     },
                     child: ListTile(
                       title: Text(pedido.cliente),
-                      subtitle: Text('fecha: ${pedido.fecha}\n'),
+                      subtitle: Text(
+                        'fecha: ${pedido.fecha.day}/${pedido.fecha.month}/${pedido.fecha.year}\n',
+                      ),
                     ),
                   ),
                 );
