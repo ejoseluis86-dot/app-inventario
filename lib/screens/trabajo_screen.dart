@@ -245,7 +245,7 @@ class _AreaTrabajoState extends State<AreaTrabajo> {
                       //y tambien debo crear un consumoReal y guaradarlo en la base
                       ConsumoRealInsumo consumo = ConsumoRealInsumo(
                         cantidadReal: 5,
-                        detallePedidoId: widget.pedidoLite.id,
+                        detallePedidoId: detalle.id!,
                         insumoId: insumoId,
                       );
                       print('Insumo: $insumoId');

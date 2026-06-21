@@ -29,7 +29,7 @@ class MyBotonera extends StatelessWidget {
               Center(
                 child: MyButton(
                   icono: Icons.person,
-                  texto: "Usuarios",
+                  texto: "Crear Usuario",
                   onPressed: () {
                     print("estoy precionando mi botom 1");
                   },

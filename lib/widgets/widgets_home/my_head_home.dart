@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/widgets/widgets_home/mi_cabecera.dart';
+import 'package:provider/provider.dart';
 
 class MyHeadHome extends StatelessWidget {
   const MyHeadHome({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final username = context.watch<UserProvider>().username;
+
     return Column(
       children: [
         Cabecera(),
@@ -18,7 +22,7 @@ class MyHeadHome extends StatelessWidget {
             ),
             SizedBox(width: 10),
             Text(
-              "nombre de usuario",
+              username ?? "Usuario",
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.white,
