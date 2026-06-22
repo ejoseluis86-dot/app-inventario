@@ -28,28 +28,26 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
     'Metal',
     'Madera',
     'Papel',
-    'Vidrio'
+    'Vidrio',
   ];
 
   @override
   void initState() {
     super.initState();
 
-    nombreController =
-        TextEditingController(text: widget.insumo.nombre);
+    nombreController = TextEditingController(text: widget.insumo.nombre);
 
-    ubicacionController =
-        TextEditingController(text: widget.insumo.ubicacion);
+    ubicacionController = TextEditingController(text: widget.insumo.ubicacion);
 
-    stockController =
-        TextEditingController(text: widget.insumo.stock.toString());
+    stockController = TextEditingController(
+      text: widget.insumo.stock.toString(),
+    );
 
     categoria = widget.insumo.categoria;
   }
 
   Future<void> _guardar() async {
     final id = widget.insumo.id;
-    if (id == null) return;
 
     final ok = await api.actualizarInsumo(
       id: id,
@@ -97,12 +95,9 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
             const SizedBox(height: 10),
 
             DropdownButtonFormField<String>(
-              value: categorias.contains(categoria) ? categoria : null,
+              initialValue: categorias.contains(categoria) ? categoria : null,
               items: categorias.map((e) {
-                return DropdownMenuItem(
-                  value: e,
-                  child: Text(e),
-                );
+                return DropdownMenuItem(value: e, child: Text(e));
               }).toList(),
               onChanged: (value) {
                 setState(() {
@@ -116,8 +111,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
 
             TextField(
               controller: ubicacionController,
-              decoration:
-                  const InputDecoration(labelText: "Ubicación"),
+              decoration: const InputDecoration(labelText: "Ubicación"),
             ),
 
             const SizedBox(height: 20),
@@ -129,7 +123,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
                 onPressed: _guardar,
                 label: const Text("Guardar cambios"),
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -46,7 +46,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
         //aca estoy creando un nuevo detalle de receta con el insumo seleccionado y la cantidad ingresada, y lo agrego a la lista de detalles
         DetalleReceta(
           cantidadTeorica: int.parse(cantidadController.text),
-          insumoId: insumoSeleccionado!.id!,
+          insumoId: insumoSeleccionado!.id,
         ),
       );
       cantidadController.clear();
