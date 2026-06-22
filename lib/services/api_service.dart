@@ -61,8 +61,6 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print('esto me esta trajendo la api $data');
       return true;
     } else {
       return false;
@@ -119,15 +117,12 @@ class ApiService {
     String rol = "EMPL",
   }) async {
     try {
-      final authService = AuthService();
-      String? token = await authService.obtenerToken();
+      final headers = await _headers();
 
       final response = await http.post(
         Uri.parse('$baseUrl/usuarios/crear/'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
+
         body: jsonEncode({
           'username': username,
           'password': password,
@@ -138,11 +133,8 @@ class ApiService {
       if (response.statusCode == 201) {
         return true;
       }
-
-      print(response.body);
       return false;
     } catch (e) {
-      print("Error crear usuario: $e");
       return false;
     }
   }
@@ -153,7 +145,6 @@ class ApiService {
     //aca traemos el token
     final authService = AuthService();
     String? token = await authService.obtenerToken();
-    print('esto estamos mandando a la base de datos ${producto.toJson()}');
     final response = await http.post(
       url,
       headers: {
