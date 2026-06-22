@@ -6,6 +6,7 @@ import 'package:mi_app/services/auth_service.dart';
 
 class ApiService {
   final String baseUrl = "http://10.0.2.2:8000/";
+  final auth = AuthService();
 
   Future<Map<String, String>> _headers() async {
     final auth = AuthService();
@@ -34,8 +35,6 @@ class ApiService {
 
     throw Exception('Error al obtener insumos');
   }
-
-  //3 crear un insumo
 
   // =========================
   // CREAR INSUMO
@@ -106,7 +105,6 @@ class ApiService {
 
     return response.statusCode == 200;
   }
-
 
   // =========================
   // STOCK RÁPIDO (opcional)
@@ -180,45 +178,54 @@ class ApiService {
   Future<bool> crearPedido(Pedido pedido) async {
     final url = Uri.parse('$baseUrl/pedidos/crear/');
     //aca traemos el token
-    final authService = AuthService();
-    String? token = await authService.obtenerToken();
-
-    print('esto estamos mandando a la base de datos ${pedido.toJson()}');
+    final headers = await _headers();
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: headers,
       body: jsonEncode(pedido.toJson()),
     );
     if (response.statusCode == 201) {
       return true;
     } else {
-      await authService.refreshToken();
       return false;
     }
   }
 
+  //----------------------
+  //OBTENEMOS PRODUCTOS
+  //--------------------
   Future<List<dynamic>> obtenerProductosLite() async {
-    final url = Uri.parse("$baseUrl/productos/");
     //aca traemos el token
-    final authService = AuthService();
-    String? token = await authService.obtenerToken();
+    final headers = await _headers();
 
     final response = await http.get(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
+      Uri.parse('$baseUrl/productos/'),
+      headers: headers,
     );
-
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
       return data;
     } else {
       throw Exception("Error al obtener productos: ${response.body}");
     }
+
+    /*  // =========================
+  // INSUMOS - LISTAR
+  // =========================
+  Future<List<dynamic>> obtenerInsumos() async {
+    final headers = await _headers();
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/insumos/'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception('Error al obtener insumos');
+  }
+ */
   }
 }

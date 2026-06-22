@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/detalle_pedido.dart';
 import 'package:mi_app/models/pedido.dart';
+import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/models/producto_lite.dart';
+import 'package:mi_app/providers/producto_lite_provider.dart';
+import 'package:provider/provider.dart';
 
 class CrearPedidoScreen extends StatefulWidget {
   const CrearPedidoScreen({super.key});
@@ -15,21 +18,8 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
   final TextEditingController descuentoController = TextEditingController();
   final TextEditingController nombreController = TextEditingController();
 
-  final List<ProductoLite> productos = [
-    ProductoLite(id: 1, nombre: "Producto 1", precio: 10.0),
-    ProductoLite(id: 2, nombre: "Producto 2", precio: 20.0),
-    ProductoLite(id: 3, nombre: "Producto 3", precio: 30.0),
-  ];
-
-  //creo una lista de nombres de productos para elegir
-  List<String> nombresProductos = [];
-  @override
-  void initState() {
-    super.initState();
-    for (var producto in productos) {
-      nombresProductos.add(producto.nombre);
-    }
-  }
+  //esto vendra de provider
+  late List<ProductoLite> productos;
 
   ProductoLite? productoSeleccionado;
 
@@ -97,6 +87,8 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //aca estoy trayendo una lista de insumos desde el provider
+    final productos = context.watch<ProductoLiteProvider>().productosLite;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -121,21 +113,22 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
 
             const SizedBox(height: 20),
 
-            DropdownButtonFormField<String>(
-              initialValue: productoSeleccionado?.nombre,
+            DropdownButtonFormField<ProductoLite>(
+              initialValue: productoSeleccionado,
               decoration: const InputDecoration(
                 labelText: 'Seleccionar Producto',
                 border: OutlineInputBorder(),
               ),
-              items: nombresProductos.map((nombre) {
-                return DropdownMenuItem(value: nombre, child: Text(nombre));
+              items: productos.map((producto) {
+                return DropdownMenuItem<ProductoLite>(
+                  value: producto,
+                  child: Text(producto.nombre),
+                );
               }).toList(),
               onChanged: (value) {
                 setState(() {
                   productoSeleccionado =
-                      productos.firstWhere(
-                            (producto) => producto.nombre == value,
-                          )
+                      productos.firstWhere((producto) => producto == value)
                           as ProductoLite?;
                 });
               },
@@ -190,17 +183,9 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
                         return Card(
                           child: ListTile(
                             title: Text(
-                              nombresProductos.firstWhere(
-                                (nombre) =>
-                                    nombre ==
-                                    productos
-                                        .firstWhere(
-                                          (producto) =>
-                                              producto.id == detalle.productoId,
-                                        )
-                                        .nombre,
-                                orElse: () => 'Producto no encontrado',
-                              ),
+                              productos
+                                  .firstWhere((p) => p.id == detalle.productoId)
+                                  .nombre,
                             ),
                             subtitle: Text(
                               'Cantidad: ${detalle.cantidad} -\n precio unitario: \$${detalle.precioUnitario.toStringAsFixed(2)} -\n precio producto: \$${productos.firstWhere((producto) => producto.id == detalle.productoId).precio.toStringAsFixed(2)} -\n descuento: ${detalle.descuento}% ',

@@ -4,13 +4,18 @@ import 'package:mi_app/services/api_service.dart';
 
 class ProductoLiteProvider extends ChangeNotifier {
   List<ProductoLite> productosLite = [];
-  bool _yacargo = false;
+  final ApiService api = ApiService();
 
   Future<void> cargarProviderProductos() async {
-    if (_yacargo) return;
-    _yacargo = true;
-    final data = await ApiService().obtenerProductosLite();
+    final data = await api.obtenerProductosLite();
     productosLite = data.map((e) => ProductoLite.fromJson(e)).toList();
     notifyListeners();
   }
 }
+/*  Future<void> cargarProviderInsumos() async {
+    final data = await api.obtenerInsumos();
+
+    insumos = data.map<Insumo>((json) => Insumo.fromJson(json)).toList();
+
+    notifyListeners();
+  } */
