@@ -94,6 +94,21 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+  // =========================
+  // ELIMINAR INSUMO
+  // =========================
+
+  Future<bool> eliminarInsumo(int id) async {
+    final headers = await _headers();
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/insumos/eliminar/$id/'),
+      headers: headers,
+    );
+
+    return response.statusCode == 200;
+  }
+
 
   // =========================
   // STOCK RÁPIDO (opcional)
