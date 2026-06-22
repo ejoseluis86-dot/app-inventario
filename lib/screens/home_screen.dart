@@ -13,30 +13,34 @@ class MyHomeScreen extends StatelessWidget {
     final user = context.watch<UserProvider>();
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      extendBodyBehindAppBar: false,
+      backgroundColor: Colors.transparent,
 
       // ---------------- APPBAR ----------------
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).colorScheme.surface
+            : Colors.white.withOpacity(0.92),
+
         surfaceTintColor: Colors.transparent,
+        elevation: 6,
+        shadowColor: Colors.black26,
         automaticallyImplyLeading: false,
         toolbarHeight: 90,
-        elevation: 4,
+
         title: Row(
           children: [
             Image.asset(
-              "assets/logo_empresa.png",
-              height: 42,
+              "assets/sz_3.png",
+              height: 33,
             ),
 
             const SizedBox(width: 10),
 
-            Expanded(
+            const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     "Sistema de Inventario",
                     maxLines: 1,
@@ -60,6 +64,7 @@ class MyHomeScreen extends StatelessWidget {
             ),
           ],
         ),
+
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -71,7 +76,6 @@ class MyHomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      
                       user.username ?? "Usuario",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
@@ -82,9 +86,7 @@ class MyHomeScreen extends StatelessWidget {
                       user.rol == "ADMIN"
                           ? "Administrador"
                           : "Empleado",
-                      style: const TextStyle(
-                        fontSize: 13,
-                      ),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
@@ -93,7 +95,8 @@ class MyHomeScreen extends StatelessWidget {
 
                 CircleAvatar(
                   radius: 16,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary,
                   child: const Icon(
                     Icons.person,
                     color: Colors.white,
@@ -119,16 +122,48 @@ class MyHomeScreen extends StatelessWidget {
         ],
       ),
 
-      // ---------------- BODY ORDENADO ----------------
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: const [
-            MiResumen(),
-            SizedBox(height: 12),
-            MyBotonera(),
-          ],
-        ),
+      // ---------------- BODY CON DEGRADÉ ----------------
+      body: Builder(
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+
+          return Stack(
+            children: [
+
+              // FONDO SOLO EN modo claro
+              if (!isDark)
+                Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF6A1B9A),
+                        Color(0xFFEDE7F6),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                // 🌑 FONDO DARK NORMAL DEL THEME
+                Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
+
+              // 📱 CONTENIDO
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: const [
+                    MiResumen(),
+                    SizedBox(height: 12),
+                    MyBotonera(),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
