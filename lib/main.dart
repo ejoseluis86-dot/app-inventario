@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/providers/insumos_provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/theme/app_themes.dart';
@@ -6,7 +7,10 @@ import 'package:provider/provider.dart';
 
 void main() => runApp(
   MultiProvider(
-    providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
+    providers: [
+      ChangeNotifierProvider(create: (_) => UserProvider()),
+      ChangeNotifierProvider(create: (_) => InsumoProvider()),
+    ],
     child: const MainApp(),
   ),
 );

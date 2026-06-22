@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/widgets/widgets_home/my_button.dart';
+import 'package:provider/provider.dart';
 
 class MyBotonera extends StatelessWidget {
   const MyBotonera({super.key});
 
   @override
   Widget build(BuildContext context) {
+    //rol del usuario
+    final rol = context.watch<UserProvider>().rol;
+
     return Column(
       //alineacion vertical (espacio entre los hijos)
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -31,7 +36,17 @@ class MyBotonera extends StatelessWidget {
                   icono: Icons.person,
                   texto: "Crear Usuario",
                   onPressed: () {
-                    print("estoy precionando mi botom 1");
+                    if (rol == 'ADMIN') {
+                      Navigator.pushNamed(context, AppRutas.crearUsuario);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Usted no tiene los permisos para crear un usuario",
+                          ),
+                        ),
+                      );
+                    }
                   },
                 ),
               ),

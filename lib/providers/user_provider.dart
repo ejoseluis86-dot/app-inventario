@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import '../services/auth_service.dart';
 
 class UserProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
-
   int? id;
   String? username;
   String? rol;

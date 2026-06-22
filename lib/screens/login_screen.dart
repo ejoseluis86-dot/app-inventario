@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/providers/insumos_provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
+      //hacemos la peticion y traemos el token
       final data = await authService.login(txtUsuario.text, txtPassword.text);
 
       if (!mounted) return;
@@ -32,9 +34,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final userProvider = context.read<UserProvider>();
 
       if (data != null) {
-        //aca cargo el providerUser
+        //aca cargo el providerUser con los datos del token que esta en data
         userProvider.setUser(data['id'], data['nombre'], data['permiso']);
-
+        //tambien creo los providers y sus peticiones
+        final insumosProvider = context.read<InsumoProvider>();
+        insumosProvider.cargarProviderInsumos();
         if (!mounted) return;
 
         Navigator.pushReplacementNamed(context, AppRutas.home);

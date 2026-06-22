@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/insumo.dart';
+import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/services/api_service.dart';
+import 'package:provider/provider.dart';
 
 class InsumosScreen extends StatefulWidget {
   const InsumosScreen({super.key});
@@ -9,17 +12,6 @@ class InsumosScreen extends StatefulWidget {
 }
 
 class _ProductosScreenState extends State<InsumosScreen> {
-  //esta lista de insums vendra de base de datos para ser cargada y mostrada
-  final List<Insumo> insumosBD = [
-    Insumo(
-      id: 6,
-      nombre: "taza",
-      categoria: "ceramica",
-      stock: 5,
-      ubicacion: "estante A",
-    ),
-  ];
-
   final stockController = TextEditingController();
 
   //esta funcion es un dialog para crear insumo
@@ -27,6 +19,7 @@ class _ProductosScreenState extends State<InsumosScreen> {
     final nombreController = TextEditingController();
     final ubicacionController = TextEditingController();
     stockController.clear();
+    final apiService = ApiService();
 
     //esto es para el scroll de categorias por el moemeto sera statica y creo que para siempre XD
     final List<String> categorias = ['ceramica', 'plactico', 'metal', 'madera'];
@@ -104,7 +97,13 @@ class _ProductosScreenState extends State<InsumosScreen> {
                           ubicacion: ubicacionController.text,
                         );
 
-                        insumosBD.add(insumo);
+                        apiService.crearInsumo(
+                          nombre: nombreController.text,
+                          categoria: categoriaSeleccionada!,
+                          stock: int.tryParse(stockController.text)!,
+                          ubicacion: ubicacionController.text,
+                        );
+                        context.read<InsumoProvider>().agregarInsumo(insumo);
                         print(insumo.toString());
                       });
 
@@ -142,17 +141,24 @@ class _ProductosScreenState extends State<InsumosScreen> {
                       decoration: InputDecoration(labelText: 'cargar stock'),
                     ),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (stockController.text.isNotEmpty) {
-                          //debe ser modificado en la base de datos el insumo que tenga el mismo id que miInsumo o el mismo nombre
-                          //se debe agregar en realidad a lo que ya habia
                           miInsumo.stock = int.tryParse(stockController.text);
+                          //aca se esta modificando el  insumo en base de datos
+                          final api = ApiService();
+                          bool ok = await api.modificarStock(
+                            miInsumo.id!,
+                            miInsumo.stock!,
+                          );
+                          //aca solo actualiza el provider la lista de insumos
+                          if (ok) {
+                            context.read<InsumoProvider>().actualizarStockLocal(
+                              miInsumo.id!,
+                              miInsumo.stock!,
+                            );
+                          }
                         }
-                        setState(() {});
                         Navigator.pop(context);
-                        print(
-                          "el insumo a modificar se llama" + miInsumo.nombre,
-                        );
                       },
                       child: Text("modificar"),
                     ),
@@ -169,6 +175,7 @@ class _ProductosScreenState extends State<InsumosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final insumosBD = context.watch<InsumoProvider>().insumos;
     return Scaffold(
       appBar: AppBar(title: const Text('INSUMOS')),
       body: insumosBD.isEmpty
@@ -182,7 +189,11 @@ class _ProductosScreenState extends State<InsumosScreen> {
               padding: const EdgeInsets.all(16),
               itemCount: insumosBD.length,
               itemBuilder: (context, index) {
-                final insumo = insumosBD[index];
+                //este insumo es un json
+                final insumo = Insumo.fromJson(insumosBD[index]);
+                print(
+                  'este es el insumo de base de datos para mostrar $insumo',
+                );
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),

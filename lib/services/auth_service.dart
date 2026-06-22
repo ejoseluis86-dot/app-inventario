@@ -9,6 +9,7 @@ class AuthService {
   final String baseUrl = 'http://10.0.2.2:8000';
 
   Future<dynamic> login(String username, String password) async {
+    //hacemos la consulta a la API en el body mandamos usuario y contraseña
     final response = await http.post(
       Uri.parse('$baseUrl/login/'),
       headers: {
@@ -20,15 +21,16 @@ class AuthService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('esto es lo que trae$data');
+      print('esto es lo que trae la Response : $data');
 
       final prefs = await SharedPreferences.getInstance();
 
       await prefs.setString('access_token', data['access']);
+      await prefs.setString('refresh_token', data['refresh']); // 🔥 NUEVO
 
       return data;
     }
-
+    //sino retornamos null
     return null;
   }
 
@@ -42,5 +44,31 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.remove('access_token');
+  }
+
+  Future<String?> refreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final refresh = prefs.getString('refresh_token');
+
+    if (refresh == null) return null;
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/refresh/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'refresh': refresh}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      await prefs.setString('access_token', data['access']);
+
+      return data['access'];
+    }
+
+    // refresh expiró → logout
+    await logout();
+    return null;
   }
 }

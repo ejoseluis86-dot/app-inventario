@@ -4,9 +4,14 @@ import 'package:mi_app/widgets/widgets_home/my_bar_bottom.dart';
 import 'package:mi_app/widgets/widgets_home/my_botonera.dart';
 import 'package:mi_app/widgets/widgets_home/my_head_home.dart';
 
-class MyHomeScreen extends StatelessWidget {
+class MyHomeScreen extends StatefulWidget {
   const MyHomeScreen({super.key});
 
+  @override
+  State<MyHomeScreen> createState() => _MyHomeScreenState();
+}
+
+class _MyHomeScreenState extends State<MyHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
