@@ -102,17 +102,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // LOGO
                     Image.asset(
-                      'assets/logo_empresa.png',
+                      'assets/sz2.png',
                       height: 160,
                     ),
 
-                    const SizedBox(height: 12),
-
+                    const SizedBox(height: 20),
                     const Text(
-                      "SZ Regalos Personalizados",
+                      "",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 17),
+                    const Text(
+                      "Bienvenido, por favor inicie sesión",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 21,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
