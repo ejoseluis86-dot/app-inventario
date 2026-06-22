@@ -3,6 +3,7 @@ import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
 import 'package:mi_app/services/api_service.dart';
 import 'package:provider/provider.dart';
+import 'package:mi_app/providers/user_provider.dart';
 
 class InsumoDetalleScreen extends StatefulWidget {
   final Insumo insumo;
@@ -74,6 +75,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(title: const Text("Detalle Insumo")),
       body: Padding(
@@ -116,6 +118,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
 
             const SizedBox(height: 20),
 
+            //BOTON GUARDAR
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -124,6 +127,62 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
                 label: const Text("Guardar cambios"),
               ),
             ),
+
+            const SizedBox(height: 10),
+
+
+            //BOTON ELIMINAR
+            if (user.rol == "ADMIN")
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.delete),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () async {
+
+                    final confirmar = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text("Eliminar insumo"),
+                        content: const Text(
+                          "¿Estás seguro de eliminar este insumo?"
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () =>
+                                Navigator.pop(context, false),
+                            child: const Text("Cancelar"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () =>
+                                Navigator.pop(context, true),
+                            child: const Text("Eliminar"),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirmar != true) return;
+
+                    final ok =
+                        await api.eliminarInsumo(widget.insumo.id!);
+
+                    if (ok) {
+                      await context
+                          .read<InsumoProvider>()
+                          .cargarProviderInsumos();
+
+                      if (mounted) {
+                        Navigator.pop(context);
+                      }
+                    }
+                  },
+                  label: const Text("Eliminar"),
+                ),
+              ),
           ],
         ),
       ),

@@ -10,7 +10,7 @@ class MiResumen extends StatelessWidget {
 
     return Card(
       elevation: 4,
-      color: const Color(0xFFEDE7F6),
+      color: Theme.of(context).colorScheme.surface,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),

@@ -13,7 +13,7 @@ class MyHomeScreen extends StatelessWidget {
     final user = context.watch<UserProvider>();
 
     return Scaffold(
-      backgroundColor:Color.fromARGB(255, 238, 226, 251),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: false,
 
       // ---------------- APPBAR ----------------
