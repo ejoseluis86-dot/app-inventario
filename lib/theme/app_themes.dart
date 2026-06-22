@@ -3,13 +3,8 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static final light = ThemeData(
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.deepPurpleAccent,
+      seedColor: const Color.fromARGB(255, 89, 45, 165),
       brightness: Brightness.light,
-    ),
-    appBarTheme: AppBarTheme(
-      backgroundColor: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurpleAccent,
-      ).primary,
     ),
     useMaterial3: true,
   );
@@ -18,11 +13,6 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.deepPurpleAccent,
       brightness: Brightness.dark,
-    ),
-    appBarTheme: AppBarTheme(
-      backgroundColor: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurpleAccent,
-      ).primary,
     ),
     useMaterial3: true,
   );

@@ -1,116 +1,160 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/services/api_service.dart';
 import 'package:provider/provider.dart';
+import 'package:mi_app/screens/insumo_detalle_screen.dart';
 
 class InsumosScreen extends StatefulWidget {
   const InsumosScreen({super.key});
 
   @override
-  State<InsumosScreen> createState() => _ProductosScreenState();
+  State<InsumosScreen> createState() => _InsumosScreenState();
 }
 
-class _ProductosScreenState extends State<InsumosScreen> {
+class _InsumosScreenState extends State<InsumosScreen> {
+  final nombreController = TextEditingController();
   final stockController = TextEditingController();
+  final ubicacionController = TextEditingController();
 
-  //esta funcion es un dialog para crear insumo
-  void _mostrarDialogoAgregarInsumo() {
-    final nombreController = TextEditingController();
-    final ubicacionController = TextEditingController();
-    stockController.clear();
-    final apiService = ApiService();
+  final ApiService api = ApiService();
 
-    //esto es para el scroll de categorias por el moemeto sera statica y creo que para siempre XD
-    final List<String> categorias = ['ceramica', 'plactico', 'metal', 'madera'];
-    String? categoriaSeleccionada;
+  String search = "";
+  String? filtroCategoria;
+
+  void _mostrarDialogo() {
+    final categorias = [
+      'Cerámica',
+      'Plástico',
+      'Metal',
+      'Madera',
+      'Papel',
+      'Vidrio',
+    ];
+
+    String? categoria;
+    bool loading = false;
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (context, setStateDialog) {
             return AlertDialog(
-              title: const Text('Nuevo Insumo'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nombreController,
-                      decoration: const InputDecoration(labelText: 'Nombre'),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: stockController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Stock'),
-                    ),
-                    const SizedBox(height: 10),
-
-                    DropdownButtonFormField<String>(
-                      initialValue: categoriaSeleccionada,
-                      decoration: const InputDecoration(
-                        labelText: '',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: categorias.map((categoria) {
-                        return DropdownMenuItem(
-                          value: categoria,
-                          child: Text(categoria),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setDialogState(() {
-                          categoriaSeleccionada = value;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    TextField(
-                      controller: ubicacionController,
-                      decoration: const InputDecoration(labelText: 'Ubicacion'),
-                    ),
-                  ],
-                ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(22),
               ),
+              title: const Text("Nuevo Insumo"),
+
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nombreController,
+                    decoration: const InputDecoration(
+                      labelText: "Nombre",
+                      prefixIcon: Icon(Icons.inventory_2),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: stockController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "Stock",
+                      prefixIcon: Icon(Icons.numbers),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  DropdownButtonFormField<String>(
+                    value: categoria,
+                    decoration: const InputDecoration(
+                      labelText: "Categoría",
+                      prefixIcon: Icon(Icons.category),
+                      border: OutlineInputBorder(),
+                    ),
+                    items: categorias
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (value) {
+                      setStateDialog(() {
+                        categoria = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: ubicacionController,
+                    decoration: const InputDecoration(
+                      labelText: "Ubicación",
+                      prefixIcon: Icon(Icons.place),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+
+                  if (loading)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
+              ),
+
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
+                  child: const Text("Cancelar"),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (nombreController.text.isNotEmpty &&
-                        stockController.text.isNotEmpty &&
-                        ubicacionController.text.isNotEmpty &&
-                        categoriaSeleccionada != null) {
-                      //este insumo es el creado y debe guardarse en base de datos
 
-                      final data = await apiService.crearInsumo(
-                        nombre: nombreController.text,
-                        categoria: categoriaSeleccionada!,
-                        stock: int.tryParse(stockController.text)!,
-                        ubicacion: ubicacionController.text,
-                      );
-                      context.read<InsumoProvider>().agregarInsumo(data);
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.save),
+                  label: const Text("Guardar"),
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Insumo creado correctamente"),
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
+                  onPressed: loading
+                      ? null
+                      : () async {
+                          if (nombreController.text.isEmpty ||
+                              stockController.text.isEmpty ||
+                              ubicacionController.text.isEmpty ||
+                              categoria == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Completá todos los campos"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
 
-                      Future.delayed(const Duration(milliseconds: 800), () {
-                        Navigator.pop(context);
-                      });
-                    }
-                  },
-                  child: const Text('Guardar'),
+                          setStateDialog(() => loading = true);
+
+                          final ok = await api.crearInsumo(
+                            nombre: nombreController.text,
+                            categoria: categoria!,
+                            stock: int.parse(stockController.text),
+                            ubicacion: ubicacionController.text,
+                          );
+
+                          setStateDialog(() => loading = false);
+
+                          if (ok) {
+                            await context
+                                .read<InsumoProvider>()
+                                .cargarProviderInsumos();
+
+                            Navigator.pop(context);
+
+                            nombreController.clear();
+                            stockController.clear();
+                            ubicacionController.clear();
+                          }
+                        },
                 ),
               ],
             );
@@ -120,112 +164,110 @@ class _ProductosScreenState extends State<InsumosScreen> {
     );
   }
 
-  //esta funcion es un dialog que recibe el Insumo a modificar y en el onpress se lo envia a la base de datos
-  void _mostrarDialogmodificarStock(Insumo miInsumo) {
-    stockController.clear();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: Text('Agregar mas Stock a  ${miInsumo.nombre}'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: stockController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: 'cargar stock'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (stockController.text.isNotEmpty) {
-                          miInsumo.stock = int.tryParse(stockController.text);
-                          //aca se esta modificando el  insumo en base de datos
-                          final api = ApiService();
-                          bool ok = await api.modificarStock(
-                            miInsumo.id!,
-                            miInsumo.stock!,
-                          );
-                          //aca solo actualiza el provider la lista de insumos
-                          if (ok) {
-                            context.read<InsumoProvider>().actualizarStockLocal(
-                              miInsumo.id!,
-                              miInsumo.stock!,
-                            );
-                          }
-                        }
-                        Navigator.pop(context);
-                      },
-                      child: Text("modificar"),
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final insumosBD = context.watch<InsumoProvider>().insumos;
-    return Scaffold(
-      appBar: AppBar(title: const Text('INSUMOS')),
-      body: insumosBD.isEmpty
-          ? const Center(
-              child: Text(
-                'No hay productos registrados',
-                style: TextStyle(fontSize: 18),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: insumosBD.length,
-              itemBuilder: (context, index) {
-                //este insumo es un json
-                final insumo = insumosBD[index];
-                print(
-                  'este es el insumo de base de datos para mostrar $insumo',
-                );
+    final insumos = context.watch<InsumoProvider>().insumos;
+    final rol = context.watch<UserProvider>().rol;
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListTile(
-                          title: Text(insumo.nombre),
-                          subtitle: Text(
-                            'Categoria: ${insumo.categoria}\n'
-                            'Stock: ${insumo.stock}\n'
-                            'Ubicacion: ${insumo.ubicacion}',
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _mostrarDialogmodificarStock(insumo);
-                          });
-                        },
-                        child: Text("Agregar"),
-                      ),
-                    ],
-                  ),
-                );
+    // 🔥 FILTRO REAL APLICADO
+    final filtrados = insumos.where((i) {
+      final nombre = i.nombre.toLowerCase();
+
+      final matchSearch = nombre.contains(search);
+
+      final matchCategoria =
+          filtroCategoria == null || i.categoria == filtroCategoria;
+
+      return matchSearch && matchCategoria;
+    }).toList();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("INSUMOS")),
+
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            TextField(
+              decoration: const InputDecoration(
+                labelText: "Buscar insumo",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  search = value.toLowerCase();
+                });
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _mostrarDialogoAgregarInsumo,
-        child: const Icon(Icons.add),
+
+            const SizedBox(height: 10),
+
+            DropdownButtonFormField<String>(
+              value: filtroCategoria,
+              decoration: const InputDecoration(
+                labelText: "Filtrar por categoría",
+                prefixIcon: Icon(Icons.filter_list),
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(value: null, child: Text("Todas")),
+                DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
+                DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
+                DropdownMenuItem(value: "Metal", child: Text("Metal")),
+                DropdownMenuItem(value: "Madera", child: Text("Madera")),
+                DropdownMenuItem(value: "Papel", child: Text("Papel")),
+                DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  filtroCategoria = value;
+                });
+              },
+            ),
+
+            const SizedBox(height: 10),
+
+            Expanded(
+              child: filtrados.isEmpty
+                  ? const Center(child: Text("No hay insumos"))
+                  : ListView.builder(
+                      itemCount: filtrados.length,
+                      itemBuilder: (context, index) {
+                        final insumo = filtrados[index];
+
+                        return Card(
+                          child: ListTile(
+                            title: Text(insumo.nombre),
+                            subtitle: Text(
+                              "Stock: ${insumo.stock}\nUbicación: ${insumo.ubicacion}",
+                            ),
+
+                            // 👇 ESTO ES LO NUEVO
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      InsumoDetalleScreen(insumo: insumo),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
+
+      floatingActionButton: rol == "ADMIN"
+          ? FloatingActionButton(
+              onPressed: _mostrarDialogo,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

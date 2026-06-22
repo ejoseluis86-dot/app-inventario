@@ -23,10 +23,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
       initialRoute: AppRutas.login,
       routes: AppRutas.rutas,
     );

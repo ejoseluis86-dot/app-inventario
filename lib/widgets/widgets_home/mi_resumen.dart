@@ -6,47 +6,82 @@ class MiResumen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).focusColor,
-        borderRadius: BorderRadius.circular(15),
+    final color = Theme.of(context).colorScheme;
+
+    return Card(
+      elevation: 4,
+      color: const Color(0xFFEDE7F6),
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 10),
-          Text(
-            "Resumen Rapido",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryFixed,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.dashboard_rounded,
+                  color: color.primary,
+                  size: 28,
+                ),
+
+                const SizedBox(width: 10),
+
+                Text(
+                  "Resumen rápido",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color.onSurface,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              MyButtonResumen(
-                icono: Icons.dangerous,
-                texto1: "Alerta de",
-                texto2: "Stock Crítico",
-                cantidad: 10,
-                onPressed: () {},
-                color: Colors.pinkAccent,
+
+            const SizedBox(height: 6),
+
+            Text(
+              "Indicadores principales del sistema",
+              style: TextStyle(
+                fontSize: 13,
+                color: color.onSurfaceVariant,
               ),
-              MyButtonResumen(
-                icono: Icons.assignment,
-                texto1: "Pedidos",
-                texto2: "Activos",
-                cantidad: 16,
-                onPressed: () {},
-                color: Colors.green,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
+            ),
+
+            const SizedBox(height: 18),
+
+            Row(
+              children: [
+                Expanded(
+                  child: MyButtonResumen(
+                    icono: Icons.warning_amber_rounded,
+                    texto1: "Alerta de",
+                    texto2: "Stock Crítico",
+                    cantidad: 10,
+                    onPressed: () {},
+                    color: Colors.orange,
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: MyButtonResumen(
+                    icono: Icons.assignment,
+                    texto1: "Pedidos",
+                    texto2: "Activos",
+                    cantidad: 16,
+                    onPressed: () {},
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
