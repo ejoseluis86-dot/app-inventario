@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/models/pedido.dart';
 import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/services/auth_service.dart';
@@ -41,14 +40,13 @@ class ApiService {
   // =========================
   // CREAR INSUMO
   // =========================
-  Future<Insumo> crearInsumo({
+  Future<bool> crearInsumo({
     required String nombre,
     required String categoria,
     required int stock,
     required String ubicacion,
   }) async {
     //aca traemos el token
-    final authService = AuthService();
     final headers = await _headers();
 
     final response = await http.post(
@@ -65,16 +63,11 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       print('esto me esta trajendo la api $data');
-      return Insumo.fromJson(data);
+      return true;
     } else {
-      await authService.refreshToken();
-      throw Exception("Error al crear insumo: ${response.body}");
+      return false;
     }
   }
-
-  //4 creae usuario
-  //   return response.statusCode == 201;
-  //}
 
   // =========================
   // ACTUALIZAR INSUMO (FULL EDIT)

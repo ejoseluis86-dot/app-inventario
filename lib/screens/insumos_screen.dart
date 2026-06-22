@@ -143,17 +143,17 @@ class _InsumosScreenState extends State<InsumosScreen> {
 
                           setStateDialog(() => loading = false);
 
-                          //if (ok) {
-                          await context
-                              .read<InsumoProvider>()
-                              .cargarProviderInsumos();
+                          if (ok) {
+                            await context
+                                .read<InsumoProvider>()
+                                .cargarProviderInsumos();
 
-                          Navigator.pop(context);
+                            Navigator.pop(context);
 
-                          nombreController.clear();
-                          stockController.clear();
-                          ubicacionController.clear();
-                          //}
+                            nombreController.clear();
+                            stockController.clear();
+                            ubicacionController.clear();
+                          }
                         },
                 ),
               ],
