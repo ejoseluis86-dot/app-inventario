@@ -37,11 +37,11 @@ class ApiService {
   }
 
   //3 crear un insumo
-  Future<Insumo> crearInsumo({
+
   // =========================
   // CREAR INSUMO
   // =========================
-  Future<bool> crearInsumo({
+  Future<Insumo> crearInsumo({
     required String nombre,
     required String categoria,
     required int stock,
@@ -49,22 +49,8 @@ class ApiService {
   }) async {
     //aca traemos el token
     final authService = AuthService();
-    String? token = await authService.obtenerToken();
     final headers = await _headers();
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/insumos/insumo'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({
-        'nombre': nombre,
-        'categoria': categoria,
-        'stock': stock,
-        'ubicacion': ubicacion,
-      }),
-    );
     final response = await http.post(
       Uri.parse('$baseUrl/insumos/insumo'),
       headers: headers,
@@ -87,8 +73,8 @@ class ApiService {
   }
 
   //4 creae usuario
-    return response.statusCode == 201;
-  }
+  //   return response.statusCode == 201;
+  //}
 
   // =========================
   // ACTUALIZAR INSUMO (FULL EDIT)
@@ -131,9 +117,8 @@ class ApiService {
     return response.statusCode == 200;
   }
 
-  
   // =========================
-  // CREAR USUARIO 
+  // CREAR USUARIO
   // =========================
   Future<bool> crearUsuario({
     required String username,
