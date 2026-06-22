@@ -9,7 +9,7 @@ class ProductoLite {
     return ProductoLite(
       id: json['id'],
       nombre: json['nombre'],
-      precio: json['precio'].toDouble(),
+      precio: double.parse(json['precio'].toString()),
     );
   }
 }

@@ -82,32 +82,32 @@ class _ProductosScreenState extends State<InsumosScreen> {
                   child: const Text('Cancelar'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (nombreController.text.isNotEmpty &&
                         stockController.text.isNotEmpty &&
                         ubicacionController.text.isNotEmpty &&
                         categoriaSeleccionada != null) {
-                      setState(() {
-                        //este insumo es el creado y debe guardarse en base de datos
+                      //este insumo es el creado y debe guardarse en base de datos
 
-                        Insumo insumo = Insumo(
-                          nombre: nombreController.text,
-                          categoria: categoriaSeleccionada!,
-                          stock: int.tryParse(stockController.text)!,
-                          ubicacion: ubicacionController.text,
-                        );
+                      final data = await apiService.crearInsumo(
+                        nombre: nombreController.text,
+                        categoria: categoriaSeleccionada!,
+                        stock: int.tryParse(stockController.text)!,
+                        ubicacion: ubicacionController.text,
+                      );
+                      context.read<InsumoProvider>().agregarInsumo(data);
 
-                        apiService.crearInsumo(
-                          nombre: nombreController.text,
-                          categoria: categoriaSeleccionada!,
-                          stock: int.tryParse(stockController.text)!,
-                          ubicacion: ubicacionController.text,
-                        );
-                        context.read<InsumoProvider>().agregarInsumo(insumo);
-                        print(insumo.toString());
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Insumo creado correctamente"),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+
+                      Future.delayed(const Duration(milliseconds: 800), () {
+                        Navigator.pop(context);
                       });
-
-                      Navigator.pop(context);
                     }
                   },
                   child: const Text('Guardar'),
@@ -190,7 +190,7 @@ class _ProductosScreenState extends State<InsumosScreen> {
               itemCount: insumosBD.length,
               itemBuilder: (context, index) {
                 //este insumo es un json
-                final insumo = Insumo.fromJson(insumosBD[index]);
+                final insumo = insumosBD[index];
                 print(
                   'este es el insumo de base de datos para mostrar $insumo',
                 );

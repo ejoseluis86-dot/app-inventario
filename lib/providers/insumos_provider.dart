@@ -3,13 +3,14 @@ import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/services/api_service.dart';
 
 class InsumoProvider extends ChangeNotifier {
-  List<dynamic> insumos = [];
+  List<Insumo> insumos = [];
   bool _yacargo = false;
 
   Future<void> cargarProviderInsumos() async {
     if (_yacargo) return;
     _yacargo = true;
-    insumos = await ApiService().obtenerInsumos();
+    final data = await ApiService().obtenerInsumos();
+    insumos = data.map((e) => Insumo.fromJson(e)).toList();
     print("esta es la lista desde la api en provider: $insumos");
     notifyListeners();
   }
@@ -20,9 +21,9 @@ class InsumoProvider extends ChangeNotifier {
   }
 
   void actualizarStockLocal(int id, int nuevoStock) {
-    final insumo = insumos.firstWhere((i) => i['id'] == id);
+    final insumo = insumos.firstWhere((i) => i.id == id);
     if (id != -1) {
-      insumo['stock'] = nuevoStock;
+      insumo.stock = nuevoStock;
       notifyListeners();
     }
   }

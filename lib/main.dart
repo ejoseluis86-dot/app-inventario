@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/theme/app_themes.dart';
@@ -10,6 +11,7 @@ void main() => runApp(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => InsumoProvider()),
+      ChangeNotifierProvider(create: (_) => ProductoLiteProvider()),
     ],
     child: const MainApp(),
   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
         //tambien creo los providers y sus peticiones
         final insumosProvider = context.read<InsumoProvider>();
         insumosProvider.cargarProviderInsumos();
+        final productosProvider = context.read<ProductoLiteProvider>();
+        productosProvider.cargarProviderProductos();
         if (!mounted) return;
 
         Navigator.pushReplacementNamed(context, AppRutas.home);

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mi_app/models/detalle_receta.dart';
 import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/models/producto.dart';
+import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/routes/app_rutas.dart';
+import 'package:mi_app/services/api_service.dart';
+import 'package:provider/provider.dart';
 
 class AsociarRecetaScreen extends StatefulWidget {
   final String nombreProducto;
@@ -20,24 +24,6 @@ class AsociarRecetaScreen extends StatefulWidget {
 
 class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
   late final TextEditingController cantidadController = TextEditingController();
-
-  final List<Insumo> insumosBD = [
-    Insumo(id: 1, nombre: 'Harina', categoria: '', stock: 5, ubicacion: ''),
-    Insumo(id: 2, nombre: 'Azúcar', categoria: '', stock: 10, ubicacion: ''),
-    Insumo(id: 3, nombre: 'Huevos', categoria: '', stock: 15, ubicacion: ''),
-    Insumo(id: 4, nombre: 'Chocolate', categoria: '', stock: 3, ubicacion: ''),
-    Insumo(id: 5, nombre: 'Leche', categoria: '', stock: 6, ubicacion: ''),
-  ];
-
-  final List<String> insumos = [];
-
-  @override
-  void initState() {
-    super.initState();
-    for (var insumo in insumosBD) {
-      insumos.add(insumo.nombre);
-    }
-  }
 
   Insumo? insumoSeleccionado;
 
@@ -75,18 +61,49 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
   }
 
   //esto no iria hay que modificar
-  void guardarReceta() {
-    final Producto nuevoProducto = Producto(
-      nombre: widget.nombreProducto,
-      precio: widget.precioProducto,
-      categoria: widget.categoria,
-      detalles: detalles,
-    );
-    print('Producto a guardar: ${nuevoProducto.toJson()}');
+  Future<void> guardarReceta() async {
+    //creo un api service
+    final apiService = ApiService();
+
+    if (widget.nombreProducto.trim().isEmpty ||
+        widget.categoria.trim().isEmpty ||
+        widget.precioProducto <= 0 ||
+        detalles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe completar todos los campos')),
+      );
+    } else {
+      final Producto nuevoProducto = Producto(
+        nombre: widget.nombreProducto,
+        precio: widget.precioProducto,
+        categoria: widget.categoria,
+        detalles: detalles,
+      );
+      //uso el api service para guardar el producto
+      bool ok = await apiService.crearProducto(nuevoProducto);
+      if (ok) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Producto creado exitosamente"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // esperar un poco y redirigir
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.pushNamed(context, AppRutas.home);
+        });
+      }
+
+      //faltaria actualizar el provider de Productos Lite
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    //aca estoy trayendo una lista de insumos desde el provider
+    final insumosBD = context.watch<InsumoProvider>().insumos;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -109,20 +126,24 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
 
             const SizedBox(height: 20),
 
-            DropdownButtonFormField<String>(
-              initialValue: insumoSeleccionado?.nombre,
+            DropdownButtonFormField<Insumo>(
+              initialValue: insumoSeleccionado,
+
               decoration: const InputDecoration(
-                labelText: 'SeleccionarInsumo Base',
+                labelText: 'Seleccionar Insumo Base',
                 border: OutlineInputBorder(),
               ),
-              items: insumos.map((insumo) {
-                return DropdownMenuItem(value: insumo, child: Text(insumo));
+
+              items: insumosBD.map((insumo) {
+                return DropdownMenuItem<Insumo>(
+                  value: insumo,
+                  child: Text(insumo.nombre),
+                );
               }).toList(),
-              onChanged: (value) {
+
+              onChanged: (Insumo? value) {
                 setState(() {
-                  insumoSeleccionado = insumosBD.firstWhere(
-                    (insumo) => insumo.nombre == value,
-                  );
+                  insumoSeleccionado = value;
                 });
               },
             ),

@@ -34,7 +34,6 @@ class Pedido {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'fecha': fecha.toIso8601String(),
       'cliente': cliente,
       'usuarioId': usuarioId,
