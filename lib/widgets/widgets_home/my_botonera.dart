@@ -1,119 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
-import 'package:mi_app/widgets/widgets_home/my_button.dart';
 import 'package:provider/provider.dart';
 
 class MyBotonera extends StatelessWidget {
   const MyBotonera({super.key});
 
+  Widget _card(BuildContext context,
+      {required IconData icono,
+      required String texto,
+      required VoidCallback onTap}) {
+    final color = Theme.of(context).colorScheme;
+
+    return Card(
+      elevation: 6,
+      shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+          
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  icono,
+                  size: 30,
+                  color: color.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                texto,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _cards(String? rol, BuildContext context) {
+    final items = <Widget>[];
+
+    if (rol == "ADMIN") {
+      items.add(_card(
+        context,
+        icono: Icons.person,
+        texto: "Usuarios",
+        onTap: () => Navigator.pushNamed(context, AppRutas.crearUsuario),
+      ));
+    }
+
+    items.addAll([
+      _card(
+        context,
+        icono: Icons.inventory_2,
+        texto: "Productos",
+        onTap: () => Navigator.pushNamed(context, AppRutas.nuevoProducto),
+      ),
+      _card(
+        context,
+        icono: Icons.shopping_cart,
+        texto: "Pedidos",
+        onTap: () => Navigator.pushNamed(context, AppRutas.crearPedido),
+      ),
+      _card(
+        context,
+        icono: Icons.inbox,
+        texto: "Insumos",
+        onTap: () => Navigator.pushNamed(context, AppRutas.insumos),
+      ),
+    ]);
+
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
-    //rol del usuario
     final rol = context.watch<UserProvider>().rol;
 
-    return Column(
-      //alineacion vertical (espacio entre los hijos)
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //alineacion Horizontal
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Panel principal",
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryFixed,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Center(
-                child: MyButton(
-                  icono: Icons.person,
-                  texto: "Crear Usuario",
-                  onPressed: () {
-                    if (rol == 'ADMIN') {
-                      Navigator.pushNamed(context, AppRutas.crearUsuario);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            "Usted no tiene los permisos para crear un usuario",
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-              Center(
-                child: MyButton(
-                  icono: Icons.inventory_2,
-                  texto: "Producto Nuevo",
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRutas.nuevoProducto);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Center(
-                child: MyButton(
-                  icono: Icons.shopping_cart,
-                  texto: "Crear Pedido",
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRutas.crearPedido);
-                  },
-                ),
-              ),
-              Center(
-                child: MyButton(
-                  icono: Icons.assignment,
-                  texto: "Area de Trabajo",
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRutas.trabajo);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Center(
-                child: MyButton(
-                  icono: Icons.store,
-                  texto: "Stock",
-                  onPressed: () {},
-                ),
-              ),
-              Center(
-                child: MyButton(
-                  icono: Icons.inbox,
-                  texto: "Insumos",
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRutas.insumos);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-      ],
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1,
+      children: _cards(rol, context),
     );
   }
 }
