@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/services/api_service.dart';
+import 'package:provider/provider.dart';
+import 'package:mi_app/providers/user_provider.dart';
 
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
@@ -84,15 +86,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
               const SizedBox(height: 10),
 
-              Text(
-                "Rol: ${usuario?['rol']}",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ],
           ),
-
           actions: [
 
             TextButton(
@@ -103,19 +98,37 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
 
             ElevatedButton(
-              onPressed: () async {
+  onPressed: () async {
 
-                final actualizado =
-                    await api.actualizarMiPerfil(
-                  nombre: nombreController.text,
-                  apellido: apellidoController.text,
-                  username: usernameController.text,
-                );
+      final actualizado = await api.actualizarMiPerfil(
+        nombre: nombreController.text,
+        apellido: apellidoController.text,
+        username: usernameController.text,
+      );
 
-                Navigator.pop(context, actualizado);
-              },
-              child: const Text("Guardar"),
-            ),
+      if (actualizado) {
+
+        // ACTUALIZA EL PROVIDER
+        final userProvider = context.read<UserProvider>();
+
+        userProvider.setUser(
+          userProvider.id!,
+          usernameController.text,
+          userProvider.rol!,
+          nombre: nombreController.text,
+          apellido: apellidoController.text,
+        );
+
+        // RECARGA DATOS DEL PERFIL
+        await cargarPerfil();
+      }
+
+      if (!context.mounted) return;
+
+      Navigator.pop(context, actualizado);
+    },
+    child: const Text("Guardar"),
+  ),
           ],
         );
       },
@@ -149,10 +162,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Usuario: ${usuario?['username']}"),
-            Text("Nombre: ${usuario?['nombre']}"),
-            Text("Apellido: ${usuario?['apellido']}"),
-            Text("Rol: ${usuario?['rol']}"),
+            
+            Text("Usuario: ${usuario?['username']}", style: const TextStyle(fontSize: 18),),
+            Text("Nombre: ${usuario?['nombre']}", style: const TextStyle(fontSize: 18),),
+            Text("Apellido: ${usuario?['apellido']}", style: const TextStyle(fontSize: 18),),
+            Text( usuario?['rol'] == "ADMIN" ? "Rol: Administrador" : "Rol: Empleado", style: const TextStyle(fontSize: 18),),
+            
             ElevatedButton.icon(
               icon: const Icon(Icons.edit),
               label: const Text("Editar perfil"),
