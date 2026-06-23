@@ -6,7 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:mi_app/screens/insumo_detalle_screen.dart';
 
 class InsumosScreen extends StatefulWidget {
-  const InsumosScreen({super.key});
+  final bool soloCriticos;
+
+  const InsumosScreen({
+    super.key,
+    this.soloCriticos = false,
+  });
 
   @override
   State<InsumosScreen> createState() => _InsumosScreenState();
@@ -21,6 +26,16 @@ class _InsumosScreenState extends State<InsumosScreen> {
 
   String search = "";
   String? filtroCategoria;
+  String? filtroStock;
+
+//muestra filtro de crticos desde pantalla principal  @override
+void initState() {
+  super.initState();
+
+  if (widget.soloCriticos) {
+    filtroStock = "CRITICO";
+  }
+}
 
   void _mostrarDialogo() {
     final categorias = [
@@ -164,22 +179,57 @@ class _InsumosScreenState extends State<InsumosScreen> {
     );
   }
 
+  //Semáforo de stock
+    Color colorStock(int stock) {
+    if (stock <= 2) return Colors.red;
+    if (stock <= 5) return Colors.orange;
+    return Colors.green;
+  }
+
+    String estadoStock(int stock) {
+      if (stock <= 2) return "Urgente";
+      if (stock <= 5) return "Crítico";
+      return "OK";
+    }
+
   @override
   Widget build(BuildContext context) {
     final insumos = context.watch<InsumoProvider>().insumos;
     final rol = context.watch<UserProvider>().rol;
 
-    // 🔥 FILTRO REAL APLICADO
+    // FILTRO APLICADO
     final filtrados = insumos.where((i) {
-      final nombre = i.nombre.toLowerCase();
+    final nombre = i.nombre.toLowerCase();
 
-      final matchSearch = nombre.contains(search);
+    final matchSearch = nombre.contains(search);
 
-      final matchCategoria =
-          filtroCategoria == null || i.categoria == filtroCategoria;
+    final matchCategoria =
+        filtroCategoria == null ||
+        i.categoria == filtroCategoria;
 
-      return matchSearch && matchCategoria;
-    }).toList();
+    final matchCritico =
+        !widget.soloCriticos ||
+        i.stock <= 5;
+
+    final matchStock =
+      filtroStock == null ||
+      (filtroStock == "OK" && i.stock > 5) ||
+      (filtroStock == "CRITICO" &&
+          i.stock > 2 &&
+          i.stock <= 5) ||
+      (filtroStock == "URGENTE" &&
+          i.stock <= 2);    
+
+    return matchSearch &&
+      matchCategoria &&
+      matchCritico &&
+      matchStock;
+    }).toList()
+    ..sort(
+      (a, b) => a.nombre
+          .toLowerCase()
+          .compareTo(b.nombre.toLowerCase()),
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text("INSUMOS")),
@@ -226,6 +276,40 @@ class _InsumosScreenState extends State<InsumosScreen> {
               },
             ),
 
+          const SizedBox(height: 10),
+
+          DropdownButtonFormField<String>(
+            value: filtroStock,
+            decoration: const InputDecoration(
+              labelText: "Estado de stock",
+              prefixIcon: Icon(Icons.traffic),
+              border: OutlineInputBorder(),
+            ),
+            items: const [
+              DropdownMenuItem(
+                value: null,
+                child: Text("Todos"),
+              ),
+              DropdownMenuItem(
+                value: "OK",
+                child: Text("🟢 OK"),
+              ),
+              DropdownMenuItem(
+                value: "CRITICO",
+                child: Text("🟠 Crítico"),
+              ),
+              DropdownMenuItem(
+                value: "URGENTE",
+                child: Text("🔴 Urgente"),
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                filtroStock = value;
+              });
+            },
+          ),  
+
             const SizedBox(height: 10),
 
             Expanded(
@@ -238,12 +322,45 @@ class _InsumosScreenState extends State<InsumosScreen> {
 
                         return Card(
                           child: ListTile(
-                            title: Text(insumo.nombre),
-                            subtitle: Text(
-                              "Stock: ${insumo.stock}\nUbicación: ${insumo.ubicacion}",
+                            leading: Icon(
+                              Icons.circle,
+                              color: colorStock(insumo.stock),
+                              size: 18,
                             ),
 
-                            // 👇 ESTO ES LO NUEVO
+                            title: Text(
+                              insumo.nombre,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Stock: ${insumo.stock}",
+                                  style: TextStyle(
+                                    color: colorStock(insumo.stock),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                Text(
+                                  estadoStock(insumo.stock),
+                                  style: TextStyle(
+                                    color: colorStock(insumo.stock),
+                                  ),
+                                ),
+
+                                Text(
+                                  "Ubicación: ${insumo.ubicacion}",
+                                ),
+                              ],
+                            ),
+
+                            trailing: const Icon(Icons.chevron_right),
+
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -255,6 +372,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
                             },
                           ),
                         );
+
                       },
                     ),
             ),

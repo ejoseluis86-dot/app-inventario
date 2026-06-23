@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/widgets/widgets_home/my_button_resumen.dart';
+import 'package:provider/provider.dart';
+import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/routes/app_rutas.dart';
+import 'package:provider/provider.dart';
+import 'package:mi_app/screens/insumos_screen.dart';
 
 class MiResumen extends StatelessWidget {
   const MiResumen({super.key});
@@ -7,6 +12,9 @@ class MiResumen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
+    final insumos = context.watch<InsumoProvider>().insumos;
+
+    final stockCritico = insumos.where((i) => i.stock <= 5).length;
 
     return Card(
       elevation: 4,
@@ -60,8 +68,17 @@ class MiResumen extends StatelessWidget {
                     icono: Icons.warning_amber_rounded,
                     texto1: "Alerta de",
                     texto2: "Stock Crítico",
-                    cantidad: 10,
-                    onPressed: () {},
+                    cantidad: stockCritico,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const InsumosScreen(
+                            soloCriticos: true,
+                          ),
+                        ),
+                      );
+                    },
                     color: Colors.orange,
                   ),
                 ),
