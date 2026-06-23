@@ -28,10 +28,6 @@ class _InsumosScreenState extends State<InsumosScreen> {
   //muestra filtro de crticos desde pantalla principal  @override
   void initState() {
     super.initState();
-
-    if (widget.soloCriticos) {
-      filtroStock = "CRITICO";
-    }
   }
 
   void _mostrarDialogo() {
@@ -42,6 +38,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
       'Madera',
       'Papel',
       'Vidrio',
+      ''
     ];
 
     String? categoria;

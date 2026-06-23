@@ -58,8 +58,8 @@ class MiResumen extends StatelessWidget {
                     icono: Icons.warning_amber_rounded,
                     texto1: "Alerta de",
                     texto2: "Stock Crítico",
-                    //esto cuenta los insumos con stock <5
-                    cantidad: insumos.where((i) => i.stock < 5).length,
+                    //esto cuenta los insumos con stock <=5
+                    cantidad: insumos.where((i) => i.stock <= 5).length,
                     onPressed: () {
                       Navigator.push(
                         context,

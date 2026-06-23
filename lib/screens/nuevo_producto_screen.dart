@@ -13,10 +13,13 @@ class _NuevoProductoScreenState extends State<NuevoProductoScreen> {
   final _precioController = TextEditingController();
   //esta sera estatica para siempre
   final List<String> categorias = [
-    'Bebidas',
-    'Comida',
-    'Limpieza',
-    'Electrónica',
+      'Cerámica',
+      'Plástico',
+      'Metal',
+      'Madera',
+      'Papel',
+      'Vidrio',
+      'Textil'
   ];
 
   String? categoriaSeleccionada;
