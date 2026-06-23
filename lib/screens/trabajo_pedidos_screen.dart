@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/providers/pedido_lite_provider.dart';
+import 'package:mi_app/routes/app_rutas.dart';
 import 'package:provider/provider.dart';
 import 'package:mi_app/screens/trabajo_screen.dart';
 
@@ -11,7 +12,14 @@ class TrabajoPedidosScreen extends StatelessWidget {
     final pedidos = context.watch<PedidoLiteProvider>().pedidosLite;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pedidos activos')),
+      appBar: AppBar(
+        title: const Text('Pedidos activos'),
+        //esto regresa al home
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pushNamed(context, AppRutas.home),
+        ),
+      ),
       body: pedidos.isEmpty
           ? const Center(child: Text('No hay pedidos'))
           : ListView.builder(

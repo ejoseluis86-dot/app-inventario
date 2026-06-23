@@ -38,7 +38,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
       'Madera',
       'Papel',
       'Vidrio',
-      ''
+      '',
     ];
 
     String? categoria;
@@ -215,7 +215,11 @@ class _InsumosScreenState extends State<InsumosScreen> {
         );
 
     return Scaffold(
-      appBar: AppBar(title: const Text("INSUMOS")),
+      appBar: AppBar(
+        title: const Text("INSUMOS"),
+        //esto deja la flecha de retroceso
+        automaticallyImplyLeading: true,
+      ),
 
       body: Padding(
         padding: const EdgeInsets.all(12),

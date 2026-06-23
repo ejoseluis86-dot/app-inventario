@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/models/consumo_real_insumo.dart';
 import 'package:mi_app/models/detalle_pedido.dart';
-import 'package:mi_app/models/detalle_receta.dart';
-import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/models/pedido_lite.dart';
-import 'package:mi_app/models/producto_lite.dart';
-import 'package:flutter/material.dart';
 
 class AreaTrabajo extends StatefulWidget {
   final PedidoLite pedidoLite;
@@ -91,7 +86,7 @@ class _AreaTrabajoState extends State<AreaTrabajo> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text("Cerrar"),
-            )
+            ),
           ],
         );
       },
