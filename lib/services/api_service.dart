@@ -5,12 +5,10 @@ import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/services/auth_service.dart';
 
 class ApiService {
-<<<<<<< HEAD
+
   final String baseUrl = "http://10.0.2.2:8000";
-=======
-  final String baseUrl = "http://10.0.2.2:8000/";
   final auth = AuthService();
->>>>>>> 8ecd674d5c05e2f022aac16b65a39338fa9cda67
+
 
   Future<Map<String, String>> _headers() async {
     final auth = AuthService();

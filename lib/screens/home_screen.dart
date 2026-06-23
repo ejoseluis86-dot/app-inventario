@@ -33,15 +33,15 @@ class MyHomeScreen extends StatelessWidget {
         // ---------------- LOGO + TITULO ----------------
         title: Row(
           children: [
-<<<<<<< HEAD
+            // LOGO
             Image.asset(
               "assets/sz_3.png",
               height: 33,
             ),
-=======
-            Image.asset("assets/sz_3.png", height: 33),
 
->>>>>>> 8ecd674d5c05e2f022aac16b65a39338fa9cda67
+            
+
+            // TITULO
             const SizedBox(width: 10),
             const Expanded(
               child: Column(
@@ -98,7 +98,6 @@ class MyHomeScreen extends StatelessWidget {
 
                 const SizedBox(width: 10),
 
-<<<<<<< HEAD
                 // BOTÓN PERFIL
                 InkWell(
                   borderRadius: BorderRadius.circular(20),
@@ -113,15 +112,7 @@ class MyHomeScreen extends StatelessWidget {
                       color: Colors.white,
                       size: 18,
                     ),
-=======
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 18,
->>>>>>> 8ecd674d5c05e2f022aac16b65a39338fa9cda67
+
                   ),
                 ),
 
@@ -152,10 +143,9 @@ class MyHomeScreen extends StatelessWidget {
 
           return Stack(
             children: [
-<<<<<<< HEAD
-=======
+
               // FONDO SOLO EN modo claro
->>>>>>> 8ecd674d5c05e2f022aac16b65a39338fa9cda67
+
               if (!isDark)
                 Container(
                   decoration: const BoxDecoration(
@@ -167,14 +157,8 @@ class MyHomeScreen extends StatelessWidget {
                   ),
                 )
               else
-<<<<<<< HEAD
-                Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
-=======
                 // 🌑 FONDO DARK NORMAL DEL THEME
                 Container(color: Theme.of(context).scaffoldBackgroundColor),
->>>>>>> 8ecd674d5c05e2f022aac16b65a39338fa9cda67
 
               const SingleChildScrollView(
                 padding: EdgeInsets.all(12),

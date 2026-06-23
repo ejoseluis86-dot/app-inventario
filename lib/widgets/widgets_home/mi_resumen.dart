@@ -4,6 +4,7 @@ import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/widgets/widgets_home/my_button_resumen.dart';
 import 'package:provider/provider.dart';
+import 'package:mi_app/screens/insumos_screen.dart';
 
 class MiResumen extends StatelessWidget {
   const MiResumen({super.key});
@@ -59,7 +60,16 @@ class MiResumen extends StatelessWidget {
                     texto2: "Stock Crítico",
                     //esto cuenta los insumos con stock <5
                     cantidad: insumos.where((i) => i.stock < 5).length,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const InsumosScreen(
+                            soloCriticos: true,
+                          ),
+                        ),
+                      );
+                    },
                     color: Colors.orange,
                   ),
                 ),
