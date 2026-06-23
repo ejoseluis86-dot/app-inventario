@@ -130,7 +130,6 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
 
             const SizedBox(height: 10),
 
-
             //BOTON ELIMINAR
             if (user.rol == "ADMIN")
               SizedBox(
@@ -142,23 +141,20 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () async {
-
                     final confirmar = await showDialog<bool>(
                       context: context,
                       builder: (_) => AlertDialog(
                         title: const Text("Eliminar insumo"),
                         content: const Text(
-                          "¿Estás seguro de eliminar este insumo?"
+                          "¿Estás seguro de eliminar este insumo?",
                         ),
                         actions: [
                           TextButton(
-                            onPressed: () =>
-                                Navigator.pop(context, false),
+                            onPressed: () => Navigator.pop(context, false),
                             child: const Text("Cancelar"),
                           ),
                           ElevatedButton(
-                            onPressed: () =>
-                                Navigator.pop(context, true),
+                            onPressed: () => Navigator.pop(context, true),
                             child: const Text("Eliminar"),
                           ),
                         ],
@@ -167,8 +163,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
 
                     if (confirmar != true) return;
 
-                    final ok =
-                        await api.eliminarInsumo(widget.insumo.id!);
+                    final ok = await api.eliminarInsumo(widget.insumo.id);
 
                     if (ok) {
                       await context

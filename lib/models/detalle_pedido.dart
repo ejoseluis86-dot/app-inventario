@@ -23,19 +23,18 @@ class DetallePedido {
       pedidoId: json['pedido_id'],
       productoId: json['producto_id'],
       cantidad: json['cantidad'],
-      precioUnitario: json['precio_unitario'].toDouble(),
+      precioUnitario: json['precio'].toDouble(),
     );
   }
 
   //esto es para convertir el objeto a json para enviarlo al backend
+  //no se manda el id porque es null al crear en el back
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'pedido_id': pedidoId,
-      'producto_id': productoId,
       'cantidad': cantidad,
-      'precio_unitario': precioUnitario,
+      'precio': precioUnitario,
       'descuento': descuento,
+      'producto_id': productoId,
     };
   }
 }

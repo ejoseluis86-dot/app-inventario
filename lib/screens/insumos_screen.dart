@@ -8,10 +8,7 @@ import 'package:mi_app/screens/insumo_detalle_screen.dart';
 class InsumosScreen extends StatefulWidget {
   final bool soloCriticos;
 
-  const InsumosScreen({
-    super.key,
-    this.soloCriticos = false,
-  });
+  const InsumosScreen({super.key, this.soloCriticos = false});
 
   @override
   State<InsumosScreen> createState() => _InsumosScreenState();
@@ -28,14 +25,14 @@ class _InsumosScreenState extends State<InsumosScreen> {
   String? filtroCategoria;
   String? filtroStock;
 
-//muestra filtro de crticos desde pantalla principal  @override
-void initState() {
-  super.initState();
+  //muestra filtro de crticos desde pantalla principal  @override
+  void initState() {
+    super.initState();
 
-  if (widget.soloCriticos) {
-    filtroStock = "CRITICO";
+    if (widget.soloCriticos) {
+      filtroStock = "CRITICO";
+    }
   }
-}
 
   void _mostrarDialogo() {
     final categorias = [
@@ -180,56 +177,45 @@ void initState() {
   }
 
   //Semáforo de stock
-    Color colorStock(int stock) {
+  Color colorStock(int stock) {
     if (stock <= 2) return Colors.red;
     if (stock <= 5) return Colors.orange;
     return Colors.green;
   }
 
-    String estadoStock(int stock) {
-      if (stock <= 2) return "Urgente";
-      if (stock <= 5) return "Crítico";
-      return "OK";
-    }
+  String estadoStock(int stock) {
+    if (stock <= 2) return "Urgente";
+    if (stock <= 5) return "Crítico";
+    return "OK";
+  }
 
   @override
   Widget build(BuildContext context) {
     final insumos = context.watch<InsumoProvider>().insumos;
     final rol = context.watch<UserProvider>().rol;
 
-    // FILTRO APLICADO
-    final filtrados = insumos.where((i) {
-    final nombre = i.nombre.toLowerCase();
+    // FILTRO POR NOMBRE
+    final filtrados =
+        insumos.where((i) {
+          final nombre = i.nombre.toLowerCase();
 
-    final matchSearch = nombre.contains(search);
+          final matchSearch = nombre.contains(search);
 
-    final matchCategoria =
-        filtroCategoria == null ||
-        i.categoria == filtroCategoria;
+          final matchCategoria =
+              filtroCategoria == null || i.categoria == filtroCategoria;
 
-    final matchCritico =
-        !widget.soloCriticos ||
-        i.stock <= 5;
+          final matchCritico = !widget.soloCriticos || i.stock <= 5;
 
-    final matchStock =
-      filtroStock == null ||
-      (filtroStock == "OK" && i.stock > 5) ||
-      (filtroStock == "CRITICO" &&
-          i.stock > 2 &&
-          i.stock <= 5) ||
-      (filtroStock == "URGENTE" &&
-          i.stock <= 2);    
+          final matchStock =
+              filtroStock == null ||
+              (filtroStock == "OK" && i.stock > 5) ||
+              (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
+              (filtroStock == "URGENTE" && i.stock <= 2);
 
-    return matchSearch &&
-      matchCategoria &&
-      matchCritico &&
-      matchStock;
-    }).toList()
-    ..sort(
-      (a, b) => a.nombre
-          .toLowerCase()
-          .compareTo(b.nombre.toLowerCase()),
-    );
+          return matchSearch && matchCategoria && matchCritico && matchStock;
+        }).toList()..sort(
+          (a, b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()),
+        );
 
     return Scaffold(
       appBar: AppBar(title: const Text("INSUMOS")),
@@ -276,39 +262,27 @@ void initState() {
               },
             ),
 
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          DropdownButtonFormField<String>(
-            value: filtroStock,
-            decoration: const InputDecoration(
-              labelText: "Estado de stock",
-              prefixIcon: Icon(Icons.traffic),
-              border: OutlineInputBorder(),
+            DropdownButtonFormField<String>(
+              value: filtroStock,
+              decoration: const InputDecoration(
+                labelText: "Estado de stock",
+                prefixIcon: Icon(Icons.traffic),
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(value: null, child: Text("Todos")),
+                DropdownMenuItem(value: "OK", child: Text("🟢 OK")),
+                DropdownMenuItem(value: "CRITICO", child: Text("🟠 Crítico")),
+                DropdownMenuItem(value: "URGENTE", child: Text("🔴 Urgente")),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  filtroStock = value;
+                });
+              },
             ),
-            items: const [
-              DropdownMenuItem(
-                value: null,
-                child: Text("Todos"),
-              ),
-              DropdownMenuItem(
-                value: "OK",
-                child: Text("🟢 OK"),
-              ),
-              DropdownMenuItem(
-                value: "CRITICO",
-                child: Text("🟠 Crítico"),
-              ),
-              DropdownMenuItem(
-                value: "URGENTE",
-                child: Text("🔴 Urgente"),
-              ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                filtroStock = value;
-              });
-            },
-          ),  
 
             const SizedBox(height: 10),
 
@@ -353,9 +327,7 @@ void initState() {
                                   ),
                                 ),
 
-                                Text(
-                                  "Ubicación: ${insumo.ubicacion}",
-                                ),
+                                Text("Ubicación: ${insumo.ubicacion}"),
                               ],
                             ),
 
@@ -372,7 +344,6 @@ void initState() {
                             },
                           ),
                         );
-
                       },
                     ),
             ),

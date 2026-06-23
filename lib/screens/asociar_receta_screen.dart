@@ -3,6 +3,7 @@ import 'package:mi_app/models/detalle_receta.dart';
 import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/services/api_service.dart';
 import 'package:provider/provider.dart';
@@ -82,6 +83,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
       //uso el api service para guardar el producto
       bool ok = await apiService.crearProducto(nuevoProducto);
       if (ok) {
+        await context.read<ProductoLiteProvider>().cargarProviderProductos();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Producto creado exitosamente"),

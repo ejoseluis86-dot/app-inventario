@@ -5,7 +5,12 @@ import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/services/auth_service.dart';
 
 class ApiService {
+<<<<<<< HEAD
   final String baseUrl = "http://10.0.2.2:8000";
+=======
+  final String baseUrl = "http://10.0.2.2:8000/";
+  final auth = AuthService();
+>>>>>>> 8ecd674d5c05e2f022aac16b65a39338fa9cda67
 
   Future<Map<String, String>> _headers() async {
     final auth = AuthService();
@@ -35,8 +40,6 @@ class ApiService {
     throw Exception('Error al obtener insumos');
   }
 
-  //3 crear un insumo
-
   // =========================
   // CREAR INSUMO
   // =========================
@@ -61,8 +64,6 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print('esto me esta trajendo la api $data');
       return true;
     } else {
       return false;
@@ -109,7 +110,6 @@ class ApiService {
     return response.statusCode == 200;
   }
 
-
   // =========================
   // STOCK RÁPIDO (opcional)
   // =========================
@@ -134,15 +134,12 @@ class ApiService {
     String rol = "EMPL",
   }) async {
     try {
-      final authService = AuthService();
-      String? token = await authService.obtenerToken();
+      final headers = await _headers();
 
       final response = await http.post(
         Uri.parse('$baseUrl/usuarios/crear/'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
+
         body: jsonEncode({
           'username': username,
           'password': password,
@@ -153,11 +150,8 @@ class ApiService {
       if (response.statusCode == 201) {
         return true;
       }
-
-      print(response.body);
       return false;
     } catch (e) {
-      print("Error crear usuario: $e");
       return false;
     }
   }
@@ -170,7 +164,6 @@ class ApiService {
     //aca traemos el token
     final authService = AuthService();
     String? token = await authService.obtenerToken();
-    print('esto estamos mandando a la base de datos ${producto.toJson()}');
     final response = await http.post(
       url,
       headers: {
@@ -193,40 +186,51 @@ class ApiService {
   Future<bool> crearPedido(Pedido pedido) async {
     final url = Uri.parse('$baseUrl/pedidos/crear/');
     //aca traemos el token
-    final authService = AuthService();
-    String? token = await authService.obtenerToken();
-
-    print('esto estamos mandando a la base de datos ${pedido.toJson()}');
+    final headers = await _headers();
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: headers,
       body: jsonEncode(pedido.toJson()),
     );
     if (response.statusCode == 201) {
       return true;
     } else {
-      await authService.refreshToken();
       return false;
     }
   }
 
+  //----------------------
+  //OBTENEMOS PRODUCTOS
+  //--------------------
   Future<List<dynamic>> obtenerProductosLite() async {
-    final url = Uri.parse("$baseUrl/productos/");
     //aca traemos el token
-    final authService = AuthService();
-    String? token = await authService.obtenerToken();
+    final headers = await _headers();
 
     final response = await http.get(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
+      Uri.parse('$baseUrl/productos/'),
+      headers: headers,
     );
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception("Error al obtener productos: ${response.body}");
+    }
+  }
 
+  //obtenemos Productos
+  //-------------------
+  //----------------------
+  //OBTENEMOS PRODUCTOS
+  //--------------------
+  Future<List<dynamic>> obtenerPedidosLite() async {
+    //aca traemos el token
+    final headers = await _headers();
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/pedidos/sin-terminar/'),
+      headers: headers,
+    );
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
       return data;

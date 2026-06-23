@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/pedido_lite_provider.dart';
+import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/widgets/widgets_home/my_button_resumen.dart';
 import 'package:provider/provider.dart';
-import 'package:mi_app/providers/insumos_provider.dart';
-import 'package:mi_app/routes/app_rutas.dart';
-import 'package:provider/provider.dart';
-import 'package:mi_app/screens/insumos_screen.dart';
 
 class MiResumen extends StatelessWidget {
   const MiResumen({super.key});
@@ -13,16 +12,13 @@ class MiResumen extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
     final insumos = context.watch<InsumoProvider>().insumos;
-
-    final stockCritico = insumos.where((i) => i.stock <= 5).length;
+    final pedidos = context.watch<PedidoLiteProvider>().pedidosLite;
 
     return Card(
       elevation: 4,
       color: Theme.of(context).colorScheme.surface,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -30,11 +26,7 @@ class MiResumen extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.dashboard_rounded,
-                  color: color.primary,
-                  size: 28,
-                ),
+                Icon(Icons.dashboard_rounded, color: color.primary, size: 28),
 
                 const SizedBox(width: 10),
 
@@ -53,10 +45,7 @@ class MiResumen extends StatelessWidget {
 
             Text(
               "Indicadores principales del sistema",
-              style: TextStyle(
-                fontSize: 13,
-                color: color.onSurfaceVariant,
-              ),
+              style: TextStyle(fontSize: 13, color: color.onSurfaceVariant),
             ),
 
             const SizedBox(height: 18),
@@ -68,17 +57,9 @@ class MiResumen extends StatelessWidget {
                     icono: Icons.warning_amber_rounded,
                     texto1: "Alerta de",
                     texto2: "Stock Crítico",
-                    cantidad: stockCritico,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const InsumosScreen(
-                            soloCriticos: true,
-                          ),
-                        ),
-                      );
-                    },
+                    //esto cuenta los insumos con stock <5
+                    cantidad: insumos.where((i) => i.stock < 5).length,
+                    onPressed: () {},
                     color: Colors.orange,
                   ),
                 ),
@@ -90,8 +71,10 @@ class MiResumen extends StatelessWidget {
                     icono: Icons.assignment,
                     texto1: "Pedidos",
                     texto2: "Activos",
-                    cantidad: 16,
-                    onPressed: () {},
+                    cantidad: pedidos.length,
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, AppRutas.trabajo);
+                    },
                     color: Colors.green,
                   ),
                 ),

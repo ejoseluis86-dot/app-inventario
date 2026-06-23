@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
@@ -25,16 +26,14 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => cargando = true);
 
     try {
-      final data = await authService.login(
-        txtUsuario.text,
-        txtPassword.text,
-      );
+      final data = await authService.login(txtUsuario.text, txtPassword.text);
 
       if (!mounted) return;
 
       final userProvider = context.read<UserProvider>();
 
       if (data != null) {
+<<<<<<< HEAD
         userProvider.setUser(
           data['id'],
           data['username'],
@@ -42,24 +41,26 @@ class _LoginScreenState extends State<LoginScreen> {
           nombre: data['nombre'],
           apellido: data['apellido'],
         );
+=======
+        userProvider.setUser(data['id'], data['nombre'], data['permiso']);
+>>>>>>> 8ecd674d5c05e2f022aac16b65a39338fa9cda67
 
         context.read<InsumoProvider>().cargarProviderInsumos();
         context.read<ProductoLiteProvider>().cargarProviderProductos();
+        context.read<PedidoLiteProvider>().cargarProviderPedidos();
 
         if (!mounted) return;
 
         Navigator.pushReplacementNamed(context, AppRutas.home);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Usuario o contraseña incorrectos'),
-          ),
+          const SnackBar(content: Text('Usuario o contraseña incorrectos')),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
 
     if (!mounted) return;
@@ -82,10 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF6A1B9A),
-              Color(0xFFEDE7F6),
-            ],
+            colors: [Color(0xFF6A1B9A), Color(0xFFEDE7F6)],
           ),
         ),
         child: Center(
@@ -101,12 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     // LOGO
-                    Image.asset(
-                      'assets/sz2.png',
-                      height: 160,
-                    ),
+                    Image.asset('assets/sz2.png', height: 160),
 
                     const SizedBox(height: 20),
                     const Text(
@@ -206,9 +200,7 @@ class _PasswordFieldState extends State<_PasswordField> {
         prefixIcon: const Icon(Icons.lock),
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
-          icon: Icon(
-            oculto ? Icons.visibility : Icons.visibility_off,
-          ),
+          icon: Icon(oculto ? Icons.visibility : Icons.visibility_off),
           onPressed: () {
             setState(() => oculto = !oculto);
           },
