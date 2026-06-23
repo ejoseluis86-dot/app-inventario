@@ -6,6 +6,8 @@ import 'package:mi_app/services/auth_service.dart';
 
 class ApiService {
   final String baseUrl = "http://10.0.2.2:8000/";
+  //esta para emulador
+  //http://10.0.2.2:8000/
   final auth = AuthService();
 
   Future<Map<String, String>> _headers() async {
