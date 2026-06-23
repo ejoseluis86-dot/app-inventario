@@ -12,6 +12,9 @@ class MyHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>();
 
+    final nombreCompleto =
+        "${user.nombre ?? user.username ?? ''} ${user.apellido ?? ''}".trim();
+
     return Scaffold(
       backgroundColor: Colors.transparent,
 
@@ -27,15 +30,14 @@ class MyHomeScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         toolbarHeight: 90,
 
+        // ---------------- LOGO + TITULO ----------------
         title: Row(
           children: [
             Image.asset(
               "assets/sz_3.png",
               height: 33,
             ),
-
             const SizedBox(width: 10),
-
             const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,9 +57,7 @@ class MyHomeScreen extends StatelessWidget {
                     "Panel de gestión",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(fontSize: 12),
                   ),
                 ],
               ),
@@ -65,45 +65,52 @@ class MyHomeScreen extends StatelessWidget {
           ],
         ),
 
+        // ---------------- USUARIO + ACCIONES ----------------
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: 10),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // TEXTO USUARIO
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      user.username ?? "Usuario",
+                      nombreCompleto.isEmpty ? "Usuario" : nombreCompleto,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     Text(
-                      user.rol == "ADMIN"
-                          ? "Administrador"
-                          : "Empleado",
+                      user.rol == "ADMIN" ? "Administrador" : "Empleado",
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
 
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
 
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primary,
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 18,
+                // BOTÓN PERFIL
+                InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRutas.perfil);
+                  },
+                  child: CircleAvatar(
+                    radius: 17,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                   ),
                 ),
 
+                // LOGOUT
                 IconButton(
                   icon: const Icon(Icons.logout),
                   onPressed: () {
@@ -122,15 +129,14 @@ class MyHomeScreen extends StatelessWidget {
         ],
       ),
 
-      // ---------------- BODY CON DEGRADÉ ----------------
+      // ---------------- BODY ----------------
       body: Builder(
         builder: (context) {
-          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final isDark =
+              Theme.of(context).brightness == Brightness.dark;
 
           return Stack(
             children: [
-
-              // FONDO SOLO EN modo claro
               if (!isDark)
                 Container(
                   decoration: const BoxDecoration(
@@ -145,16 +151,14 @@ class MyHomeScreen extends StatelessWidget {
                   ),
                 )
               else
-                // 🌑 FONDO DARK NORMAL DEL THEME
                 Container(
                   color: Theme.of(context).scaffoldBackgroundColor,
                 ),
 
-              // 📱 CONTENIDO
-              SingleChildScrollView(
-                padding: const EdgeInsets.all(12),
+              const SingleChildScrollView(
+                padding: EdgeInsets.all(12),
                 child: Column(
-                  children: const [
+                  children: [
                     MiResumen(),
                     SizedBox(height: 12),
                     MyBotonera(),

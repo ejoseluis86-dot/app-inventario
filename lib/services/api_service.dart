@@ -5,7 +5,7 @@ import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/services/auth_service.dart';
 
 class ApiService {
-  final String baseUrl = "http://10.0.2.2:8000/";
+  final String baseUrl = "http://10.0.2.2:8000";
 
   Future<Map<String, String>> _headers() async {
     final auth = AuthService();
@@ -162,7 +162,9 @@ class ApiService {
     }
   }
 
-  //5
+  // =========================
+  // CREAR PRODUCTO
+  // =========================
   Future<bool> crearProducto(Producto producto) async {
     final url = Uri.parse('$baseUrl/productos/crear/');
     //aca traemos el token
@@ -185,7 +187,9 @@ class ApiService {
     }
   }
 
-  //6
+   // =========================
+  // CREAR PEDIDO
+  // =========================
   Future<bool> crearPedido(Pedido pedido) async {
     final url = Uri.parse('$baseUrl/pedidos/crear/');
     //aca traemos el token
@@ -230,4 +234,47 @@ class ApiService {
       throw Exception("Error al obtener productos: ${response.body}");
     }
   }
+
+  
+    // =========================
+  // OBTENER PERFIL
+  // =========================
+  Future<Map<String, dynamic>> obtenerMiPerfil() async {
+  final headers = await _headers();
+
+  final response = await http.get(
+    Uri.parse('$baseUrl/usuarios/miPerfil/'),
+    headers: headers,
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  }
+
+  throw Exception("Error al obtener perfil");
+}
+
+ // =========================
+  // ACTUALIZAR PERFIL
+  // =========================
+Future<bool> actualizarMiPerfil({
+  required String nombre,
+  required String apellido,
+  required String username,
+}) async {
+  final headers = await _headers();
+
+  final response = await http.put(
+    Uri.parse('$baseUrl/usuarios/modificarMiPerfil/'),
+    headers: headers,
+    body: jsonEncode({
+      "nombre": nombre,
+      "apellido": apellido,
+      "username": username,
+    }),
+  );
+
+  return response.statusCode == 200;
+}
+
 }
