@@ -70,26 +70,41 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
 
   //crea el pedido con todos los detalles incluidos este pedido se guardara en la base de datos
   Future<void> guardarPedido() async {
-    if (nombreController.text.isNotEmpty && detallesPedido.isNotEmpty) {
-      final Pedido nuevoPedido = Pedido(
-        fecha: DateTime.now(),
-        cliente: nombreController.text,
-        usuario: 1, //acase irá un id de usuario de la BD
-        detalles: detallesPedido,
-        terminado: false,
+    if (nombreController.text.isEmpty || detallesPedido.isEmpty) return;
+
+    final Pedido nuevoPedido = Pedido(
+      fecha: DateTime.now(),
+      cliente: nombreController.text,
+      usuario: 1,
+      detalles: detallesPedido,
+      terminado: false,
+    );
+
+    print('Pedido a guardar: ${nuevoPedido.toJson()}');
+
+    final ok = await ApiService().crearPedido(nuevoPedido);
+
+    print("RESULTADO API: $ok");
+
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error al guardar pedido")),
       );
-      print('Pedido a guardar : ${nuevoPedido.toJson()}');
-      //aca estoy guardando el pedido en la API devuelve un bool
-      bool ok = await ApiService().crearPedido(nuevoPedido);
-      if (ok) {
-        await context.read<PedidoLiteProvider>().cargarProviderPedidos();
-        print('Pedido guardado: ${nuevoPedido.toJson()}');
-      }
-      nombreController.clear();
-      cantidadController.clear();
-      descuentoController.clear();
-      setState(() {});
+      return;
     }
+
+    await context.read<PedidoLiteProvider>().cargarProviderPedidos();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Pedido guardado correctamente")),
+    );
+
+    nombreController.clear();
+    cantidadController.clear();
+    descuentoController.clear();
+    detallesPedido.clear();
+
+    setState(() {});
   }
 
   @override

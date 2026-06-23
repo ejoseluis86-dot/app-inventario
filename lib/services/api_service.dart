@@ -183,18 +183,34 @@ class ApiService {
   // =========================
   Future<bool> crearPedido(Pedido pedido) async {
     final url = Uri.parse('$baseUrl/pedidos/crear/');
-    //aca traemos el token
     final headers = await _headers();
+
     final response = await http.post(
       url,
       headers: headers,
       body: jsonEncode(pedido.toJson()),
     );
-    if (response.statusCode == 201) {
-      return true;
-    } else {
-      return false;
+
+    if (response.statusCode == 401) {
+      print("Token vencido, intentando refresh...");
+
+      await AuthService().refreshToken();
+
+      final newHeaders = await _headers();
+
+      final retry = await http.post(
+        url,
+        headers: newHeaders,
+        body: jsonEncode(pedido.toJson()),
+      );
+
+      print("RETRY STATUS: ${retry.statusCode}");
+      print("RETRY BODY: ${retry.body}");
+
+      return retry.statusCode == 201 || retry.statusCode == 200;
     }
+
+    return response.statusCode == 201 || response.statusCode == 200;
   }
 
   //----------------------
