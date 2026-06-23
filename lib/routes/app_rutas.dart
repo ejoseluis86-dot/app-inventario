@@ -7,6 +7,8 @@ import 'package:mi_app/screens/insumos_screen.dart';
 import 'package:mi_app/screens/login_screen.dart';
 import 'package:mi_app/screens/nuevo_producto_screen.dart';
 import 'package:mi_app/screens/trabajo_pedidos_screen.dart';
+import 'package:mi_app/screens/perfil_screen.dart';
+
 
 class AppRutas {
   static const String home = '/';
@@ -17,6 +19,7 @@ class AppRutas {
   static const String trabajo = '/trabajo';
   static const String login = '/login';
   static const String crearUsuario = '/crearUsuario';
+  static const perfil = '/perfil';
 
   static Map<String, WidgetBuilder> rutas = {
     home: (context) => const MyHomeScreen(),
@@ -31,5 +34,6 @@ class AppRutas {
     trabajo: (context) => const TrabajoPedidosScreen(),
     login: (context) => const LoginScreen(),
     crearUsuario: (context) => const CrearUsuarioScreen(),
+    perfil: (context) => const PerfilScreen(),
   };
 }

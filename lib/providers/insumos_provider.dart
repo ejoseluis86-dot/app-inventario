@@ -6,6 +6,9 @@ class InsumoProvider extends ChangeNotifier {
   final ApiService api = ApiService();
 
   List<Insumo> insumos = [];
+  List<Insumo> get insumosCriticos {
+  return insumos.where((i) => i.stock < 5).toList();
+}
 
   Future<void> cargarProviderInsumos() async {
     final data = await api.obtenerInsumos();

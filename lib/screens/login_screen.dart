@@ -33,7 +33,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final userProvider = context.read<UserProvider>();
 
       if (data != null) {
-        userProvider.setUser(data['id'], data['nombre'], data['permiso']);
+
+        userProvider.setUser(
+          data['id'],
+          data['username'],
+          data['permiso'],
+          nombre: data['nombre'],
+          apellido: data['apellido'],
+        );
+
+        
 
         context.read<InsumoProvider>().cargarProviderInsumos();
         context.read<ProductoLiteProvider>().cargarProviderProductos();

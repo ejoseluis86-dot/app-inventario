@@ -154,7 +154,9 @@ class ApiService {
     }
   }
 
-  //5
+  // =========================
+  // CREAR PRODUCTO
+  // =========================
   Future<bool> crearProducto(Producto producto) async {
     final url = Uri.parse('$baseUrl/productos/crear/');
     //aca traemos el token
@@ -176,21 +178,39 @@ class ApiService {
     }
   }
 
-  //6
+  // =========================
+  // CREAR PEDIDO
+  // =========================
   Future<bool> crearPedido(Pedido pedido) async {
     final url = Uri.parse('$baseUrl/pedidos/crear/');
-    //aca traemos el token
     final headers = await _headers();
+
     final response = await http.post(
       url,
       headers: headers,
       body: jsonEncode(pedido.toJson()),
     );
-    if (response.statusCode == 201) {
-      return true;
-    } else {
-      return false;
+
+    if (response.statusCode == 401) {
+      print("Token vencido, intentando refresh...");
+
+      await AuthService().refreshToken();
+
+      final newHeaders = await _headers();
+
+      final retry = await http.post(
+        url,
+        headers: newHeaders,
+        body: jsonEncode(pedido.toJson()),
+      );
+
+      print("RETRY STATUS: ${retry.statusCode}");
+      print("RETRY BODY: ${retry.body}");
+
+      return retry.statusCode == 201 || retry.statusCode == 200;
     }
+
+    return response.statusCode == 201 || response.statusCode == 200;
   }
 
   //----------------------
@@ -231,5 +251,49 @@ class ApiService {
     } else {
       throw Exception("Error al obtener productos: ${response.body}");
     }
+  }
+
+  // =========================
+  // OBTENER PERFIL
+  // =========================
+  Future<Map<String, dynamic>> obtenerMiPerfil() async {
+    final headers = await _headers();
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/usuarios/miPerfil/'),
+      headers: headers,
+    );
+
+    print("STATUS: ${response.statusCode}");
+    print("BODY: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Error al obtener perfil");
+  }
+
+  // =========================
+  // ACTUALIZAR PERFIL
+  // =========================
+  Future<bool> actualizarMiPerfil({
+    required String nombre,
+    required String apellido,
+    required String username,
+  }) async {
+    final headers = await _headers();
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/usuarios/modificarMiPerfil/'),
+      headers: headers,
+      body: jsonEncode({
+        "nombre": nombre,
+        "apellido": apellido,
+        "username": username,
+      }),
+    );
+
+    return response.statusCode == 200;
   }
 }

@@ -42,20 +42,14 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
     }
     setState(() {
       detallesPedido.add(
-        //aca estoy creando un nuevo detalle de receta con el insumo seleccionado y la cantidad ingresada, y lo agrego a la lista de detalles
-        DetallePedido(
-          cantidad: int.parse(cantidadController.text),
-          descuento: double.tryParse(descuentoController.text) ?? 0.0,
-          precioUnitario: //aca se pone el precio total con el descuento incluido
-              productoSeleccionado!.precio *
-                  int.parse(cantidadController.text) -
-              productoSeleccionado!.precio *
-                  (double.tryParse(descuentoController.text) ?? 0.0) /
-                  100,
-          productoId: productoSeleccionado!.id,
-          pedidoId: null,
-        ),
-      );
+  DetallePedido(
+    cantidad: int.parse(cantidadController.text),
+    descuento: double.tryParse(descuentoController.text) ?? 0.0,
+    precioUnitario: productoSeleccionado!.precio,
+    productoId: productoSeleccionado!.id,
+    pedidoId: null,
+  ),
+);
       //limpio los campos
       cantidadController.clear();
       descuentoController.clear();
@@ -70,27 +64,27 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
 
   //crea el pedido con todos los detalles incluidos este pedido se guardara en la base de datos
   Future<void> guardarPedido() async {
-    if (nombreController.text.isNotEmpty && detallesPedido.isNotEmpty) {
-      final Pedido nuevoPedido = Pedido(
-        fecha: DateTime.now(),
-        cliente: nombreController.text,
-        usuario: 1, //acase irá un id de usuario de la BD
-        detalles: detallesPedido,
-        terminado: false,
-      );
-      print('Pedido a guardar : ${nuevoPedido.toJson()}');
-      //aca estoy guardando el pedido en la API devuelve un bool
-      bool ok = await ApiService().crearPedido(nuevoPedido);
-      if (ok) {
-        await context.read<PedidoLiteProvider>().cargarProviderPedidos();
-        print('Pedido guardado: ${nuevoPedido.toJson()}');
-      }
-      nombreController.clear();
-      cantidadController.clear();
-      descuentoController.clear();
-      setState(() {});
+  if (nombreController.text.isEmpty || detallesPedido.isEmpty) return;
+
+  final Pedido nuevoPedido = Pedido(
+    fecha: DateTime.now(),
+    cliente: nombreController.text,
+    usuario: 1,
+    detalles: detallesPedido,
+    terminado: false,
+  );
+
+  bool ok = await ApiService().crearPedido(nuevoPedido);
+
+  if (ok) {
+    await context.read<PedidoLiteProvider>().cargarProviderPedidos();
+
+    // 🔥 IMPORTANTE: salir de la pantalla
+    if (mounted) {
+      Navigator.pop(context);
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
