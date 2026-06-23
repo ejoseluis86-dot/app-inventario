@@ -29,10 +29,7 @@ class MyHomeScreen extends StatelessWidget {
 
         title: Row(
           children: [
-            Image.asset(
-              "assets/sz_3.png",
-              height: 33,
-            ),
+            Image.asset("assets/sz_3.png", height: 33),
 
             const SizedBox(width: 10),
 
@@ -55,9 +52,7 @@ class MyHomeScreen extends StatelessWidget {
                     "Panel de gestión",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(fontSize: 12),
                   ),
                 ],
               ),
@@ -83,9 +78,7 @@ class MyHomeScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      user.rol == "ADMIN"
-                          ? "Administrador"
-                          : "Empleado",
+                      user.rol == "ADMIN" ? "Administrador" : "Empleado",
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
@@ -95,8 +88,7 @@ class MyHomeScreen extends StatelessWidget {
 
                 CircleAvatar(
                   radius: 16,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   child: const Icon(
                     Icons.person,
                     color: Colors.white,
@@ -129,7 +121,6 @@ class MyHomeScreen extends StatelessWidget {
 
           return Stack(
             children: [
-
               // FONDO SOLO EN modo claro
               if (!isDark)
                 Container(
@@ -137,18 +128,13 @@ class MyHomeScreen extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF6A1B9A),
-                        Color(0xFFEDE7F6),
-                      ],
+                      colors: [Color(0xFF6A1B9A), Color(0xFFEDE7F6)],
                     ),
                   ),
                 )
               else
                 // 🌑 FONDO DARK NORMAL DEL THEME
-                Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
+                Container(color: Theme.of(context).scaffoldBackgroundColor),
 
               // 📱 CONTENIDO
               SingleChildScrollView(

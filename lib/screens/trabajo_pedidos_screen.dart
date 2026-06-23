@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/pedido_lite.dart';
+import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:mi_app/screens/trabajo_screen.dart';
+import 'package:provider/provider.dart';
 
 class TrabajoPedidosScreen extends StatefulWidget {
   const TrabajoPedidosScreen({super.key});
@@ -24,6 +26,8 @@ class _TrabajoPedidosScreen extends State<TrabajoPedidosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //estos son los pedidos del provider cargados en el login
+    final pedidos = context.read<PedidoLiteProvider>().pedidosLite;
     return Scaffold(
       appBar: AppBar(title: const Text('Pedidos')),
       body: pedidos.isEmpty

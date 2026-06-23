@@ -12,10 +12,3 @@ class ProductoLiteProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-/*  Future<void> cargarProviderInsumos() async {
-    final data = await api.obtenerInsumos();
-
-    insumos = data.map<Insumo>((json) => Insumo.fromJson(json)).toList();
-
-    notifyListeners();
-  } */

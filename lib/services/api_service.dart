@@ -208,24 +208,26 @@ class ApiService {
     } else {
       throw Exception("Error al obtener productos: ${response.body}");
     }
+  }
 
-    /*  // =========================
-  // INSUMOS - LISTAR
-  // =========================
-  Future<List<dynamic>> obtenerInsumos() async {
+  //obtenemos Productos
+  //-------------------
+  //----------------------
+  //OBTENEMOS PRODUCTOS
+  //--------------------
+  Future<List<dynamic>> obtenerPedidosLite() async {
+    //aca traemos el token
     final headers = await _headers();
 
     final response = await http.get(
-      Uri.parse('$baseUrl/insumos/'),
+      Uri.parse('$baseUrl/pedidos/sin-terminar/'),
       headers: headers,
     );
-
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final List data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception("Error al obtener productos: ${response.body}");
     }
-
-    throw Exception('Error al obtener insumos');
-  }
- */
   }
 }

@@ -8,7 +8,7 @@ class PedidoLite {
   factory PedidoLite.fromJson(Map<String, dynamic> json) {
     return PedidoLite(
       id: json['id'],
-      cliente: json['nombre'],
+      cliente: json['cliente'],
       fecha: DateTime.parse(json['fecha']),
     );
   }

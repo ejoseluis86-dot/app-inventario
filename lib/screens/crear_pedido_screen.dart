@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/detalle_pedido.dart';
 import 'package:mi_app/models/pedido.dart';
-import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/models/producto_lite.dart';
+import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
+import 'package:mi_app/services/api_service.dart';
 import 'package:provider/provider.dart';
 
 class CrearPedidoScreen extends StatefulWidget {
@@ -68,16 +69,22 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
   }
 
   //crea el pedido con todos los detalles incluidos este pedido se guardara en la base de datos
-  void guardarPedido() {
+  Future<void> guardarPedido() async {
     if (nombreController.text.isNotEmpty && detallesPedido.isNotEmpty) {
       final Pedido nuevoPedido = Pedido(
         fecha: DateTime.now(),
         cliente: nombreController.text,
-        usuarioId: 1, //acase irá un id de usuario de la BD
+        usuario: 1, //acase irá un id de usuario de la BD
         detalles: detallesPedido,
         terminado: false,
       );
-      print('Pedido guardado: ${nuevoPedido.toJson()}');
+      print('Pedido a guardar : ${nuevoPedido.toJson()}');
+      //aca estoy guardando el pedido en la API devuelve un bool
+      bool ok = await ApiService().crearPedido(nuevoPedido);
+      if (ok) {
+        await context.read<PedidoLiteProvider>().cargarProviderPedidos();
+        print('Pedido guardado: ${nuevoPedido.toJson()}');
+      }
       nombreController.clear();
       cantidadController.clear();
       descuentoController.clear();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
@@ -36,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         context.read<InsumoProvider>().cargarProviderInsumos();
         context.read<ProductoLiteProvider>().cargarProviderProductos();
+        context.read<PedidoLiteProvider>().cargarProviderPedidos();
 
         if (!mounted) return;
 

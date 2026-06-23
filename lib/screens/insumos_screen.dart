@@ -169,7 +169,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
     final insumos = context.watch<InsumoProvider>().insumos;
     final rol = context.watch<UserProvider>().rol;
 
-    // 🔥 FILTRO REAL APLICADO
+    // FILTRO POR NOMBRE
     final filtrados = insumos.where((i) {
       final nombre = i.nombre.toLowerCase();
 

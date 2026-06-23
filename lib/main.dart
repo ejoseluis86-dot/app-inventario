@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
+import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
@@ -12,6 +13,7 @@ void main() => runApp(
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => InsumoProvider()),
       ChangeNotifierProvider(create: (_) => ProductoLiteProvider()),
+      ChangeNotifierProvider(create: (_) => PedidoLiteProvider()),
     ],
     child: const MainApp(),
   ),
