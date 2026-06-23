@@ -12,6 +12,12 @@ class InsumoProvider extends ChangeNotifier {
 
     insumos = data.map<Insumo>((json) => Insumo.fromJson(json)).toList();
 
+    insumos.sort(
+      (a, b) => a.nombre.toLowerCase().compareTo(
+        b.nombre.toLowerCase(),
+      ),
+    );
+
     notifyListeners();
   }
 
