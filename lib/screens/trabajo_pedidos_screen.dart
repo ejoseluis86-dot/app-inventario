@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/models/detalle_pedido.dart';
-import 'package:mi_app/models/pedido_lite.dart';
-import 'package:mi_app/models/producto_lite.dart';
 import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/screens/trabajo_screen.dart';
-
-
 
 class TrabajoPedidosScreen extends StatelessWidget {
   const TrabajoPedidosScreen({super.key});
