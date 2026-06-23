@@ -242,19 +242,22 @@ class ApiService {
   // OBTENER PERFIL
   // =========================
   Future<Map<String, dynamic>> obtenerMiPerfil() async {
-  final headers = await _headers();
+    final headers = await _headers();
 
-  final response = await http.get(
-    Uri.parse('$baseUrl/usuarios/miPerfil/'),
-    headers: headers,
-  );
+    final response = await http.get(
+      Uri.parse('$baseUrl/usuarios/miPerfil/'),
+      headers: headers,
+    );
 
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body);
+    print("STATUS: ${response.statusCode}");
+    print("BODY: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Error al obtener perfil");
   }
-
-  throw Exception("Error al obtener perfil");
-}
 
  // =========================
   // ACTUALIZAR PERFIL
