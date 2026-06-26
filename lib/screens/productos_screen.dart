@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:mi_app/providers/user_provider.dart';
+import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
 
 class ProductosScreen extends StatefulWidget {
@@ -16,6 +18,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
   @override
   Widget build(BuildContext context) {
     final productos = context.watch<ProductoLiteProvider>().productosLite;
+    final rol = context.watch<UserProvider>().rol;
 
     final filtrados =
         productos.where((p) {
@@ -165,6 +168,17 @@ class _ProductosScreenState extends State<ProductosScreen> {
           ],
         ),
       ),
+      floatingActionButton: rol == "ADMIN"
+        ? FloatingActionButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                AppRutas.nuevoProducto,
+              );
+            },
+            child: const Icon(Icons.add),
+          )
+        : null,
     );
   }
 }
