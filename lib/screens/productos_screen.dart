@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:mi_app/providers/producto_lite_provider.dart';
-import 'package:mi_app/providers/user_provider.dart';
-import 'package:mi_app/models/producto_lite.dart';
-import 'package:mi_app/screens/nuevo_producto_screen.dart';
 
 class ProductosScreen extends StatefulWidget {
   const ProductosScreen({super.key});
@@ -14,149 +10,160 @@ class ProductosScreen extends StatefulWidget {
 }
 
 class _ProductosScreenState extends State<ProductosScreen> {
-  final buscador = TextEditingController();
-
-  String categoria = "Todas";
-
-  final categorias = [
-    "Todas",
-    "Cerámica",
-    "Plástico",
-    "Metal",
-    "Madera",
-    "Papel",
-    "Vidrio",
-    "Textil",
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-
-    Future.microtask(() {
-      context.read<ProductoLiteProvider>().cargarProviderProductos();
-    });
-  }
+  String search = "";
+  String? filtroCategoria;
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ProductoLiteProvider>();
+    final productos = context.watch<ProductoLiteProvider>().productosLite;
 
-    final rol = context.watch<UserProvider>().rol;
+    final filtrados =
+        productos.where((p) {
+          final matchNombre = p.nombre.toLowerCase().contains(search);
 
-    List<ProductoLite> lista = provider.productosLite;
+          final matchCategoria =
+              filtroCategoria == null || p.categoria == filtroCategoria;
 
-    if (categoria != "Todas") {
-      lista = lista
-          .where((e) => e.categoria == categoria)
-          .toList();
-    }
-
-    if (buscador.text.isNotEmpty) {
-      lista = lista.where((e) {
-        return e.nombre.toLowerCase().contains(
-              buscador.text.toLowerCase(),
-            );
-      }).toList();
-    }
+          return matchNombre && matchCategoria;
+        }).toList()
+          ..sort(
+            (a, b) =>
+                a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()),
+          );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Productos"),
+        title: const Text("PRODUCTOS"),
       ),
 
-      floatingActionButton: rol == "ADMIN"
-          ? FloatingActionButton.extended(
-              icon: const Icon(Icons.add),
-              label: const Text("Nuevo"),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const NuevoProductoScreen(),
-                  ),
-                );
-              },
-            )
-          : null,
+      body: Padding(
+        padding: const EdgeInsets.all(12),
 
-      body: Column(
-        children: [
+        child: Column(
+          children: [
 
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              controller: buscador,
+            TextField(
               decoration: const InputDecoration(
+                labelText: "Buscar producto",
                 prefixIcon: Icon(Icons.search),
-                hintText: "Buscar producto...",
+                border: OutlineInputBorder(),
               ),
-              onChanged: (_) => setState(() {}),
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: DropdownButtonFormField<String>(
-              value: categoria,
-              decoration: const InputDecoration(
-                labelText: "Categoría",
-              ),
-              items: categorias
-                  .map(
-                    (e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(e),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (v) {
+              onChanged: (value) {
                 setState(() {
-                  categoria = v!;
+                  search = value.toLowerCase();
                 });
               },
             ),
-          ),
 
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          Expanded(
-            child: ListView.builder(
-              itemCount: lista.length,
-              itemBuilder: (_, i) {
-                final producto = lista[i];
+            DropdownButtonFormField<String>(
+              value: filtroCategoria,
+              decoration: const InputDecoration(
+                labelText: "Categoría",
+                prefixIcon: Icon(Icons.filter_list),
+                border: OutlineInputBorder(),
+              ),
+              items: const [
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 5,
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text(producto.nombre[0]),
-                    ),
+                DropdownMenuItem(
+                  value: null,
+                  child: Text("Todas"),
+                ),
 
-                    title: Text(producto.nombre),
+                DropdownMenuItem(
+                  value: "Cerámica",
+                  child: Text("Cerámica"),
+                ),
 
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("\$ ${producto.precio.toStringAsFixed(2)}"),
-                        Text(producto.categoria),
-                      ],
-                    ),
+                DropdownMenuItem(
+                  value: "Plástico",
+                  child: Text("Plástico"),
+                ),
 
-                    trailing: const Icon(Icons.chevron_right),
+                DropdownMenuItem(
+                  value: "Metal",
+                  child: Text("Metal"),
+                ),
 
-                    onTap: () {
-                      // siguiente paso
-                    },
-                  ),
-                );
+                DropdownMenuItem(
+                  value: "Madera",
+                  child: Text("Madera"),
+                ),
+
+                DropdownMenuItem(
+                  value: "Papel",
+                  child: Text("Papel"),
+                ),
+
+                DropdownMenuItem(
+                  value: "Vidrio",
+                  child: Text("Vidrio"),
+                ),
+
+                DropdownMenuItem(
+                  value: "Textil",
+                  child: Text("Textil"),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  filtroCategoria = value;
+                });
               },
             ),
-          ),
-        ],
+
+            const SizedBox(height: 12),
+
+            Expanded(
+              child: filtrados.isEmpty
+                  ? const Center(
+                      child: Text("No hay productos"),
+                    )
+                  : ListView.builder(
+                      itemCount: filtrados.length,
+                      itemBuilder: (_, index) {
+                        final producto = filtrados[index];
+
+                        return Card(
+                          child: ListTile(
+                            leading: const Icon(Icons.inventory_2),
+
+                            title: Text(
+                              producto.nombre,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            subtitle: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+
+                                Text(
+                                  producto.categoria,
+                                ),
+
+                                Text(
+                                  "\$ ${producto.precio.toStringAsFixed(2)}",
+                                ),
+                              ],
+                            ),
+
+                            trailing:
+                                const Icon(Icons.chevron_right),
+
+                            onTap: () {
+                              // después abriremos ProductoDetalleScreen
+                            },
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

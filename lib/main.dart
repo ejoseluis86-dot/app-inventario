@@ -6,6 +6,7 @@ import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/theme/app_themes.dart';
 import 'package:provider/provider.dart';
+import 'package:mi_app/screens/productos_screen.dart';
 
 void main() => runApp(
   MultiProvider(
