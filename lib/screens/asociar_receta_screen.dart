@@ -87,6 +87,43 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
     );
     return;
   }
+
+  final nuevoProducto = Producto(
+    nombre: widget.nombreProducto,
+    precio: widget.precioProducto,
+    categoria: widget.categoria,
+    detalles: detalles,
+  );
+
+  final ok = await apiService.crearProducto(nuevoProducto);
+
+  if (ok) {
+    await context.read<ProductoLiteProvider>().cargarProviderProductos();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Producto creado correctamente"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRutas.home,
+      (route) => false,
+    );
+  } else {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("No se pudo crear el producto"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 }
   @override
   Widget build(BuildContext context) {
@@ -103,86 +140,125 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            // HEADER
             Text(
               widget.nombreProducto,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              "Arma la receta del producto",
+              style: TextStyle(
+                color: Colors.grey[600],
               ),
             ),
 
             const SizedBox(height: 20),
 
-            DropdownButtonFormField<Insumo>(
-              initialValue: insumoSeleccionado,
-
-              decoration: const InputDecoration(
-                labelText: 'Seleccionar Insumo Base',
-                border: OutlineInputBorder(),
+            // FORM CARD
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
 
-              items: insumosBD.map((insumo) {
-                return DropdownMenuItem<Insumo>(
-                  value: insumo,
-                  child: Text(insumo.nombre),
-                );
-              }).toList(),
+                    DropdownButtonFormField<Insumo>(
+                      value: insumoSeleccionado,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Insumo',
+                        prefixIcon: Icon(Icons.inventory_2),
+                        border: OutlineInputBorder(),
+                      ),
+                      items: insumosBD.map((insumo) {
+                        return DropdownMenuItem(
+                          value: insumo,
+                          child: Text(insumo.nombre),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          insumoSeleccionado = value;
+                        });
+                      },
+                    ),
 
-              onChanged: (Insumo? value) {
-                setState(() {
-                  insumoSeleccionado = value;
-                });
-              },
-            ),
+                    const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
+                    TextField(
+                      controller: cantidadController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Cantidad teórica',
+                        prefixIcon: Icon(Icons.numbers),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
 
-            TextField(
-              controller: cantidadController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: const InputDecoration(
-                labelText: 'Cantidad Teorica Requerida',
-                border: OutlineInputBorder(),
-              ),
-            ),
+                    const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: agregarDetalle,
-                icon: const Icon(Icons.add),
-                label: const Text('Agregar'),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: agregarDetalle,
+                        icon: const Icon(Icons.add),
+                        label: const Text("Agregar a receta"),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
             const SizedBox(height: 20),
 
+            // LISTA HEADER
+            const Text(
+              "Insumos agregados",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // LISTA
             Expanded(
               child: detalles.isEmpty
-                  ? const Center(child: Text('No hay detalles agregados'))
+                  ? const Center(
+                      child: Text("No hay insumos agregados"),
+                    )
                   : ListView.builder(
                       itemCount: detalles.length,
                       itemBuilder: (context, index) {
                         final detalle = detalles[index];
 
+                        final insumo = insumosBD.firstWhere(
+                          (i) => i.id == detalle.insumoId,
+                        );
+
                         return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
                           child: ListTile(
-                            title: Text(
-                              insumosBD
-                                  .firstWhere(
-                                    (insumo) => insumo.id == detalle.insumoId,
-                                  )
-                                  .nombre,
-                            ),
-                            subtitle: Text(
-                              'Cantidad: ${detalle.cantidadTeorica}',
-                            ),
+                            leading: const Icon(Icons.check_circle, color: Colors.green),
+
+                            title: Text(insumo.nombre),
+
+                            subtitle: Text("Cantidad: ${detalle.cantidadTeorica}"),
+
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () => eliminarDetalle(index),
@@ -193,12 +269,21 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
                     ),
             ),
 
+            const SizedBox(height: 10),
+
+            // FINAL BUTTON
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 onPressed: guardarReceta,
-                child: const Text('GUARDAR RECETA COMPLETA'),
+                child: const Text("Guardar producto"),
               ),
             ),
           ],

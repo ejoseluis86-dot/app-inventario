@@ -49,7 +49,7 @@ class MyHomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Sistema de Inventario",
+                    "SZ App",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
