@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
+import 'package:mi_app/screens/producto_detalle_screen.dart';
 
 class ProductosScreen extends StatefulWidget {
   const ProductosScreen({super.key});
@@ -158,7 +159,14 @@ class _ProductosScreenState extends State<ProductosScreen> {
                                 const Icon(Icons.chevron_right),
 
                             onTap: () {
-                              // después abriremos ProductoDetalleScreen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ProductoDetalleScreen(
+                                    producto: producto,
+                                  ),
+                                ),
+                              );
                             },
                           ),
                         );
