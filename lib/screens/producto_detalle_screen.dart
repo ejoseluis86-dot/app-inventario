@@ -1,74 +1,122 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/models/producto_lite.dart';
+import 'package:mi_app/models/producto.dart';
+import 'package:mi_app/services/api_service.dart';
 
-class ProductoDetalleScreen extends StatelessWidget {
-  final ProductoLite producto;
+class ProductoDetalleScreen extends StatefulWidget {
+  final int productoId;
 
   const ProductoDetalleScreen({
     super.key,
-    required this.producto,
+    required this.productoId,
   });
 
   @override
+  State<ProductoDetalleScreen> createState() => _ProductoDetalleScreenState();
+}
+
+class _ProductoDetalleScreenState extends State<ProductoDetalleScreen> {
+  final ApiService api = ApiService();
+
+  Producto? producto;
+  bool loading = true;
+  bool error = false;
+
+  @override
+  void initState() {
+    super.initState();
+    cargarProducto();
+  }
+
+  Future<void> cargarProducto() async {
+    try {
+      setState(() {
+        loading = true;
+        error = false;
+      });
+
+      final data = await api.obtenerProducto(widget.productoId);
+
+      setState(() {
+        producto = data;
+        loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        loading = false;
+        error = true;
+      });
+
+      print("❌ Error cargando producto: $e");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (error || producto == null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Error al cargar producto"),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: cargarProducto,
+                child: const Text("Reintentar"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(producto.nombre),
+        title: Text(producto!.nombre),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  producto.nombre,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                Text(
-                  "Precio: \$${producto.precio.toStringAsFixed(2)}",
-                  style: const TextStyle(fontSize: 18),
-                ),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  "Categoría: ${producto.categoria}",
-                  style: const TextStyle(fontSize: 18),
-                ),
-
-                const SizedBox(height: 30),
-
-                const Divider(),
-
-                const SizedBox(height: 10),
-
-                const Text(
-                  "Receta",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                const Center(
-                  child: Text(
-                    "Aquí mostraremos los insumos de la receta.",
-                  ),
-                ),
-              ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Nombre: ${producto!.nombre}",
+              style: const TextStyle(fontSize: 18),
             ),
-          ),
+            Text("Precio: \$${producto!.precio}"),
+            Text("Categoría: ${producto!.categoria}"),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              "Receta:",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 10),
+
+            Expanded(
+              child: ListView.builder(
+                itemCount: producto!.detalles?.length ?? 0,
+                itemBuilder: (context, index) {
+                  final d = producto!.detalles![index];
+
+                  return ListTile(
+                    title: Text(d.nombreInsumo ?? "Insumo"),
+                    subtitle: Text(
+                      "Cantidad: ${d.cantidadTeorica}",
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

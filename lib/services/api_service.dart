@@ -6,13 +6,13 @@ import 'package:mi_app/services/auth_service.dart';
 
 class ApiService {
   final String baseUrl = "http://10.0.2.2:8000/";
-  //esta para emulador
-  //http://10.0.2.2:8000/
-  final auth = AuthService();
+  final AuthService auth = AuthService();
 
+  // =========================
+  // HEADERS CON TOKEN
+  // =========================
   Future<Map<String, String>> _headers() async {
-    final auth = AuthService();
-    String? token = await auth.obtenerToken();
+    final token = await auth.obtenerToken();
 
     return {
       'Content-Type': 'application/json',
@@ -21,14 +21,34 @@ class ApiService {
   }
 
   // =========================
-  // INSUMOS - LISTAR
+  // REQUEST CENTRAL CON REFRESH
   // =========================
-  Future<List<dynamic>> obtenerInsumos() async {
+  Future<http.Response> _requestWithAuth(
+    Future<http.Response> Function(Map<String, String>) request,
+  ) async {
     final headers = await _headers();
 
-    final response = await http.get(
-      Uri.parse('$baseUrl/insumos/'),
-      headers: headers,
+    http.Response response = await request(headers);
+
+    if (response.statusCode == 401) {
+      print("🔁 Token vencido → refrescando...");
+
+      await auth.refreshToken();
+
+      final newHeaders = await _headers();
+
+      response = await request(newHeaders);
+    }
+
+    return response;
+  }
+
+  // =========================
+  // INSUMOS
+  // =========================
+  Future<List<dynamic>> obtenerInsumos() async {
+    final response = await _requestWithAuth(
+      (h) => http.get(Uri.parse('$baseUrl/insumos/'), headers: h),
     );
 
     if (response.statusCode == 200) {
@@ -38,39 +58,28 @@ class ApiService {
     throw Exception('Error al obtener insumos');
   }
 
-  // =========================
-  // CREAR INSUMO
-  // =========================
   Future<bool> crearInsumo({
     required String nombre,
     required String categoria,
     required int stock,
     required String ubicacion,
   }) async {
-    //aca traemos el token
-    final headers = await _headers();
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/insumos/insumo'),
-      headers: headers,
-      body: jsonEncode({
-        'nombre': nombre,
-        'categoria': categoria,
-        'stock': stock,
-        'ubicacion': ubicacion,
-      }),
+    final response = await _requestWithAuth(
+      (h) => http.post(
+        Uri.parse('$baseUrl/insumos/insumo'),
+        headers: h,
+        body: jsonEncode({
+          'nombre': nombre,
+          'categoria': categoria,
+          'stock': stock,
+          'ubicacion': ubicacion,
+        }),
+      ),
     );
 
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
-    }
+    return response.statusCode == 200;
   }
 
-  // =========================
-  // ACTUALIZAR INSUMO (FULL EDIT)
-  // =========================
   Future<bool> actualizarInsumo({
     required int id,
     required String nombre,
@@ -78,194 +87,63 @@ class ApiService {
     required int stock,
     required String ubicacion,
   }) async {
-    final headers = await _headers();
-
-    final response = await http.put(
-      Uri.parse('$baseUrl/insumos/modificar/$id/'),
-      headers: headers,
-      body: jsonEncode({
-        'nombre': nombre,
-        'categoria': categoria,
-        'stock': stock,
-        'ubicacion': ubicacion,
-      }),
+    final response = await _requestWithAuth(
+      (h) => http.put(
+        Uri.parse('$baseUrl/insumos/modificar/$id/'),
+        headers: h,
+        body: jsonEncode({
+          'nombre': nombre,
+          'categoria': categoria,
+          'stock': stock,
+          'ubicacion': ubicacion,
+        }),
+      ),
     );
 
     return response.statusCode == 200;
   }
-  // =========================
-  // ELIMINAR INSUMO
-  // =========================
 
   Future<bool> eliminarInsumo(int id) async {
-    final headers = await _headers();
-
-    final response = await http.delete(
-      Uri.parse('$baseUrl/insumos/eliminar/$id/'),
-      headers: headers,
+    final response = await _requestWithAuth(
+      (h) => http.delete(
+        Uri.parse('$baseUrl/insumos/eliminar/$id/'),
+        headers: h,
+      ),
     );
 
     return response.statusCode == 200;
   }
 
   // =========================
-  // STOCK RÁPIDO (opcional)
-  // =========================
-  Future<bool> modificarStock(int idInsumo, int stock) async {
-    final headers = await _headers();
-
-    final response = await http.put(
-      Uri.parse('$baseUrl/insumos/modificar/$idInsumo/'),
-      headers: headers,
-      body: jsonEncode({'stock': stock}),
-    );
-
-    return response.statusCode == 200;
-  }
-
-  // =========================
-  // CREAR USUARIO
+  // USUARIOS
   // =========================
   Future<bool> crearUsuario({
     required String username,
     required String password,
     String rol = "EMPL",
   }) async {
-    try {
-      final headers = await _headers();
-
-      final response = await http.post(
+    final response = await _requestWithAuth(
+      (h) => http.post(
         Uri.parse('$baseUrl/usuarios/crear/'),
-        headers: headers,
-
+        headers: h,
         body: jsonEncode({
           'username': username,
           'password': password,
           'rol': rol,
         }),
-      );
-
-      if (response.statusCode == 201) {
-        return true;
-      }
-      return false;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  // =========================
-  // CREAR PRODUCTO
-  // =========================
-  Future<bool> crearProducto(Producto producto) async {
-    final url = Uri.parse('$baseUrl/productos/crear/');
-    //aca traemos el token
-    final authService = AuthService();
-    String? token = await authService.obtenerToken();
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(producto.toJson()),
-    );
-    if (response.statusCode == 201) {
-      return true;
-    } else {
-      await authService.refreshToken();
-      return false;
-    }
-  }
-
-  // =========================
-  // CREAR PEDIDO
-  // =========================
-  Future<bool> crearPedido(Pedido pedido) async {
-    final url = Uri.parse('$baseUrl/pedidos/crear/');
-    final headers = await _headers();
-
-    final response = await http.post(
-      url,
-      headers: headers,
-      body: jsonEncode(pedido.toJson()),
+      ),
     );
 
-    if (response.statusCode == 401) {
-      print("Token vencido, intentando refresh...");
-
-      await AuthService().refreshToken();
-
-      final newHeaders = await _headers();
-
-      final retry = await http.post(
-        url,
-        headers: newHeaders,
-        body: jsonEncode(pedido.toJson()),
-      );
-
-      print("RETRY STATUS: ${retry.statusCode}");
-      print("RETRY BODY: ${retry.body}");
-
-      return retry.statusCode == 201 || retry.statusCode == 200;
-    }
-
-    return response.statusCode == 201 || response.statusCode == 200;
+    return response.statusCode == 201;
   }
 
-  //----------------------
-  //OBTENEMOS PRODUCTOS
-  //--------------------
-  Future<List<dynamic>> obtenerProductosLite() async {
-    //aca traemos el token
-    final headers = await _headers();
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/productos/'),
-      headers: headers,
-    );
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data;
-    } else {
-      throw Exception("Error al obtener productos: ${response.body}");
-    }
-  }
-
-  //obtenemos Productos
-  //-------------------
-  //----------------------
-  //OBTENEMOS PRODUCTOS
-  //--------------------
-  Future<List<dynamic>> obtenerPedidosLite() async {
-    //aca traemos el token
-    final headers = await _headers();
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/pedidos/sin-terminar/'),
-      headers: headers,
-    );
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data;
-    } else {
-      throw Exception("Error al obtener productos: ${response.body}");
-    }
-  }
-
-  // =========================
-  // OBTENER PERFIL
-  // =========================
   Future<Map<String, dynamic>> obtenerMiPerfil() async {
-    final headers = await _headers();
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/usuarios/miPerfil/'),
-      headers: headers,
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/usuarios/miPerfil/'),
+        headers: h,
+      ),
     );
-
-    print("STATUS: ${response.statusCode}");
-    print("BODY: ${response.body}");
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -274,26 +152,113 @@ class ApiService {
     throw Exception("Error al obtener perfil");
   }
 
-  // =========================
-  // ACTUALIZAR PERFIL
-  // =========================
   Future<bool> actualizarMiPerfil({
     required String nombre,
     required String apellido,
     required String username,
   }) async {
-    final headers = await _headers();
-
-    final response = await http.put(
-      Uri.parse('$baseUrl/usuarios/modificarMiPerfil/'),
-      headers: headers,
-      body: jsonEncode({
-        "nombre": nombre,
-        "apellido": apellido,
-        "username": username,
-      }),
+    final response = await _requestWithAuth(
+      (h) => http.put(
+        Uri.parse('$baseUrl/usuarios/modificarMiPerfil/'),
+        headers: h,
+        body: jsonEncode({
+          "nombre": nombre,
+          "apellido": apellido,
+          "username": username,
+        }),
+      ),
     );
 
     return response.statusCode == 200;
+  }
+
+  // =========================
+  // PRODUCTO
+  // =========================
+  Future<Producto> obtenerProducto(int id) async {
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/productos/$id/'),
+        headers: h,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return Producto.fromJson(jsonDecode(response.body));
+    }
+
+    throw Exception("Error al obtener producto");
+  }
+
+  Future<List<dynamic>> obtenerProductosLite() async {
+  final response = await _requestWithAuth(
+    (h) => http.get(
+      Uri.parse('$baseUrl/productos/'),
+      headers: h,
+    ),
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  }
+
+  throw Exception("Error al obtener productos");
+}
+
+  Future<List<dynamic>> obtenerRecetaProducto(int idProducto) async {
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/productos/$idProducto/detalles-receta/'),
+        headers: h,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Error al obtener receta");
+  }
+
+  Future<bool> crearProducto(Producto producto) async {
+    final response = await _requestWithAuth(
+      (h) => http.post(
+        Uri.parse('$baseUrl/productos/crear/'),
+        headers: h,
+        body: jsonEncode(producto.toJson()),
+      ),
+    );
+
+    return response.statusCode == 201 || response.statusCode == 200;
+  }
+
+  // =========================
+  // PEDIDOS
+  // =========================
+  Future<List<dynamic>> obtenerPedidosLite() async {
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/pedidos/sin-terminar/'),
+        headers: h,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Error al obtener pedidos");
+  }
+
+  Future<bool> crearPedido(Pedido pedido) async {
+    final response = await _requestWithAuth(
+      (h) => http.post(
+        Uri.parse('$baseUrl/pedidos/crear/'),
+        headers: h,
+        body: jsonEncode(pedido.toJson()),
+      ),
+    );
+
+    return response.statusCode == 201 || response.statusCode == 200;
   }
 }

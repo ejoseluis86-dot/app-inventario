@@ -39,17 +39,18 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
   }
 
   void agregarDetalle() {
-    if (insumoSeleccionado == null || cantidadController.text.isEmpty) {
-      return;
-    }
+    final cantidad = int.tryParse(cantidadController.text);
+
+    if (insumoSeleccionado == null || cantidad == null) return;
+
     setState(() {
       detalles.add(
-        //aca estoy creando un nuevo detalle de receta con el insumo seleccionado y la cantidad ingresada, y lo agrego a la lista de detalles
         DetalleReceta(
-          cantidadTeorica: int.parse(cantidadController.text),
-          insumoId: insumoSeleccionado!.id,
+          cantidadTeorica: cantidad,
+          insumoId: insumoSeleccionado!.id!,
         ),
       );
+
       cantidadController.clear();
       insumoSeleccionado = null;
     });
@@ -63,44 +64,30 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
 
   //esto no iria hay que modificar
   Future<void> guardarReceta() async {
-    //creo un api service
-    final apiService = ApiService();
+  final apiService = ApiService();
 
-    if (widget.nombreProducto.trim().isEmpty ||
-        widget.categoria.trim().isEmpty ||
-        widget.precioProducto <= 0 ||
-        detalles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe completar todos los campos')),
-      );
-    } else {
-      final Producto nuevoProducto = Producto(
-        nombre: widget.nombreProducto,
-        precio: widget.precioProducto,
-        categoria: widget.categoria,
-        detalles: detalles,
-      );
-      //uso el api service para guardar el producto
-      bool ok = await apiService.crearProducto(nuevoProducto);
-      if (ok) {
-        await context.read<ProductoLiteProvider>().cargarProviderProductos();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Producto creado exitosamente"),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // esperar un poco y redirigir
-        Future.delayed(const Duration(seconds: 1), () {
-          Navigator.pushNamed(context, AppRutas.home);
-        });
-      }
-
-      //faltaria actualizar el provider de Productos Lite
-    }
+  if (widget.nombreProducto.trim().isEmpty ||
+      widget.categoria.trim().isEmpty ||
+      widget.precioProducto <= 0) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Debe completar nombre, precio y categoría'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
   }
 
+  if (detalles.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Debe agregar al menos un insumo'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+}
   @override
   Widget build(BuildContext context) {
     //aca estoy trayendo una lista de insumos desde el provider

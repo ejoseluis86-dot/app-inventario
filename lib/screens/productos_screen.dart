@@ -5,6 +5,7 @@ import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/screens/producto_detalle_screen.dart';
 
+
 class ProductosScreen extends StatefulWidget {
   const ProductosScreen({super.key});
 
@@ -133,37 +134,23 @@ class _ProductosScreenState extends State<ProductosScreen> {
                           child: ListTile(
                             leading: const Icon(Icons.inventory_2),
 
-                            title: Text(
-                              producto.nombre,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                            title: Text(producto.nombre),
+
+                            subtitle: Text(
+                              "\$${producto.precio} • ${producto.categoria}",
                             ),
 
-                            subtitle: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              children: [
-
-                                Text(
-                                  producto.categoria,
-                                ),
-
-                                Text(
-                                  "\$ ${producto.precio.toStringAsFixed(2)}",
-                                ),
-                              ],
-                            ),
-
-                            trailing:
-                                const Icon(Icons.chevron_right),
+                            trailing: const Icon(Icons.chevron_right),
 
                             onTap: () {
+                              final id = producto.id;
+                              if (id == null) return;
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => ProductoDetalleScreen(
-                                    producto: producto,
+                                    productoId: id,
                                   ),
                                 ),
                               );
