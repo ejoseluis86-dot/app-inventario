@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mi_app/models/pedido.dart';
 import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/services/auth_service.dart';
+import 'package:mi_app/models/detalle_receta.dart';
 
 class ApiService {
   final String baseUrl = "http://10.0.2.2:8000/";
@@ -258,16 +259,29 @@ class ApiService {
     throw Exception("Error al crear producto");
   }
 
-  Future<bool> actualizarProducto(Producto producto) async {
+  Future<bool> actualizarProducto({
+    required int id,
+    required String nombre,
+    required double precio,
+    required String categoria,
+    required List<DetalleReceta> detalles,
+  }) async {
     final response = await _requestWithAuth(
       (h) => http.put(
-        Uri.parse('$baseUrl/productos/modificar/${producto.id}/'),
+        Uri.parse('$baseUrl/productos/modificar/$id/'),
         headers: h,
-        body: jsonEncode(producto.toJson()),
+        body: jsonEncode({
+          'nombre': nombre,
+          'precio': precio,
+          'categoria': categoria,
+        }),
       ),
     );
 
-    return response.statusCode == 200;
+    if (response.statusCode != 200) return false;
+
+    // 🔴 receta NO se actualiza en backend aún
+    return true;
   }
 
 

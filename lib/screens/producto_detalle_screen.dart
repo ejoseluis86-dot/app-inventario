@@ -84,16 +84,20 @@ class _ProductoDetalleScreenState extends State<ProductoDetalleScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => EditarProductoScreen(producto: producto!),
                 ),
               );
+
+              if (result == true) {
+                cargarProducto(); // refresca
+              }
             },
           ),
-        ],  
+        ],
       ),
       
       body: Padding(

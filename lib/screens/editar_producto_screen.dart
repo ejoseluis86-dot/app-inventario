@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/producto.dart';
+import 'package:mi_app/models/detalle_receta.dart';
+import 'package:mi_app/providers/insumos_provider.dart';
 import 'package:mi_app/services/api_service.dart';
+import 'package:provider/provider.dart';
 
 class EditarProductoScreen extends StatefulWidget {
   final Producto producto;
@@ -11,122 +14,189 @@ class EditarProductoScreen extends StatefulWidget {
   });
 
   @override
-  State<EditarProductoScreen> createState() => _EditarProductoScreenState();
+  State<EditarProductoScreen> createState() =>
+      _EditarProductoScreenState();
 }
 
 class _EditarProductoScreenState extends State<EditarProductoScreen> {
-  late TextEditingController nombreController;
-  late TextEditingController precioController;
-
+  final nombreController = TextEditingController();
+  final precioController = TextEditingController();
   String? categoriaSeleccionada;
 
-  final categorias = [
-    'Cerámica',
-    'Plástico',
-    'Metal',
-    'Madera',
-    'Papel',
-    'Vidrio',
-    'Textil',
-  ];
+  List<DetalleReceta> detalles = [];
 
   @override
   void initState() {
     super.initState();
-    nombreController = TextEditingController(text: widget.producto.nombre);
-    precioController = TextEditingController(
-      text: widget.producto.precio.toString(),
-    );
+
+    nombreController.text = widget.producto.nombre;
+    precioController.text = widget.producto.precio.toString();
     categoriaSeleccionada = widget.producto.categoria;
-  }
-
-  Future<void> guardarCambios() async {
-    final api = ApiService();
-
-    final precio = double.tryParse(precioController.text);
-
-    if (nombreController.text.trim().isEmpty ||
-        precio == null ||
-        precio <= 0 ||
-        categoriaSeleccionada == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Complete todos los campos")),
-      );
-      return;
-    }
-
-    final productoEditado = Producto(
-      id: widget.producto.id,
-      nombre: nombreController.text.trim(),
-      precio: precio,
-      categoria: categoriaSeleccionada!,
-      detalles: widget.producto.detalles,
-    );
-
-    final ok = await api.actualizarProducto(productoEditado);
-
-    if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Producto actualizado"),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Error al actualizar"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    detalles = List.from(widget.producto.detalles ?? []);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Editar Producto")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: nombreController,
-              decoration: const InputDecoration(labelText: "Nombre"),
-            ),
+  void dispose() {
+    nombreController.dispose();
+    precioController.dispose();
+    super.dispose();
+  }
 
-            TextField(
-              controller: precioController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Precio"),
-            ),
+  Future<void> guardarProducto() async {
+  final api = ApiService();
 
-            DropdownButtonFormField<String>(
-              value: categoriaSeleccionada,
-              items: categorias
-                  .map((c) => DropdownMenuItem(
-                        value: c,
-                        child: Text(c),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  categoriaSeleccionada = value;
-                });
-              },
-            ),
+  if (nombreController.text.trim().isEmpty ||
+      precioController.text.isEmpty ||
+      categoriaSeleccionada == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Completa todos los campos"),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-            const SizedBox(height: 20),
+  final ok = await api.actualizarProducto(
+    id: widget.producto.id!,
+    nombre: nombreController.text.trim(),
+    precio: double.parse(precioController.text),
+    categoria: categoriaSeleccionada!,
+    detalles: detalles,
+  );
 
-            ElevatedButton(
-              onPressed: guardarCambios,
-              child: const Text("Guardar cambios"),
-            ),
-          ],
-        ),
+  if (!mounted) return;
+
+  if (ok) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Producto actualizado")),
+    );
+
+    Navigator.pop(context, true);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Error al actualizar"),
+        backgroundColor: Colors.red,
       ),
     );
   }
+}
+
+  @override
+@override
+Widget build(BuildContext context) {
+  final insumos = context.watch<InsumoProvider>().insumos;
+
+  return Scaffold(
+    appBar: AppBar(title: const Text("Editar Producto Completo")),
+    body: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+
+          // ======================
+          // PRODUCTO
+          // ======================
+          TextField(
+            controller: nombreController,
+            decoration: const InputDecoration(labelText: "Nombre"),
+          ),
+
+          const SizedBox(height: 10),
+
+          TextField(
+            controller: precioController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: "Precio"),
+          ),
+
+          const SizedBox(height: 10),
+
+          DropdownButtonFormField<String>(
+            value: categoriaSeleccionada,
+            items: const [
+              DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
+              DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
+              DropdownMenuItem(value: "Metal", child: Text("Metal")),
+              DropdownMenuItem(value: "Madera", child: Text("Madera")),
+              DropdownMenuItem(value: "Papel", child: Text("Papel")),
+              DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
+              DropdownMenuItem(value: "Textil", child: Text("Textil")),
+            ],
+            onChanged: (value) {
+              setState(() => categoriaSeleccionada = value);
+            },
+          ),
+
+          const SizedBox(height: 20),
+
+          const Divider(),
+
+          const Text(
+            "Receta",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 10),
+
+          // ======================
+          // RECETA
+          // ======================
+          Expanded(
+            child: ListView.builder(
+              itemCount: detalles.length,
+              itemBuilder: (context, index) {
+                final d = detalles[index];
+
+                final insumo = insumos.firstWhere(
+                  (i) => i.id == d.insumoId,
+                );
+
+                return Card(
+                  child: ListTile(
+                    title: Text(insumo.nombre),
+
+                    subtitle: TextField(
+                      keyboardType: TextInputType.number,
+                      controller: TextEditingController(
+                        text: d.cantidadTeorica.toString(),
+                      ),
+                      onSubmitted: (value) {
+                        final cantidad = int.tryParse(value);
+                        if (cantidad != null) {
+                          setState(() {
+                            detalles[index] = DetalleReceta(
+                              id: d.id,
+                              insumoId: d.insumoId,
+                              cantidadTeorica: cantidad,
+                            );
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // ======================
+          // BOTÓN GUARDAR
+          // ======================
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: guardarProducto,
+              child: const Text("Guardar cambios"),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 }
