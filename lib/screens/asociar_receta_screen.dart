@@ -12,6 +12,8 @@ class AsociarRecetaScreen extends StatefulWidget {
   final String nombreProducto;
   final double precioProducto;
   final String categoria;
+
+
   const AsociarRecetaScreen({
     super.key,
     required this.nombreProducto,
@@ -139,6 +141,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
       precio: widget.precioProducto,
       categoria: widget.categoria,
       detalles: detalles,
+      activo: true,
     );
 
     try {

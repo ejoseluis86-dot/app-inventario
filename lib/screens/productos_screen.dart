@@ -38,6 +38,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
     final productos = context.watch<ProductoLiteProvider>().productosLite;
     final userProvider = context.watch<UserProvider>();
     final esAdmin = userProvider.rol == "ADMIN";
+    
   
 
     final filtrados = productos.where((p) {
@@ -50,8 +51,11 @@ class _ProductosScreenState extends State<ProductosScreen> {
           ? (mostrarInactivos ? true : p.activo)
           : p.activo;
 
+      
+
       return matchNombre && matchCategoria && matchActivo;
-    }).toList();
+    }).toList()
+      ..sort((a, b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
 
     return Scaffold(
       appBar: AppBar(
@@ -154,35 +158,60 @@ class _ProductosScreenState extends State<ProductosScreen> {
                           child: ListTile(
                             leading: const Icon(Icons.inventory_2),
 
-                            title: Text(
-                              producto.nombre,
-                              style: TextStyle(
-                                color: producto.activo ? Colors.black : Colors.grey,
-                                fontWeight: producto.activo ? FontWeight.normal : FontWeight.bold,
-                              ),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                Text(
+                                  producto.nombre,
+                                  style: TextStyle(
+                                    color: producto.activo ? Colors.black : Colors.grey,
+                                    fontWeight: producto.activo ? FontWeight.normal : FontWeight.w600,
+                                  ),
+                                ),
+
+                                if (!producto.activo)
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      "INACTIVO",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
 
                             subtitle: Text(
-                              "\$${producto.precioFormateado} • ${producto.categoria}"
+                              "\$${producto.precio.toStringAsFixed(2)} • ${producto.categoria}",
                             ),
 
                             trailing: esAdmin
-                              ? IconButton(
-                                  icon: Icon(
-                                    producto.activo ? Icons.toggle_on : Icons.toggle_off,
-                                    color: producto.activo ? Colors.green : Colors.red,
-                                  ),
-                                  onPressed: () async {
-                                    await context
-                                        .read<ApiService>()
-                                        .toggleProducto(producto.id!);
+                                ? Switch(
+                                    value: producto.activo,
+                                    onChanged: (value) async {
+                                      final api = context.read<ApiService>();
 
-                                    await context
-                                        .read<ProductoLiteProvider>()
-                                        .cargarProviderProductos(true);
-                                  },
-                                )
-                              : const Icon(Icons.chevron_right),
+                                      final ok = await api.toggleProducto(producto.id!);
+
+                                      if (!ok) return;
+
+                                      final esAdmin = context.read<UserProvider>().rol == "ADMIN";
+
+                                      await context
+                                          .read<ProductoLiteProvider>()
+                                          .cargarProviderProductos(esAdmin);
+                                    }
+                                  )
+                                : const Icon(Icons.chevron_right),
 
                             onTap: () async {
                               final id = producto.id;
@@ -195,8 +224,8 @@ class _ProductosScreenState extends State<ProductosScreen> {
                                 ),
                               );
 
-                              // REFRESCAR LISTA AL VOLVER
-                              final esAdmin = context.read<UserProvider>().rol == "ADMIN";
+                              final esAdmin =
+                                  context.read<UserProvider>().rol == "ADMIN";
 
                               await context
                                   .read<ProductoLiteProvider>()

@@ -7,6 +7,8 @@ import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/theme/app_themes.dart';
 import 'package:provider/provider.dart';
 
+import 'services/api_service.dart';
+
 
 void main() => runApp(
   MultiProvider(
@@ -15,6 +17,10 @@ void main() => runApp(
       ChangeNotifierProvider(create: (_) => InsumoProvider()),
       ChangeNotifierProvider(create: (_) => ProductoLiteProvider()),
       ChangeNotifierProvider(create: (_) => PedidoLiteProvider()),
+
+      Provider<ApiService>(
+        create: (_) => ApiService(),
+      ),
     ],
     child: const MainApp(),
   ),

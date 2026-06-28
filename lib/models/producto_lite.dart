@@ -3,8 +3,7 @@ class ProductoLite {
   final String nombre;
   final double precio;
   final String categoria;
-  final bool activo;
-  
+  final bool activo; // 
 
   ProductoLite({
     required this.id,
@@ -14,16 +13,13 @@ class ProductoLite {
     required this.activo,
   });
 
-  //precio con 2 decimales
-  String get precioFormateado => precio.toStringAsFixed(2);
-
   factory ProductoLite.fromJson(Map<String, dynamic> json) {
     return ProductoLite(
       id: json['id'],
       nombre: json['nombre'],
       precio: double.parse(json['precio'].toString()),
       categoria: json['categoria'],
-      activo: json['activo'],
+      activo: json['activo'] ?? true, // 🔥 IMPORTANTE
     );
   }
 }

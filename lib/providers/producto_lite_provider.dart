@@ -26,6 +26,9 @@ class ProductoLiteProvider extends ChangeNotifier {
       // 🔥 fuerza rebuild limpio
       productosLite = List.from(productosLite);
 
+      productosLite.sort((a, b) =>
+        a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
+
     } catch (e) {
       error = e.toString();
       productosLite = [];

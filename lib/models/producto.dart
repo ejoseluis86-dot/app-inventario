@@ -6,6 +6,7 @@ class Producto {
   final double precio;
   final String categoria;
   final List<DetalleReceta>? detalles;
+  final bool activo;
 
   Producto({
     this.detalles,
@@ -13,6 +14,7 @@ class Producto {
     required this.nombre,
     required this.precio,
     required this.categoria,
+    required this.activo,
   });
 
   //precio con 2 decimales
@@ -28,6 +30,7 @@ class Producto {
           ?.map((e) => DetalleReceta.fromJson(e))
           .toList()
           ?? [],
+      activo: json['activo'] ?? true,    
     );
   }
 
@@ -37,6 +40,7 @@ class Producto {
       'precio': precio,
       'categoria': categoria,
       'detalles': detalles?.map((e) => e.toJson()).toList(),
+      'activo': activo,
     };
   }
 }
