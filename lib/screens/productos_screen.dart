@@ -236,15 +236,16 @@ class _ProductosScreenState extends State<ProductosScreen> {
                       },
                     ),
             ),
-            SwitchListTile(
-              title: const Text("Ver inactivos"),
-              value: mostrarInactivos,
-              onChanged: (value) {
-                setState(() {
-                  mostrarInactivos = value;
-                });
-              },
-            ),
+            if (esAdmin)
+              SwitchListTile(
+                title: const Text("Ver inactivos"),
+                value: mostrarInactivos,
+                onChanged: (value) {
+                  setState(() {
+                    mostrarInactivos = value;
+                  });
+                },
+              ),
           ],
           
         ),
