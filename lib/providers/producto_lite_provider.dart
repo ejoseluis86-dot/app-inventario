@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/producto_lite.dart';
 import 'package:mi_app/services/api_service.dart';
+import 'package:mi_app/models/producto.dart';
 
 class ProductoLiteProvider extends ChangeNotifier {
   List<ProductoLite> productosLite = [];
@@ -11,30 +12,21 @@ class ProductoLiteProvider extends ChangeNotifier {
 
   Future<void> cargarProviderProductos(bool esAdmin) async {
     try {
-      loading = true;
-      error = null;
-      notifyListeners();
+      final api = ApiService();
 
       final data = esAdmin
           ? await api.obtenerProductosAdmin()
           : await api.obtenerProductosLite();
+      
+      productosLite = (data as List)
+        .map((e) => ProductoLite.fromJson(
+              e as Map<String, dynamic>,
+            ))
+        .toList();
 
-      productosLite = data
-          .map((e) => ProductoLite.fromJson(e))
-          .toList();
-
-      // 🔥 fuerza rebuild limpio
-      productosLite = List.from(productosLite);
-
-      productosLite.sort((a, b) =>
-        a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
-
-    } catch (e) {
-      error = e.toString();
-      productosLite = [];
-    } finally {
-      loading = false;
       notifyListeners();
+    } catch (e) {
+      print("ERROR: $e");
     }
   }
 }

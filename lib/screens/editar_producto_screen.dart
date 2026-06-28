@@ -32,7 +32,7 @@ class _EditarProductoScreenState extends State<EditarProductoScreen> {
     super.initState();
 
     nombreController.text = widget.producto.nombre;
-    precioController.text = widget.producto.precio.toString();
+    precioController.text = widget.producto.precio.toString(); 
     categoriaSeleccionada = widget.producto.categoria;
     detalles = List.from(widget.producto.detalles ?? []);
   }

@@ -62,7 +62,7 @@ class MyHomeScreen extends StatelessWidget {
                     "Panel de gestión",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: 13),
                   ),
                 ],
               ),
@@ -86,12 +86,12 @@ class MyHomeScreen extends StatelessWidget {
                       nombreCompleto.isEmpty ? "Usuario" : nombreCompleto,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: 15,
                       ),
                     ),
                     Text(
                       user.rol == "ADMIN" ? "Administrador" : "Empleado",
-                      style: const TextStyle(fontSize: 13),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ],
                 ),

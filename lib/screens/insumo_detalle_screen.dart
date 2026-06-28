@@ -30,6 +30,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
     'Madera',
     'Papel',
     'Vidrio',
+    'Textil',
   ];
 
   @override
@@ -76,6 +77,8 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>();
+    final puedeEditar = user.rol == "ADMIN";
+
     return Scaffold(
       appBar: AppBar(title: const Text("Detalle Insumo")),
       body: Padding(
@@ -84,14 +87,20 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
           children: [
             TextField(
               controller: nombreController,
-              decoration: const InputDecoration(labelText: "Nombre"),
+              enabled: puedeEditar,
+              decoration: const InputDecoration(
+                labelText: "Nombre",
+              ),
             ),
             const SizedBox(height: 10),
 
             TextField(
               controller: stockController,
+              enabled: puedeEditar,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Stock"),
+              decoration: const InputDecoration(
+                labelText: "Stock",
+              ),
             ),
 
             const SizedBox(height: 10),
@@ -101,11 +110,13 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
               items: categorias.map((e) {
                 return DropdownMenuItem(value: e, child: Text(e));
               }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  categoria = value;
-                });
-              },
+              onChanged: puedeEditar
+                ? (value) {
+                    setState(() {
+                      categoria = value;
+                    });
+                  }
+                : null,
               decoration: const InputDecoration(labelText: "Categoría"),
             ),
 
@@ -113,40 +124,53 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
 
             TextField(
               controller: ubicacionController,
-              decoration: const InputDecoration(labelText: "Ubicación"),
+              enabled: puedeEditar,
+              decoration: const InputDecoration(
+                labelText: "Ubicación",
+              ),
             ),
 
             const SizedBox(height: 20),
 
             //BOTON GUARDAR
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.save),
-                onPressed: _guardar,
-                label: const Text("Guardar cambios"),
+            if (puedeEditar)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.save),
+                  onPressed: _guardar,
+                  label: const Text("Guardar cambios"),
+                ),
               ),
-            ),
 
             const SizedBox(height: 10),
 
-            //BOTON ELIMINAR
+            // BOTON ACTIVAR / DESACTIVAR
             if (user.rol == "ADMIN")
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  icon: const Icon(Icons.delete),
+                  icon: Icon(
+                    (widget.insumo.activo ?? true) ? Icons.pause : Icons.play_arrow,
+                  ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor:
+                        (widget.insumo.activo == true) ? Colors.red : Colors.green,
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () async {
                     final confirmar = await showDialog<bool>(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: const Text("Eliminar insumo"),
-                        content: const Text(
-                          "¿Estás seguro de eliminar este insumo?",
+                        title: Text(
+                          (widget.insumo.activo ?? true)
+                              ? "Desactivar insumo"
+                              : "Activar insumo",
+                        ),
+                        content: Text(
+                          (widget.insumo.activo ?? true)
+                              ? "¿Querés desactivar este insumo?"
+                              : "¿Querés activar este insumo?",
                         ),
                         actions: [
                           TextButton(
@@ -155,7 +179,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
                           ),
                           ElevatedButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: const Text("Eliminar"),
+                            child: const Text("Confirmar"),
                           ),
                         ],
                       ),
@@ -163,19 +187,17 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
 
                     if (confirmar != true) return;
 
-                    final ok = await api.eliminarInsumo(widget.insumo.id);
+                    final ok = await api.toggleInsumo(widget.insumo.id);
 
                     if (ok) {
-                      await context
-                          .read<InsumoProvider>()
-                          .cargarProviderInsumos();
+                      await context.read<InsumoProvider>().cargarProviderInsumos();
 
-                      if (mounted) {
-                        Navigator.pop(context);
-                      }
+                      if (mounted) Navigator.pop(context);
                     }
                   },
-                  label: const Text("Eliminar"),
+                  label: Text(
+                    (widget.insumo.activo ?? true) ? "Desactivar" : "Activar",
+                  ),
                 ),
               ),
           ],

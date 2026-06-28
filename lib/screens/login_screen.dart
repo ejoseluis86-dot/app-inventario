@@ -42,10 +42,19 @@ class _LoginScreenState extends State<LoginScreen> {
           apellido: data['apellido'],
         );
 
+        // 👇 ESPERAR un frame
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        final esAdmin = userProvider.rol == "ADMIN";
+
+        await context.read<InsumoProvider>().cargarProviderInsumos();
+        await context.read<ProductoLiteProvider>().cargarProviderProductos(esAdmin);
+        await context.read<PedidoLiteProvider>().cargarProviderPedidos();
+
         
 
         context.read<InsumoProvider>().cargarProviderInsumos();
-        context.read<ProductoLiteProvider>().cargarProviderProductos;
+        context.read<ProductoLiteProvider>().cargarProviderProductos(userProvider.rol == "ADMIN",);
         context.read<PedidoLiteProvider>().cargarProviderPedidos();
 
         if (!mounted) return;

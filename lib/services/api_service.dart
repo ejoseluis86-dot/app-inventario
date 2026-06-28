@@ -6,20 +6,26 @@ import 'package:mi_app/services/auth_service.dart';
 import 'package:mi_app/models/detalle_receta.dart';
 
 class ApiService {
-  final String baseUrl = "http://10.0.2.2:8000/";
+  final String baseUrl = "http://10.0.2.2:8000";
   final AuthService auth = AuthService();
 
   // =========================
   // HEADERS CON TOKEN
   // =========================
   Future<Map<String, String>> _headers() async {
-    final token = await auth.obtenerToken();
+  final token = await auth.obtenerToken();
 
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
+  if (token == null || token.isEmpty) {
+    throw Exception("No hay token guardado");
   }
+
+  print("TOKEN = $token"); // 👈 DEBUG CLAVE
+
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
+}
 
   // =========================
   // REQUEST CENTRAL CON REFRESH
@@ -52,6 +58,9 @@ class ApiService {
       (h) => http.get(Uri.parse('$baseUrl/insumos/'), headers: h),
     );
 
+    print(response.statusCode);
+    print(response.body);
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
@@ -59,7 +68,23 @@ class ApiService {
     throw Exception('Error al obtener insumos');
   }
 
-  Future<bool> crearInsumo({
+  Future<List<dynamic>> obtenerInsumosAdmin() async {
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/insumos/admin/'),
+        headers: h,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception('Error al obtener insumos admin');
+  }
+
+
+  Future<String?> crearInsumo({
     required String nombre,
     required String categoria,
     required int stock,
@@ -77,8 +102,12 @@ class ApiService {
         }),
       ),
     );
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 201) return null; // OK
 
-    return response.statusCode == 200;
+    final data = jsonDecode(response.body);
+    return data['error'] ?? "Error desconocido";
   }
 
   Future<bool> actualizarInsumo({
@@ -100,6 +129,8 @@ class ApiService {
         }),
       ),
     );
+    print(response.statusCode);
+    print(response.body);
 
     return response.statusCode == 200;
   }
@@ -108,6 +139,17 @@ class ApiService {
     final response = await _requestWithAuth(
       (h) => http.delete(
         Uri.parse('$baseUrl/insumos/eliminar/$id/'),
+        headers: h,
+      ),
+    );
+
+    return response.statusCode == 200;
+  }
+
+   Future<bool> toggleInsumo(int id) async {
+    final response = await _requestWithAuth(
+      (h) => http.put(
+        Uri.parse('$baseUrl/insumos/toggle/$id/'),
         headers: h,
       ),
     );
@@ -183,6 +225,8 @@ class ApiService {
         headers: h,
       ),
     );
+    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 200) {
       print(response.body); //para ver que devuelve al tocar el primer producto de la lista
@@ -192,35 +236,35 @@ class ApiService {
     throw Exception("Error al obtener producto");
   }
 
-  Future<List<dynamic>> obtenerProductosLite() async {
-  final response = await _requestWithAuth(
-    (h) => http.get(
-      Uri.parse('$baseUrl/productos/'),
-      headers: h,
-    ),
-  );
-
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body);
-  }
-
-  throw Exception("Error al obtener productos");
-}
-
-  Future<List<dynamic>> obtenerProductosAdmin() async {
+  Future<List<Producto>> obtenerProductosLite() async {
     final response = await _requestWithAuth(
-      (h) => http.get(
-        Uri.parse('$baseUrl/productos/admin/'),
-        headers: h,
-      ),
+      (h) => http.get(Uri.parse('$baseUrl/productos/'), headers: h),
     );
+    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final List data = jsonDecode(response.body);
+      return data.map((e) => Producto.fromJson(e)).toList();
     }
 
-    throw Exception("Error al obtener productos admin");
+    throw Exception("Error al obtener productos");
   }
+
+  Future<List<Producto>> obtenerProductosAdmin() async {
+  final response = await _requestWithAuth(
+    (h) => http.get(Uri.parse('$baseUrl/productos/admin/'), headers: h),
+  );
+  print(response.statusCode);
+  print(response.body);
+
+  if (response.statusCode == 200) {
+    final List data = jsonDecode(response.body);
+    return data.map((e) => Producto.fromJson(e)).toList();
+  }
+
+  throw Exception("Error al obtener productos admin");
+}
 
   Future<List<dynamic>> obtenerRecetaProducto(int idProducto) async {
     final response = await _requestWithAuth(
@@ -322,6 +366,9 @@ class ApiService {
 
   return response.statusCode == 200;
 }
+
+ 
+
 
   // =========================
   // PEDIDOS

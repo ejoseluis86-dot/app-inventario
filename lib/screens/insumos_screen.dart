@@ -22,8 +22,8 @@ class _InsumosScreenState extends State<InsumosScreen> {
   final ApiService api = ApiService();
 
   String search = "";
-  String? filtroCategoria;
-  String? filtroStock;
+  String filtroCategoria = "TODAS";
+  String filtroStock = "TODOS";
 
   //muestra filtro de crticos desde pantalla principal  @override
   void initState() {
@@ -38,11 +38,14 @@ class _InsumosScreenState extends State<InsumosScreen> {
       'Madera',
       'Papel',
       'Vidrio',
-      '',
+      'Textil',
     ];
 
     String? categoria;
     bool loading = false;
+    String? errorMensaje;
+    String? errorNombre;
+    final formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -56,63 +59,122 @@ class _InsumosScreenState extends State<InsumosScreen> {
               ),
               title: const Text("Nuevo Insumo"),
 
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nombreController,
-                    decoration: const InputDecoration(
-                      labelText: "Nombre",
-                      prefixIcon: Icon(Icons.inventory_2),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (errorMensaje != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            errorMensaje!,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    TextFormField(
+                      controller: nombreController,
+                      decoration: InputDecoration(
+                        labelText: "Nombre",
+                        prefixIcon: const Icon(Icons.inventory_2),
+                        border: const OutlineInputBorder(),
 
-                  TextField(
-                    controller: stockController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: "Stock",
-                      prefixIcon: Icon(Icons.numbers),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+                        // 👇 error del backend
+                        errorText: errorNombre,
+                      ),
 
-                  DropdownButtonFormField<String>(
-                    value: categoria,
-                    decoration: const InputDecoration(
-                      labelText: "Categoría",
-                      prefixIcon: Icon(Icons.category),
-                      border: OutlineInputBorder(),
-                    ),
-                    items: categorias
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (value) {
-                      setStateDialog(() {
-                        categoria = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 12),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'El nombre es obligatorio';
+                        }
+                        return null;
+                      },
 
-                  TextField(
-                    controller: ubicacionController,
-                    decoration: const InputDecoration(
-                      labelText: "Ubicación",
-                      prefixIcon: Icon(Icons.place),
-                      border: OutlineInputBorder(),
+                      onChanged: (_) {
+                        if (errorNombre != null) {
+                          setStateDialog(() {
+                            errorNombre = null;
+                          });
+                        }
+                      },
                     ),
-                  ),
 
-                  if (loading)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: CircularProgressIndicator(),
+                    const SizedBox(height: 12),
+
+                    TextFormField(
+                      controller: stockController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: "Stock",
+                        prefixIcon: Icon(Icons.numbers),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'El stock es obligatorio';
+                        }
+                        if (int.tryParse(value.trim()) == null) {
+                          return 'Debe ser un número válido';
+                        }
+                        return null;
+                      },
                     ),
-                ],
+
+                    const SizedBox(height: 12),
+
+                    DropdownButtonFormField<String>(
+                      value: categoria,
+                      decoration: const InputDecoration(
+                        labelText: "Categoría",
+                        prefixIcon: Icon(Icons.category),
+                        border: OutlineInputBorder(),
+                      ),
+                      items: categorias
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Selecciona una categoría';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          categoria = value;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextFormField(
+                      controller: ubicacionController,
+                      decoration: const InputDecoration(
+                        labelText: "Ubicación",
+                        prefixIcon: Icon(Icons.place),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'La ubicación es obligatoria';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    if (loading)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: CircularProgressIndicator(),
+                      ),
+                  ],
+                ),
               ),
 
               actions: [
@@ -126,44 +188,47 @@ class _InsumosScreenState extends State<InsumosScreen> {
                   label: const Text("Guardar"),
 
                   onPressed: loading
-                      ? null
-                      : () async {
-                          if (nombreController.text.isEmpty ||
-                              stockController.text.isEmpty ||
-                              ubicacionController.text.isEmpty ||
-                              categoria == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Completá todos los campos"),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
+                    ? null
+                    : () async {
+                        setStateDialog(() {
+                          errorMensaje = null;
+                        });
 
-                          setStateDialog(() => loading = true);
+                        if (!formKey.currentState!.validate()) {
+                          return;
+                        }
 
-                          final ok = await api.crearInsumo(
-                            nombre: nombreController.text,
-                            categoria: categoria!,
-                            stock: int.parse(stockController.text),
-                            ubicacion: ubicacionController.text,
-                          );
+                        final stock = int.parse(stockController.text.trim());
 
-                          setStateDialog(() => loading = false);
+                        setStateDialog(() => loading = true);
 
-                          if (ok) {
-                            await context
-                                .read<InsumoProvider>()
-                                .cargarProviderInsumos();
+                        final error = await api.crearInsumo(
+                          nombre: nombreController.text.trim(),
+                          categoria: categoria!,
+                          stock: stock,
+                          ubicacion: ubicacionController.text.trim(),
+                        );
 
-                            Navigator.pop(context);
+                        setStateDialog(() => loading = false);
 
-                            nombreController.clear();
-                            stockController.clear();
-                            ubicacionController.clear();
-                          }
-                        },
+                        if (error != null) {
+                          setStateDialog(() {
+                            if (error.toLowerCase().contains("nombre")) {
+                              errorNombre = error;
+                            } else {
+                              errorMensaje = error;
+                            }
+                          });
+                          return;
+                        }
+                        await context.read<InsumoProvider>().cargarProviderInsumos();
+
+                        if (mounted) Navigator.pop(context);
+
+                        nombreController.clear();
+                        stockController.clear();
+                        ubicacionController.clear();
+                      },
                 ),
               ],
             );
@@ -172,6 +237,8 @@ class _InsumosScreenState extends State<InsumosScreen> {
       },
     );
   }
+                
+                
 
   //Semáforo de stock
   Color colorStock(int stock) {
@@ -186,171 +253,147 @@ class _InsumosScreenState extends State<InsumosScreen> {
     return "OK";
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final insumos = context.watch<InsumoProvider>().insumos;
-    final rol = context.watch<UserProvider>().rol;
+@override
+Widget build(BuildContext context) {
+  final insumos = context.watch<InsumoProvider>().insumos;
+  final rol = context.watch<UserProvider>().rol;
 
-    // FILTRO POR NOMBRE
-    final filtrados =
-        insumos.where((i) {
-          final nombre = i.nombre.toLowerCase();
+  final filtrados = insumos.where((i) {
+    final nombre = i.nombre.toLowerCase();
+    final matchSearch = nombre.contains(search);
 
-          final matchSearch = nombre.contains(search);
+    final matchCategoria =
+    filtroCategoria == "TODAS" ||
+    i.categoria == filtroCategoria;
 
-          final matchCategoria =
-              filtroCategoria == null || i.categoria == filtroCategoria;
+    final matchStock =
+        filtroStock == "TODOS" ||
+        (filtroStock == "OK" && i.stock > 5) ||
+        (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
+        (filtroStock == "URGENTE" && i.stock <= 2);
 
-          final matchCritico = !widget.soloCriticos || i.stock <= 5;
+    return matchSearch && matchCategoria && matchStock;
+  }).toList();
 
-          final matchStock =
-              filtroStock == null ||
-              (filtroStock == "OK" && i.stock > 5) ||
-              (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
-              (filtroStock == "URGENTE" && i.stock <= 2);
-
-          return matchSearch && matchCategoria && matchCritico && matchStock;
-        }).toList()..sort(
-          (a, b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()),
-        );
-
-    return Scaffold(
+  return DefaultTabController(
+    length: rol == "ADMIN" ? 2 : 1,
+    child: Scaffold(
       appBar: AppBar(
         title: const Text("INSUMOS"),
-        //esto deja la flecha de retroceso
-        automaticallyImplyLeading: true,
-      ),
-
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            TextField(
-              decoration: const InputDecoration(
-                labelText: "Buscar insumo",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  search = value.toLowerCase();
-                });
-              },
-            ),
-
-            const SizedBox(height: 10),
-
-            DropdownButtonFormField<String>(
-              value: filtroCategoria,
-              decoration: const InputDecoration(
-                labelText: "Filtrar por categoría",
-                prefixIcon: Icon(Icons.filter_list),
-                border: OutlineInputBorder(),
-              ),
-              items: const [
-                DropdownMenuItem(value: null, child: Text("Todas")),
-                DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
-                DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
-                DropdownMenuItem(value: "Metal", child: Text("Metal")),
-                DropdownMenuItem(value: "Madera", child: Text("Madera")),
-                DropdownMenuItem(value: "Papel", child: Text("Papel")),
-                DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  filtroCategoria = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: 10),
-
-            DropdownButtonFormField<String>(
-              value: filtroStock,
-              decoration: const InputDecoration(
-                labelText: "Estado de stock",
-                prefixIcon: Icon(Icons.traffic),
-                border: OutlineInputBorder(),
-              ),
-              items: const [
-                DropdownMenuItem(value: null, child: Text("Todos")),
-                DropdownMenuItem(value: "OK", child: Text("🟢 OK")),
-                DropdownMenuItem(value: "CRITICO", child: Text("🟠 Crítico")),
-                DropdownMenuItem(value: "URGENTE", child: Text("🔴 Urgente")),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  filtroStock = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: 10),
-
-            Expanded(
-              child: filtrados.isEmpty
-                  ? const Center(child: Text("No hay insumos"))
-                  : ListView.builder(
-                      itemCount: filtrados.length,
-                      itemBuilder: (context, index) {
-                        final insumo = filtrados[index];
-
-                        return Card(
-                          child: ListTile(
-                            leading: Icon(
-                              Icons.circle,
-                              color: colorStock(insumo.stock),
-                              size: 18,
-                            ),
-
-                            title: Text(
-                              insumo.nombre,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Stock: ${insumo.stock}",
-                                  style: TextStyle(
-                                    color: colorStock(insumo.stock),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-
-                                Text(
-                                  estadoStock(insumo.stock),
-                                  style: TextStyle(
-                                    color: colorStock(insumo.stock),
-                                  ),
-                                ),
-
-                                Text("Ubicación: ${insumo.ubicacion}"),
-                              ],
-                            ),
-
-                            trailing: const Icon(Icons.chevron_right),
-
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      InsumoDetalleScreen(insumo: insumo),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
-            ),
+        bottom: TabBar(
+          tabs: [
+            const Tab(text: "Activos"),
+            if (rol == "ADMIN") const Tab(text: "Inactivos"),
           ],
         ),
       ),
+
+          body: Column(
+            children: [
+
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Buscar insumo...",
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      search = value.toLowerCase();
+                    });
+                  },
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: filtroCategoria,
+                        decoration: const InputDecoration(
+                          labelText: "Categoría",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: "TODAS", child: Text("Todas")),
+                          DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
+                          DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
+                          DropdownMenuItem(value: "Metal", child: Text("Metal")),
+                          DropdownMenuItem(value: "Madera", child: Text("Madera")),
+                          DropdownMenuItem(value: "Papel", child: Text("Papel")),
+                          DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
+                          DropdownMenuItem(value: "Textil", child: Text("Textil")),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            filtroCategoria = value ?? "TODAS";
+                          });
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: filtroStock,
+                        decoration: const InputDecoration(
+                          labelText: "Estado",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: "TODOS", child: Text("Todos")),
+                          DropdownMenuItem(value: "OK", child: Text("OK")),
+                          DropdownMenuItem(value: "CRITICO", child: Text("Crítico")),
+                          DropdownMenuItem(value: "URGENTE", child: Text("Urgente")),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            filtroStock = value ?? "TODOS";
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Expanded(
+                child: TabBarView(
+                  children: [
+
+                    RefreshIndicator(
+                      onRefresh: () async {
+                        await context.read<InsumoProvider>().cargarProviderInsumos();
+                      },
+                      child: _buildLista(
+                        filtrados.where((i) => i.activo).toList(),
+                      ),
+                    ),
+
+                    if (rol == "ADMIN")
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          await context.read<InsumoProvider>().cargarProviderInsumos();
+                        },
+                        child: _buildLista(
+                          filtrados.where((i) => !i.activo).toList(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+  ],
+),
 
       floatingActionButton: rol == "ADMIN"
           ? FloatingActionButton(
@@ -358,6 +401,80 @@ class _InsumosScreenState extends State<InsumosScreen> {
               child: const Icon(Icons.add),
             )
           : null,
+    ),
+  );
+}
+  Widget _buildLista(List insumosList) {
+  if (insumosList.isEmpty) {
+    return const Center(
+      child: Text(
+        "No hay insumos",
+        style: TextStyle(fontSize: 18),
+      ),
     );
   }
+
+  return ListView.separated(
+    padding: const EdgeInsets.all(12),
+    itemCount: insumosList.length,
+    separatorBuilder: (_, __) => const SizedBox(height: 8),
+    itemBuilder: (context, index) {
+      final insumo = insumosList[index];
+
+      return Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
+
+          leading: CircleAvatar(
+            radius: 10,
+            backgroundColor: colorStock(insumo.stock),
+          ),
+
+          title: Text(
+            insumo.nombre,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Categoría: ${insumo.categoria}"),
+              Text("Stock: ${insumo.stock}"),
+              Text("Ubicación: ${insumo.ubicacion}"),
+              Text(
+                estadoStock(insumo.stock),
+                style: TextStyle(
+                  color: colorStock(insumo.stock),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          trailing: const Icon(Icons.chevron_right),
+
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => InsumoDetalleScreen(
+                  insumo: insumo,
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    },
+  );
+}
 }
