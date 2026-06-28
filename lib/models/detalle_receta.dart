@@ -1,6 +1,6 @@
 class DetalleReceta {
   final int? id; //PK
-  final int cantidadTeorica;
+  int cantidadTeorica;
   final String? nombreInsumo;
   final int insumoId; //FK
   final int? productoId; //FK

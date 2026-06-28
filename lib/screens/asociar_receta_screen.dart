@@ -41,25 +41,71 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
   void agregarDetalle() {
     final cantidad = int.tryParse(cantidadController.text);
 
-    if (insumoSeleccionado == null || cantidad == null) return;
+    if (insumoSeleccionado == null || cantidad == null || cantidad <= 0) {
+      return;
+    }
 
     setState(() {
-      detalles.add(
-        DetalleReceta(
-          cantidadTeorica: cantidad,
-          insumoId: insumoSeleccionado!.id!,
-        ),
+      final index = detalles.indexWhere(
+        (d) => d.insumoId == insumoSeleccionado!.id,
       );
+
+      if (index != -1) {
+        // Ya existe ese insumo → sumar cantidad
+        detalles[index].cantidadTeorica += cantidad;
+      } else {
+        // No existe → agregarlo
+        detalles.add(
+          DetalleReceta(
+            cantidadTeorica: cantidad,
+            insumoId: insumoSeleccionado!.id!,
+          ),
+        );
+      }
 
       cantidadController.clear();
       insumoSeleccionado = null;
     });
   }
 
-  void eliminarDetalle(int index) {
-    setState(() {
-      detalles.removeAt(index);
-    });
+  void editarCantidad(int index) {
+    final controller = TextEditingController(
+      text: detalles[index].cantidadTeorica.toString(),
+    );
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Modificar cantidad"),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: "Cantidad",
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final nuevaCantidad = int.tryParse(controller.text);
+
+              if (nuevaCantidad != null && nuevaCantidad > 0) {
+                setState(() {
+                  detalles[index].cantidadTeorica = nuevaCantidad;
+                });
+
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Guardar"),
+          ),
+        ],
+      ),
+    );
   }
 
   //esto no iria hay que modificar
@@ -260,8 +306,8 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
                             subtitle: Text("Cantidad: ${detalle.cantidadTeorica}"),
 
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => eliminarDetalle(index),
+                              icon: const Icon(Icons.edit),
+                              onPressed: () => editarCantidad(index),
                             ),
                           ),
                         );
