@@ -130,7 +130,10 @@ class _ProductosScreenState extends State<ProductosScreen> {
                       itemBuilder: (_, index) {
                         final producto = filtrados[index];
 
+                        print( "Fila $index -> id=${producto.id} nombre=${producto.nombre}", );                 
+
                         return Card(
+                          key: ValueKey(producto.id),
                           child: ListTile(
                             leading: const Icon(Icons.inventory_2),
 
@@ -145,6 +148,8 @@ class _ProductosScreenState extends State<ProductosScreen> {
                             onTap: () {
                               final id = producto.id;
                               if (id == null) return;
+
+                              print("Abriendo producto ${producto.id}");
 
                               Navigator.push(
                                 context,

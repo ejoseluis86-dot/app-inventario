@@ -22,11 +22,10 @@ class Producto {
     nombre: json['nombre'],
     precio: double.parse(json['precio'].toString()),
     categoria: json['categoria'],
-    detalles: json['detalles'] != null
-        ? (json['detalles'] as List)
-            .map((e) => DetalleReceta.fromJson(e))
-            .toList()
-        : null,
+    detalles: (json['detalles'] as List?)
+        ?.map((e) => DetalleReceta.fromJson(e))
+        .toList()
+        ?? [],
   );
 }
 

@@ -185,6 +185,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
+      print(response.body); //para ver que devuelve al tocar el primer producto de la lista
       return Producto.fromJson(jsonDecode(response.body));
     }
 
@@ -274,6 +275,7 @@ class ApiService {
           'nombre': nombre,
           'precio': precio,
           'categoria': categoria,
+          'detalles': detalles.map((e) => e.toJson()).toList(),
         }),
       ),
     );

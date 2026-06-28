@@ -12,19 +12,20 @@ class ProductoLiteProvider extends ChangeNotifier {
   Future<void> cargarProviderProductos() async {
     try {
       loading = true;
-      error = null;
       notifyListeners();
 
       final data = await api.obtenerProductosLite();
 
-      productosLite =
-          data.map((e) => ProductoLite.fromJson(e)).toList();
+      productosLite = data.map((e) {
+        return ProductoLite.fromJson(e);
+      }).toList();
+
+      // 🔥 IMPORTANTE: forzar rebuild limpio
+      productosLite = List.from(productosLite);
 
     } catch (e) {
       error = e.toString();
       productosLite = [];
-      print("❌ ERROR PRODUCTOS: $e");
-
     } finally {
       loading = false;
       notifyListeners();
