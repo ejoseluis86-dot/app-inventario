@@ -7,7 +7,7 @@ import 'package:mi_app/providers/user_provider.dart';
 
 class InsumoDetalleScreen extends StatefulWidget {
   final Insumo insumo;
-
+  
   const InsumoDetalleScreen({super.key, required this.insumo});
 
   @override
@@ -33,6 +33,9 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
     'Textil',
   ];
 
+  String? errorNombre;
+  String? errorGeneral;
+
   @override
   void initState() {
     super.initState();
@@ -49,29 +52,58 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
   }
 
   Future<void> _guardar() async {
+    setState(() {
+      errorNombre = null;
+      errorGeneral = null;
+    });
+
+    final nombre = nombreController.text.trim();
+    final stockText = stockController.text.trim();
+
+    if (nombre.isEmpty ||
+        stockText.isEmpty ||
+        ubicacionController.text.isEmpty ||
+        categoria == null) {
+      setState(() {
+        errorGeneral = "Completa todos los campos";
+      });
+      return;
+    }
+
+    final stock = int.tryParse(stockText);
+
+    if (stock == null) {
+      setState(() {
+        errorGeneral = "El stock debe ser numérico";
+      });
+      return;
+    }
+
     final id = widget.insumo.id;
 
-    final ok = await api.actualizarInsumo(
+    final error = await api.actualizarInsumo(
       id: id,
-      nombre: nombreController.text,
-      categoria: categoria ?? widget.insumo.categoria,
-      stock: int.tryParse(stockController.text) ?? widget.insumo.stock,
-      ubicacion: ubicacionController.text,
+      nombre: nombre,
+      categoria: categoria!,
+      stock: stock,
+      ubicacion: ubicacionController.text.trim(),
     );
 
     if (!mounted) return;
 
-    if (ok) {
-      await context.read<InsumoProvider>().cargarProviderInsumos();
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Error al actualizar insumo"),
-          backgroundColor: Colors.red,
-        ),
-      );
+    if (error != null) {
+      setState(() {
+        if (error != null && error.toLowerCase().contains("nombre")) {
+          errorNombre = error;
+        } else {
+          errorGeneral = error;
+        }
+      });
+      return;
     }
+
+    await context.read<InsumoProvider>().cargarProviderInsumos();
+    Navigator.pop(context);
   }
 
   @override
@@ -85,11 +117,25 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+
+            if (errorGeneral != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  errorGeneral!,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
             TextField(
               controller: nombreController,
               enabled: puedeEditar,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Nombre",
+                errorText: errorNombre,
               ),
             ),
             const SizedBox(height: 10),

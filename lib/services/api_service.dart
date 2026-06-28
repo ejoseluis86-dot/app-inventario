@@ -110,30 +110,34 @@ class ApiService {
     return data['error'] ?? "Error desconocido";
   }
 
-  Future<bool> actualizarInsumo({
-    required int id,
-    required String nombre,
-    required String categoria,
-    required int stock,
-    required String ubicacion,
-  }) async {
-    final response = await _requestWithAuth(
-      (h) => http.put(
-        Uri.parse('$baseUrl/insumos/modificar/$id/'),
-        headers: h,
-        body: jsonEncode({
-          'nombre': nombre,
-          'categoria': categoria,
-          'stock': stock,
-          'ubicacion': ubicacion,
-        }),
-      ),
-    );
-    print(response.statusCode);
-    print(response.body);
+  Future<String?> actualizarInsumo({
+  required int id,
+  required String nombre,
+  required String categoria,
+  required int stock,
+  required String ubicacion,
+}) async {
+  final response = await _requestWithAuth(
+    (h) => http.put(
+      Uri.parse('$baseUrl/insumos/modificar/$id/'),
+      headers: h,
+      body: jsonEncode({
+        'nombre': nombre,
+        'categoria': categoria,
+        'stock': stock,
+        'ubicacion': ubicacion,
+      }),
+    ),
+  );
 
-    return response.statusCode == 200;
-  }
+  print(response.statusCode);
+  print(response.body);
+
+  if (response.statusCode == 200) return null;
+
+  final data = jsonDecode(response.body);
+  return data['error'] ?? "Error desconocido";
+}
 
   Future<bool> eliminarInsumo(int id) async {
     final response = await _requestWithAuth(
