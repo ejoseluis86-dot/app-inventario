@@ -173,7 +173,7 @@ class ApiService {
   }
 
   // =========================
-  // PRODUCTO
+  // PRODUCTOS
   // =========================
   Future<Producto> obtenerProducto(int id) async {
     final response = await _requestWithAuth(
@@ -220,6 +220,23 @@ class ApiService {
     throw Exception("Error al obtener receta");
   }
 
+  Future<bool> existeProducto(String nombre) async {
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/productos/existe/$nombre/'),
+        headers: h,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data["existe"] == true;
+    }
+
+    return false;
+  }
+
+
   Future<bool> crearProducto(Producto producto) async {
     final response = await _requestWithAuth(
       (h) => http.post(
@@ -229,7 +246,16 @@ class ApiService {
       ),
     );
 
-    return response.statusCode == 201 || response.statusCode == 200;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    }
+
+    if (response.statusCode == 400) {
+      final body = jsonDecode(response.body);
+      throw Exception(body["error"]);
+    }
+
+    throw Exception("Error al crear producto");
   }
 
   // =========================

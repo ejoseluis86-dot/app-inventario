@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/screens/asociar_receta_screen.dart';
+import 'package:mi_app/services/api_service.dart';
 
 class NuevoProductoScreen extends StatefulWidget {
   const NuevoProductoScreen({super.key});
@@ -166,34 +167,54 @@ class _NuevoProductoScreenState extends State<NuevoProductoScreen> {
     );
   }
 
-    void _continuar() {
-      if (_nombreController.text.trim().isEmpty ||
-          _precioController.text.isEmpty ||
-          double.tryParse(_precioController.text) == null ||
-          double.parse(_precioController.text) <= 0 ||
-          categoriaSeleccionada == null ||
-          categoriaSeleccionada!.trim().isEmpty) {
+    void _continuar() async {
+      final nombre = _nombreController.text.trim();
+      final precioTexto = _precioController.text.trim();
+      final precio = double.tryParse(precioTexto);
 
+      if (nombre.isEmpty ||
+          precio == null ||
+          precio <= 0 ||
+          categoriaSeleccionada == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Complete nombre, precio y categoría"),
-            backgroundColor: Colors.red,
           ),
         );
-
         return;
       }
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => AsociarRecetaScreen(
-            nombreProducto: _nombreController.text.trim(),
-            precioProducto: double.parse(_precioController.text),
-            categoria: categoriaSeleccionada!,
-          ),
-        ),
-      );
-    }
+      final api = ApiService();
 
+      try {
+        final existe = await api.existeProducto(nombre);
+
+        if (existe) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Ya existe un producto con ese nombre"),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AsociarRecetaScreen(
+              nombreProducto: nombre,
+              precioProducto: precio,
+              categoria: categoriaSeleccionada!,
+            ),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error verificando producto"),
+          ),
+        );
+      }
+    }
 }

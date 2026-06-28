@@ -108,69 +108,73 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
     );
   }
 
-  //esto no iria hay que modificar
+  //metodo para guardar la receta
   Future<void> guardarReceta() async {
-  final apiService = ApiService();
+    final apiService = ApiService();
 
-  if (widget.nombreProducto.trim().isEmpty ||
-      widget.categoria.trim().isEmpty ||
-      widget.precioProducto <= 0) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Debe completar nombre, precio y categoría'),
-        backgroundColor: Colors.red,
-      ),
+    if (widget.nombreProducto.trim().isEmpty ||
+        widget.categoria.trim().isEmpty ||
+        widget.precioProducto <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debe completar nombre, precio y categoría'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (detalles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debe agregar al menos un insumo'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final nuevoProducto = Producto(
+      nombre: widget.nombreProducto,
+      precio: widget.precioProducto,
+      categoria: widget.categoria,
+      detalles: detalles,
     );
-    return;
+
+    try {
+      final ok = await apiService.crearProducto(nuevoProducto);
+
+      if (ok) {
+        await context.read<ProductoLiteProvider>().cargarProviderProductos();
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Producto creado correctamente"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRutas.home,
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString().replaceFirst("Exception: ", ""),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
-  if (detalles.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Debe agregar al menos un insumo'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
-  }
-
-  final nuevoProducto = Producto(
-    nombre: widget.nombreProducto,
-    precio: widget.precioProducto,
-    categoria: widget.categoria,
-    detalles: detalles,
-  );
-
-  final ok = await apiService.crearProducto(nuevoProducto);
-
-  if (ok) {
-    await context.read<ProductoLiteProvider>().cargarProviderProductos();
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Producto creado correctamente"),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      AppRutas.home,
-      (route) => false,
-    );
-  } else {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("No se pudo crear el producto"),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
   @override
   Widget build(BuildContext context) {
     //aca estoy trayendo una lista de insumos desde el provider
