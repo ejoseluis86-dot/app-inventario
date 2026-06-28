@@ -140,25 +140,24 @@ class _ProductosScreenState extends State<ProductosScreen> {
                             title: Text(producto.nombre),
 
                             subtitle: Text(
-                              "\$${producto.precio} • ${producto.categoria}",
+                              "\$${producto.precioFormateado} • ${producto.categoria}",
                             ),
 
                             trailing: const Icon(Icons.chevron_right),
 
-                            onTap: () {
+                            onTap: () async {
                               final id = producto.id;
                               if (id == null) return;
 
-                              print("Abriendo producto ${producto.id}");
-
-                              Navigator.push(
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => ProductoDetalleScreen(
-                                    productoId: id,
-                                  ),
+                                  builder: (_) => ProductoDetalleScreen(productoId: id),
                                 ),
                               );
+
+                              // REFRESCAR LISTA AL VOLVER
+                              context.read<ProductoLiteProvider>().cargarProviderProductos();
                             },
                           ),
                         );

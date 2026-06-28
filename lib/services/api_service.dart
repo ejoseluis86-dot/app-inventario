@@ -286,6 +286,16 @@ class ApiService {
     return true;
   }
 
+  Future<bool> eliminarProducto(int id) async {
+    final response = await _requestWithAuth(
+      (h) => http.delete(
+        Uri.parse('$baseUrl/productos/eliminar/$id/'),
+        headers: h,
+      ),
+    );
+
+    return response.statusCode == 200;
+  }
 
 
   // =========================

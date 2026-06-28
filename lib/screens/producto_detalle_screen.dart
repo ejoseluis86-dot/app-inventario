@@ -54,6 +54,52 @@ class _ProductoDetalleScreenState extends State<ProductoDetalleScreen> {
     print("Error cargando producto: $e");
   }
 }
+
+  Future<void> confirmarBaja() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Dar de baja producto"),
+        content: const Text(
+          "¿Seguro que querés dar de baja este producto?\n"
+          "No se eliminará, solo dejará de aparecer.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              "Dar de baja",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final api = ApiService();
+
+    final ok = await api.eliminarProducto(producto!.id!);
+
+    if (!mounted) return;
+
+    if (ok) {
+      Navigator.pop(context, true); // vuelve a la lista
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error al dar de baja"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
 Widget build(BuildContext context) {
   final user = context.watch<UserProvider>();
@@ -95,14 +141,21 @@ Widget build(BuildContext context) {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => EditarProductoScreen(producto: producto!),
+                    builder: (_) =>
+                        EditarProductoScreen(producto: producto!),
                   ),
                 );
 
                 if (result == true) {
-                  await cargarProducto(); // 🔥 recarga datos actualizados
+                  await cargarProducto();
                 }
               },
+            ),
+
+            IconButton(
+              icon: const Icon(Icons.delete),
+              color: Colors.red,
+              onPressed: () => confirmarBaja(),
             ),
           ]
         : null,
@@ -117,7 +170,7 @@ Widget build(BuildContext context) {
             "Nombre: ${producto!.nombre}",
             style: const TextStyle(fontSize: 18),
           ),
-          Text("Precio: \$${producto!.precio}"),
+          Text("Precio: \$${producto!.precioFormateado}"),
           Text("Categoría: ${producto!.categoria}"),
 
           const SizedBox(height: 20),

@@ -11,6 +11,9 @@ class ProductoLite {
     required this.categoria,
   });
 
+  //precio con 2 decimales
+  String get precioFormateado => precio.toStringAsFixed(2);
+
   factory ProductoLite.fromJson(Map<String, dynamic> json) {
     return ProductoLite(
       id: json['id'],
