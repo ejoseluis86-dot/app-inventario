@@ -9,18 +9,21 @@ class ProductoLiteProvider extends ChangeNotifier {
 
   final ApiService api = ApiService();
 
-  Future<void> cargarProviderProductos() async {
+  Future<void> cargarProviderProductos(bool esAdmin) async {
     try {
       loading = true;
+      error = null;
       notifyListeners();
 
-      final data = await api.obtenerProductosLite();
+      final data = esAdmin
+          ? await api.obtenerProductosAdmin()
+          : await api.obtenerProductosLite();
 
-      productosLite = data.map((e) {
-        return ProductoLite.fromJson(e);
-      }).toList();
+      productosLite = data
+          .map((e) => ProductoLite.fromJson(e))
+          .toList();
 
-      // 🔥 IMPORTANTE: forzar rebuild limpio
+      // 🔥 fuerza rebuild limpio
       productosLite = List.from(productosLite);
 
     } catch (e) {

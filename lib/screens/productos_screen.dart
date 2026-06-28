@@ -18,9 +18,25 @@ class _ProductosScreenState extends State<ProductosScreen> {
   String? filtroCategoria;
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final esAdmin =
+          context.read<UserProvider>().rol == "ADMIN";
+
+      context
+          .read<ProductoLiteProvider>()
+          .cargarProviderProductos(esAdmin);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final productos = context.watch<ProductoLiteProvider>().productosLite;
-    final rol = context.watch<UserProvider>().rol;
+    final userProvider = context.watch<UserProvider>();
+    final esAdmin = userProvider.rol == "ADMIN";
+  
 
     final filtrados =
         productos.where((p) {
@@ -141,6 +157,9 @@ class _ProductosScreenState extends State<ProductosScreen> {
 
                             subtitle: Text(
                               "\$${producto.precioFormateado} • ${producto.categoria}",
+                              style: TextStyle(
+                                color: producto.activo ? Colors.black : Colors.grey,
+                              ),
                             ),
 
                             trailing: const Icon(Icons.chevron_right),
@@ -157,7 +176,11 @@ class _ProductosScreenState extends State<ProductosScreen> {
                               );
 
                               // REFRESCAR LISTA AL VOLVER
-                              context.read<ProductoLiteProvider>().cargarProviderProductos();
+                              final esAdmin = context.read<UserProvider>().rol == "ADMIN";
+
+                              await context
+                                  .read<ProductoLiteProvider>()
+                                  .cargarProviderProductos(esAdmin);
                             },
                           ),
                         );
@@ -167,7 +190,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
           ],
         ),
       ),
-      floatingActionButton: rol == "ADMIN"
+      floatingActionButton: esAdmin
         ? FloatingActionButton(
             onPressed: () {
               Navigator.pushNamed(

@@ -3,12 +3,15 @@ class ProductoLite {
   final String nombre;
   final double precio;
   final String categoria;
+  final bool activo;
+  
 
   ProductoLite({
     required this.id,
     required this.nombre,
     required this.precio,
     required this.categoria,
+    required this.activo,
   });
 
   //precio con 2 decimales
@@ -20,6 +23,7 @@ class ProductoLite {
       nombre: json['nombre'],
       precio: double.parse(json['precio'].toString()),
       categoria: json['categoria'],
+      activo: json['activo'],
     );
   }
 }

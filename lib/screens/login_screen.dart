@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
         
 
         context.read<InsumoProvider>().cargarProviderInsumos();
-        context.read<ProductoLiteProvider>().cargarProviderProductos();
+        context.read<ProductoLiteProvider>().cargarProviderProductos;
         context.read<PedidoLiteProvider>().cargarProviderPedidos();
 
         if (!mounted) return;

@@ -207,6 +207,21 @@ class ApiService {
   throw Exception("Error al obtener productos");
 }
 
+  Future<List<dynamic>> obtenerProductosAdmin() async {
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/productos/admin/'),
+        headers: h,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Error al obtener productos admin");
+  }
+
   Future<List<dynamic>> obtenerRecetaProducto(int idProducto) async {
     final response = await _requestWithAuth(
       (h) => http.get(

@@ -145,7 +145,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
       final ok = await apiService.crearProducto(nuevoProducto);
 
       if (ok) {
-        await context.read<ProductoLiteProvider>().cargarProviderProductos();
+        await context.read<ProductoLiteProvider>().cargarProviderProductos;
 
         if (!mounted) return;
 
