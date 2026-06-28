@@ -297,7 +297,7 @@ class ApiService {
 
     if (response.statusCode != 200) return false;
 
-    // 🔴 receta NO se actualiza en backend aún
+    // 
     return true;
   }
 
@@ -312,6 +312,16 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  Future<bool> toggleProducto(int id) async {
+    final response = await _requestWithAuth(
+      (h) => http.put(
+        Uri.parse('$baseUrl/productos/toggle/$id/'),
+        headers: h,
+      ),
+    );
+
+    return response.statusCode == 200;
+  }
 
   // =========================
   // PEDIDOS

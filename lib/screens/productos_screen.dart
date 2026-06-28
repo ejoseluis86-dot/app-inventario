@@ -4,6 +4,7 @@ import 'package:mi_app/providers/user_provider.dart';
 import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/screens/producto_detalle_screen.dart';
+import 'package:mi_app/services/api_service.dart';
 
 
 class ProductosScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class ProductosScreen extends StatefulWidget {
 class _ProductosScreenState extends State<ProductosScreen> {
   String search = "";
   String? filtroCategoria;
+  bool mostrarInactivos = false;
 
   @override
   void initState() {
@@ -38,19 +40,18 @@ class _ProductosScreenState extends State<ProductosScreen> {
     final esAdmin = userProvider.rol == "ADMIN";
   
 
-    final filtrados =
-        productos.where((p) {
-          final matchNombre = p.nombre.toLowerCase().contains(search);
+    final filtrados = productos.where((p) {
+      final matchNombre = p.nombre.toLowerCase().contains(search);
 
-          final matchCategoria =
-              filtroCategoria == null || p.categoria == filtroCategoria;
+      final matchCategoria =
+          filtroCategoria == null || p.categoria == filtroCategoria;
 
-          return matchNombre && matchCategoria;
-        }).toList()
-          ..sort(
-            (a, b) =>
-                a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()),
-          );
+      final matchActivo = esAdmin
+          ? (mostrarInactivos ? true : p.activo)
+          : p.activo;
+
+      return matchNombre && matchCategoria && matchActivo;
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -153,16 +154,35 @@ class _ProductosScreenState extends State<ProductosScreen> {
                           child: ListTile(
                             leading: const Icon(Icons.inventory_2),
 
-                            title: Text(producto.nombre),
-
-                            subtitle: Text(
-                              "\$${producto.precioFormateado} • ${producto.categoria}",
+                            title: Text(
+                              producto.nombre,
                               style: TextStyle(
                                 color: producto.activo ? Colors.black : Colors.grey,
+                                fontWeight: producto.activo ? FontWeight.normal : FontWeight.bold,
                               ),
                             ),
 
-                            trailing: const Icon(Icons.chevron_right),
+                            subtitle: Text(
+                              "\$${producto.precioFormateado} • ${producto.categoria}"
+                            ),
+
+                            trailing: esAdmin
+                              ? IconButton(
+                                  icon: Icon(
+                                    producto.activo ? Icons.toggle_on : Icons.toggle_off,
+                                    color: producto.activo ? Colors.green : Colors.red,
+                                  ),
+                                  onPressed: () async {
+                                    await context
+                                        .read<ApiService>()
+                                        .toggleProducto(producto.id!);
+
+                                    await context
+                                        .read<ProductoLiteProvider>()
+                                        .cargarProviderProductos(true);
+                                  },
+                                )
+                              : const Icon(Icons.chevron_right),
 
                             onTap: () async {
                               final id = producto.id;
@@ -187,7 +207,17 @@ class _ProductosScreenState extends State<ProductosScreen> {
                       },
                     ),
             ),
+            SwitchListTile(
+              title: const Text("Ver inactivos"),
+              value: mostrarInactivos,
+              onChanged: (value) {
+                setState(() {
+                  mostrarInactivos = value;
+                });
+              },
+            ),
           ],
+          
         ),
       ),
       floatingActionButton: esAdmin
