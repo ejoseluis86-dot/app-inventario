@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/producto.dart';
 import 'package:mi_app/services/api_service.dart';
+import 'package:mi_app/screens/editar_producto_screen.dart';
 
 class ProductoDetalleScreen extends StatefulWidget {
   final int productoId;
@@ -79,7 +80,22 @@ class _ProductoDetalleScreenState extends State<ProductoDetalleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(producto!.nombre),
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => EditarProductoScreen(producto: producto!),
+                ),
+              );
+            },
+          ),
+        ],  
       ),
+      
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

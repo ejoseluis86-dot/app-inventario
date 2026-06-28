@@ -258,6 +258,20 @@ class ApiService {
     throw Exception("Error al crear producto");
   }
 
+  Future<bool> actualizarProducto(Producto producto) async {
+    final response = await _requestWithAuth(
+      (h) => http.put(
+        Uri.parse('$baseUrl/productos/modificar/${producto.id}/'),
+        headers: h,
+        body: jsonEncode(producto.toJson()),
+      ),
+    );
+
+    return response.statusCode == 200;
+  }
+
+
+
   // =========================
   // PEDIDOS
   // =========================
