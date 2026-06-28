@@ -24,7 +24,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
   String search = "";
   String filtroCategoria = "TODAS";
   String filtroStock = "TODOS";
-
+  
   //muestra filtro de crticos desde pantalla principal  @override
   void initState() {
     super.initState();
@@ -46,6 +46,8 @@ class _InsumosScreenState extends State<InsumosScreen> {
     String? errorMensaje;
     String? errorNombre;
     final formKey = GlobalKey<FormState>();
+    final user = context.watch<UserProvider>();
+    final esAdmin = user.rol == "ADMIN";
 
     showDialog(
       context: context,
@@ -257,6 +259,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
 Widget build(BuildContext context) {
   final insumos = context.watch<InsumoProvider>().insumos;
   final rol = context.watch<UserProvider>().rol;
+  final esAdmin = rol == "ADMIN";
 
   final filtrados = insumos.where((i) {
     final nombre = i.nombre.toLowerCase();
@@ -281,10 +284,14 @@ Widget build(BuildContext context) {
       appBar: AppBar(
         title: const Text("INSUMOS"),
         bottom: TabBar(
-          tabs: [
-            const Tab(text: "Activos"),
-            if (rol == "ADMIN") const Tab(text: "Inactivos"),
-          ],
+          tabs: esAdmin
+              ? const [
+                  Tab(text: "Activos"),
+                  Tab(text: "Inactivos"),
+                ]
+              : const [
+                  Tab(text: "  "),
+                ],
         ),
       ),
 
@@ -369,27 +376,35 @@ Widget build(BuildContext context) {
 
               Expanded(
                 child: TabBarView(
-                  children: [
-
-                    RefreshIndicator(
-                      onRefresh: () async {
-                        await context.read<InsumoProvider>().cargarProviderInsumos();
-                      },
-                      child: _buildLista(
-                        filtrados.where((i) => i.activo).toList(),
-                      ),
-                    ),
-
-                    if (rol == "ADMIN")
-                      RefreshIndicator(
-                        onRefresh: () async {
-                          await context.read<InsumoProvider>().cargarProviderInsumos();
-                        },
-                        child: _buildLista(
-                          filtrados.where((i) => !i.activo).toList(),
-                        ),
-                      ),
-                  ],
+                  children: esAdmin
+                      ? [
+                          RefreshIndicator(
+                            onRefresh: () async {
+                              await context.read<InsumoProvider>().cargarProviderInsumos();
+                            },
+                            child: _buildLista(
+                              filtrados.where((i) => i.activo).toList(),
+                            ),
+                          ),
+                          RefreshIndicator(
+                            onRefresh: () async {
+                              await context.read<InsumoProvider>().cargarProviderInsumos();
+                            },
+                            child: _buildLista(
+                              filtrados.where((i) => !i.activo).toList(),
+                            ),
+                          ),
+                        ]
+                      : [
+                          RefreshIndicator(
+                            onRefresh: () async {
+                              await context.read<InsumoProvider>().cargarProviderInsumos();
+                            },
+                            child: _buildLista(
+                              filtrados.where((i) => i.activo).toList(),
+                            ),
+                          ),
+                        ],
                 ),
               ),
   ],
