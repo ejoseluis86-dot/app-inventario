@@ -71,13 +71,14 @@ class MyHomeScreen extends StatelessWidget {
         ),
 
         // ---------------- USUARIO + ACCIONES ----------------
+// ---------------- USUARIO + ACCIONES ----------------
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // TEXTO USUARIO
+                // TEXTO USUARIO (¡Se queda firme acá!)
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -98,7 +99,7 @@ class MyHomeScreen extends StatelessWidget {
 
                 const SizedBox(width: 10),
 
-                // BOTÓN PERFIL
+                // 🔮 BOTÓN PERFIL CON AVATAR DINÁMICO
                 InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
@@ -106,13 +107,19 @@ class MyHomeScreen extends StatelessWidget {
                   },
                   child: CircleAvatar(
                     radius: 17,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 18,
+                    backgroundColor: const Color(0xFF6A1B9A), // Tu violeta institucional
+                    child: Text(
+                      (user.nombre != null && user.nombre!.isNotEmpty)
+                          ? user.nombre![0].toUpperCase()
+                          : (user.username != null && user.username!.isNotEmpty)
+                              ? user.username![0].toUpperCase()
+                              : "U",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-
                   ),
                 ),
 
