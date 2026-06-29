@@ -74,7 +74,7 @@ class MyBotonera extends StatelessWidget {
         context,
         icono: Icons.shopping_cart,
         texto: "Pedidos",
-        onTap: () => Navigator.pushNamed(context, AppRutas.crearPedido),
+        onTap: () => Navigator.pushNamed(context, AppRutas.pedidos),
       ),
       _card(
         context,

@@ -10,6 +10,7 @@ import 'package:mi_app/screens/nuevo_producto_screen.dart';
 import 'package:mi_app/screens/trabajo_pedidos_screen.dart';
 import 'package:mi_app/screens/perfil_screen.dart';
 import 'package:mi_app/screens/productos_screen.dart';
+import 'package:mi_app/screens/pedidos_screen.dart';
 
 
 class AppRutas {
@@ -18,6 +19,7 @@ class AppRutas {
   static const String nuevoProducto = '/nuevo_producto';
   static const String nuevaReceta = '/nueva_receta';
   static const String crearPedido = '/crear_pedido';
+  static const String pedidos = '/pedidos';
   static const String insumos = '/insumos';
   static const String trabajo = '/trabajo';
   static const String login = '/login';
@@ -41,6 +43,6 @@ class AppRutas {
     crearUsuario: (context) => const CrearUsuarioScreen(),
     perfil: (context) => const PerfilScreen(),
     usuarios: (context) => const UsuariosScreen(),
-    crearUsuario: (context) => const CrearUsuarioScreen(),
+    pedidos: (context) => PedidosScreen(),
   };
 }

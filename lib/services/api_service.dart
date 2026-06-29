@@ -447,4 +447,33 @@ class ApiService {
 
     return response.statusCode == 201 || response.statusCode == 200;
   }
+
+  Future<bool> finalizarPedido(int idPedido) async {
+    try {
+      // 1. Usamos _requestWithAuth para heredar la lógica de headers (Bearer Token)
+      // Esto es mucho más seguro y limpio que armar el header manualmente
+      final response = await _requestWithAuth(
+        (headers) => http.put(
+          Uri.parse('$baseUrl/finalizar_pedido/$idPedido/'),
+          headers: headers,
+        ),
+      );
+
+      // 2. Evaluamos la respuesta de forma estricta
+      if (response.statusCode == 200) {
+        print("¡Pedido $idPedido finalizado con éxito!");
+        return true; // Todo salió bien
+      } else {
+        // Si el servidor responde con error (ej. 400 o 500), lo logueamos
+        print("Error al finalizar pedido ${response.statusCode}: ${response.body}");
+        return false; 
+      }
+    } catch (e) {
+      // 3. Manejo de excepciones de conexión (ej. internet caído)
+      print("Error de conexión al finalizar: $e");
+      return false;
+    }
+  }
+
+
 }
