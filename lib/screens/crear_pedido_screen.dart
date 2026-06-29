@@ -19,17 +19,12 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
   final TextEditingController descuentoController = TextEditingController();
   final TextEditingController nombreController = TextEditingController();
 
-  //esto vendra de provider
   late List<ProductoLite> productos;
-
   ProductoLite? productoSeleccionado;
-
-  //esta es un alista de detalles que se usa para mostrar y crear la receta
   final List<DetallePedido> detallesPedido = [];
 
   @override
   void dispose() {
-    //esto es para destruir los controladores de texto cuando ya no se necesiten, para liberar recursos
     cantidadController.dispose();
     descuentoController.dispose();
     nombreController.dispose();
@@ -42,15 +37,15 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
     }
     setState(() {
       detallesPedido.add(
-  DetallePedido(
-    cantidad: int.parse(cantidadController.text),
-    descuento: double.tryParse(descuentoController.text) ?? 0.0,
-    precioUnitario: productoSeleccionado!.precio,
-    productoId: productoSeleccionado!.id,
-    pedidoId: null,
-  ),
-);
-      //limpio los campos
+        DetallePedido(
+          cantidad: int.parse(cantidadController.text),
+          descuento: double.tryParse(descuentoController.text) ?? 0.0,
+          precioUnitario: productoSeleccionado!.precio,
+          // 🛡️ PROTECCIÓN 1: Si el id es null, le ponemos 0 por defecto para que no falle
+          productoId: productoSeleccionado!.id ?? 0, 
+          pedidoId: null,
+        ),
+      );
       cantidadController.clear();
       descuentoController.clear();
     });
@@ -62,33 +57,29 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
     });
   }
 
-  //crea el pedido con todos los detalles incluidos este pedido se guardara en la base de datos
   Future<void> guardarPedido() async {
-  if (nombreController.text.isEmpty || detallesPedido.isEmpty) return;
+    if (nombreController.text.isEmpty || detallesPedido.isEmpty) return;
 
-  final Pedido nuevoPedido = Pedido(
-    fecha: DateTime.now(),
-    cliente: nombreController.text,
-    usuario: 1,
-    detalles: detallesPedido,
-    terminado: false,
-  );
+    final Pedido nuevoPedido = Pedido(
+      fecha: DateTime.now(),
+      cliente: nombreController.text,
+      usuario: 1,
+      detalles: detallesPedido,
+      terminado: false,
+    );
 
-  bool ok = await ApiService().crearPedido(nuevoPedido);
+    bool ok = await ApiService().crearPedido(nuevoPedido);
 
-  if (ok) {
-    await context.read<PedidoLiteProvider>().cargarProviderPedidos();
-
-    // 🔥 IMPORTANTE: salir de la pantalla
-    if (mounted) {
-      Navigator.pop(context);
+    if (ok) {
+      await context.read<PedidoLiteProvider>().cargarProviderPedidos();
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
-    //aca estoy trayendo una lista de insumos desde el provider
     final productos = context.watch<ProductoLiteProvider>().productosLite;
     return Scaffold(
       appBar: AppBar(
@@ -102,20 +93,17 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-
             TextField(
               controller: nombreController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Nombre del cliente',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
               ),
             ),
-
             const SizedBox(height: 20),
-
             DropdownButtonFormField<ProductoLite>(
-              initialValue: productoSeleccionado,
+              value: productoSeleccionado,
               decoration: const InputDecoration(
                 labelText: 'Seleccionar Producto',
                 border: OutlineInputBorder(),
@@ -128,40 +116,29 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  productoSeleccionado =
-                      productos.firstWhere((producto) => producto == value)
-                          as ProductoLite?;
+                  productoSeleccionado = value;
                 });
               },
             ),
-
             const SizedBox(height: 12),
-
             TextField(
               controller: cantidadController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Cantidad',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
-
             TextField(
               controller: descuentoController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Descuento (%)',
                 border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 12),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -170,9 +147,7 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
                 label: const Text('Agregar'),
               ),
             ),
-
             const SizedBox(height: 20),
-
             Expanded(
               child: detallesPedido.isEmpty
                   ? const Center(child: Text('No hay detalles agregados'))
@@ -181,15 +156,23 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
                       itemBuilder: (context, index) {
                         final detalle = detallesPedido[index];
 
+                        // Buscamos el producto usando orElse por si las dudas
+                        final productoAsociado = productos.firstWhere(
+                          (p) => p.id == detalle.productoId,
+                          orElse: () => ProductoLite(
+                            id: 0,
+                            nombre: "Producto Desconocido",
+                            precio: 0.0,
+                            categoria: "Ninguna",
+                            activo: false,
+                          ),
+                        );
+
                         return Card(
                           child: ListTile(
-                            title: Text(
-                              productos
-                                  .firstWhere((p) => p.id == detalle.productoId)
-                                  .nombre,
-                            ),
+                            title: Text(productoAsociado.nombre), // 👈 Cambiado por productoAsociado
                             subtitle: Text(
-                              'Cantidad: ${detalle.cantidad} -\n precio unitario: \$${detalle.precioUnitario.toStringAsFixed(2)} -\n precio producto: \$${productos.firstWhere((producto) => producto.id == detalle.productoId).precio.toStringAsFixed(2)} -\n descuento: ${detalle.descuento}% ',
+                              'Cantidad: ${detalle.cantidad} -\n precio unitario: \$${detalle.precioUnitario.toStringAsFixed(2)} -\n precio producto: \$${productoAsociado.precio.toStringAsFixed(2)} -\n descuento: ${detalle.descuento}% ',
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
@@ -200,7 +183,6 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
                       },
                     ),
             ),
-
             SizedBox(
               width: double.infinity,
               height: 55,

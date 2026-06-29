@@ -42,20 +42,14 @@ class _ProductosScreenState extends State<ProductosScreen> {
   
 
     final filtrados = productos.where((p) {
-      final matchNombre = p.nombre.toLowerCase().contains(search);
-
-      final matchCategoria =
-          filtroCategoria == null || p.categoria == filtroCategoria;
-
-      final matchActivo = esAdmin
-          ? (mostrarInactivos ? true : p.activo)
-          : p.activo;
-
-      
+      // .trim() evita que los espacios fantasma al inicio desordenen o rompan la búsqueda
+      final matchNombre = p.nombre.trim().toLowerCase().contains(search.trim().toLowerCase());
+      final matchCategoria = filtroCategoria == null || p.categoria == filtroCategoria;
+      final matchActivo = esAdmin ? (mostrarInactivos ? true : p.activo) : p.activo;
 
       return matchNombre && matchCategoria && matchActivo;
     }).toList()
-      ..sort((a, b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
+      ..sort((a, b) => a.nombre.trim().toLowerCase().compareTo(b.nombre.trim().toLowerCase()));
 
     return Scaffold(
       appBar: AppBar(

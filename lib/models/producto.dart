@@ -23,13 +23,14 @@ class Producto {
   factory Producto.fromJson(Map<String, dynamic> json) {
     return Producto(
       id: json['id'],
-      nombre: json['nombre'],
-      precio: double.parse(json['precio'].toString()),
-      categoria: json['categoria'],
+      nombre: json['nombre'] ?? 'Sin nombre',
+      // tryParse previene cierres inesperados si el backend manda un String o un número mal formateado
+      precio: double.tryParse(json['precio'].toString()) ?? 0.0,
+      categoria: json['categoria'] ?? 'Sin categoría',
       detalles: (json['detalles'] as List?)
           ?.map((e) => DetalleReceta.fromJson(e))
-          .toList()
-          ?? [],
+          .toList() ?? [],
+      // Si por la migración vieja algún registro quedó null, por defecto se asume true
       activo: json['activo'] ?? true,    
     );
   }

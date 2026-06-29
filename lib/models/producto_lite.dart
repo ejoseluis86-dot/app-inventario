@@ -1,12 +1,12 @@
 class ProductoLite {
-  final int id;
+  final int? id; // agregamos el '?' para que coincida con Producto
   final String nombre;
   final double precio;
   final String categoria;
   final bool activo; // 
 
   ProductoLite({
-    required this.id,
+    this.id,
     required this.nombre,
     required this.precio,
     required this.categoria,

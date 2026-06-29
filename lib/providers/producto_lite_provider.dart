@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/producto_lite.dart';
 import 'package:mi_app/services/api_service.dart';
-import 'package:mi_app/models/producto.dart';
+import 'package:mi_app/models/producto.dart'; // 👈 Importante para reconocer el modelo de la API
 
 class ProductoLiteProvider extends ChangeNotifier {
   List<ProductoLite> productosLite = [];
@@ -12,21 +12,33 @@ class ProductoLiteProvider extends ChangeNotifier {
 
   Future<void> cargarProviderProductos(bool esAdmin) async {
     try {
-      final api = ApiService();
+      loading = true;
+      error = null;
+      notifyListeners();
 
-      final data = esAdmin
+      // 1. ApiService ya nos devuelve un List<Producto> mapeado internamente
+      final List<Producto> data = esAdmin
           ? await api.obtenerProductosAdmin()
           : await api.obtenerProductosLite();
       
-      productosLite = (data as List)
-        .map((e) => ProductoLite.fromJson(
-              e as Map<String, dynamic>,
-            ))
-        .toList();
+      // 2. Transformamos cada objeto 'Producto' al molde liviano 'ProductoLite'
+      productosLite = data.map((productoCompleto) {
+        return ProductoLite(
+          id: productoCompleto.id,
+          nombre: productoCompleto.nombre,
+          precio: productoCompleto.precio,
+          categoria: productoCompleto.categoria,
+          activo: productoCompleto.activo,
+        );
+      }).toList();
 
+      loading = false;
       notifyListeners();
     } catch (e) {
-      print("ERROR: $e");
+      loading = false;
+      error = e.toString();
+      print("❌ ERROR EN PRODUCTO_LITE_PROVIDER: $e");
+      notifyListeners();
     }
   }
 }
