@@ -51,16 +51,17 @@ class _InsumosScreenState extends State<InsumosScreen> {
 
   }
 @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
 
-    if (_inicializado) return;
-    _inicializado = true;
+  if (_inicializado) return;
+  _inicializado = true;
 
-    if (widget.abrirCriticos) {
-      filtroStock = "CRITICO";
-    }
+  if (widget.abrirCriticos) {
+    filtroStock = "ALERTADOS"; // 👈 Ahora cae acá y muestra urgentes + críticos
   }
+}
   void _mostrarDialogo() {
     final categorias = [
       'Cerámica',
@@ -305,11 +306,12 @@ Widget build(BuildContext context) {
         filtroCategoria == "TODAS" || i.categoria == filtroCategoria;
 
     final matchStock =
-        filtroStock == "TODOS" ||
-        (filtroStock == "OK" && i.stock > 5) ||
-        (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
-        (filtroStock == "URGENTE" && i.stock <= 2);
-
+    filtroStock == "TODOS" ||
+    (filtroStock == "OK" && i.stock > 5) ||
+    (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
+    (filtroStock == "URGENTE" && i.stock <= 2) ||
+    //CRITICOS + URGENTES
+    (filtroStock == "ALERTADOS" && i.stock <= 5);
     return matchSearch && matchCategoria && matchStock;
   }).toList();
 
@@ -405,6 +407,7 @@ Widget build(BuildContext context) {
                     ),
                     items: const [
                       DropdownMenuItem(value: "TODOS", child: Text("Todos")),
+                      DropdownMenuItem(value: "ALERTADOS", child: Text("Bajo Stock")),
                       DropdownMenuItem(value: "OK", child: Text("OK")),
                       DropdownMenuItem(value: "CRITICO", child: Text("Crítico")),
                       DropdownMenuItem(value: "URGENTE", child: Text("Urgente")),

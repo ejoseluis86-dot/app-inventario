@@ -9,7 +9,8 @@ class InsumoProvider extends ChangeNotifier {
   List<Insumo> insumos = [];
 
   List<Insumo> get insumosCriticos {
-  return insumos.where((i) => i.stock < 5).toList();
+    // Trae todo lo que sea menor o igual a 5 (incluye urgentes de 0 a 2 y críticos de 3 a 5)
+  return insumos.where((i) => i.stock <= 5).toList();
   }
   
   List<Insumo> get activos =>
