@@ -23,8 +23,6 @@ List<Insumo> get inactivos =>
 
     insumos = data.map<Insumo>((json) => Insumo.fromJson(json)).toList();
 
-    insumos.sort((a, b) => a.nombre.compareTo(b.nombre));
-
     notifyListeners();
   }
 

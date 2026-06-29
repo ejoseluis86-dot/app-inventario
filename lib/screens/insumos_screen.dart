@@ -6,9 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:mi_app/screens/insumo_detalle_screen.dart';
 
 class InsumosScreen extends StatefulWidget {
-  final bool soloCriticos;
+  
+  final bool abrirCriticos;
 
-  const InsumosScreen({super.key, this.soloCriticos = false});
+  const InsumosScreen({
+    super.key,
+    this.abrirCriticos = false,
+  });
 
   @override
   State<InsumosScreen> createState() => _InsumosScreenState();
@@ -25,11 +29,38 @@ class _InsumosScreenState extends State<InsumosScreen> {
   String filtroCategoria = "TODAS";
   String filtroStock = "TODOS";
   
+  bool _inicializado = false;
+
+  //saltar tildes en busqueda
+  String _normalizar(String texto) {
+    return texto
+        .trim() // 👈 ACÁ ESTÁ LA CLAVE: Borra espacios fantasmas al inicio y al final
+        .toLowerCase()
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll('ñ', 'n');
+  }
   //muestra filtro de crticos desde pantalla principal  @override
+  @override
+  @override
   void initState() {
     super.initState();
-  }
 
+  }
+@override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_inicializado) return;
+    _inicializado = true;
+
+    if (widget.abrirCriticos) {
+      filtroStock = "CRITICO";
+    }
+  }
   void _mostrarDialogo() {
     final categorias = [
       'Cerámica',
@@ -256,18 +287,22 @@ class _InsumosScreenState extends State<InsumosScreen> {
   }
 
 @override
+@override
 Widget build(BuildContext context) {
-  final insumos = context.watch<InsumoProvider>().insumos;
+  // 1. Obtenemos la lista cruda del Provider (sin ordenar acá para no procesar doble)
+  final insumosRaw = context.watch<InsumoProvider>().insumos;
   final rol = context.watch<UserProvider>().rol;
   final esAdmin = rol == "ADMIN";
 
-  final filtrados = insumos.where((i) {
-    final nombre = i.nombre.toLowerCase();
-    final matchSearch = nombre.contains(search);
+  // 2. Aplicamos los filtros globales (Búsqueda, Categoría, Estado de Stock)
+  final filtradosBase = insumosRaw.where((i) {
+    final nombre = _normalizar(i.nombre);
+    final busqueda = _normalizar(search);
+
+    final matchSearch = nombre.contains(busqueda);
 
     final matchCategoria =
-    filtroCategoria == "TODAS" ||
-    i.categoria == filtroCategoria;
+        filtroCategoria == "TODAS" || i.categoria == filtroCategoria;
 
     final matchStock =
         filtroStock == "TODOS" ||
@@ -277,6 +312,24 @@ Widget build(BuildContext context) {
 
     return matchSearch && matchCategoria && matchStock;
   }).toList();
+
+  // 3. SEPARAMOS Y ORDENAMOS ALFABÉTICAMENTE AL FINAL EN CADA TAB
+  
+  // Lista de Activos Ordenada
+  final activosOrdenados = filtradosBase.where((i) => i.activo).toList()
+    ..sort((a, b) {
+      final cmp = _normalizar(a.nombre).compareTo(_normalizar(b.nombre));
+      if (cmp != 0) return cmp;
+      return (a.id ?? 0).compareTo(b.id ?? 0); // Desempate seguro por ID
+    });
+
+  // Lista de Inactivos Ordenada
+  final inactivosOrdenados = filtradosBase.where((i) => !i.activo).toList()
+    ..sort((a, b) {
+      final cmp = _normalizar(a.nombre).compareTo(_normalizar(b.nombre));
+      if (cmp != 0) return cmp;
+      return (a.id ?? 0).compareTo(b.id ?? 0);
+    });
 
   return DefaultTabController(
     length: rol == "ADMIN" ? 2 : 1,
@@ -294,122 +347,110 @@ Widget build(BuildContext context) {
                 ],
         ),
       ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Buscar insumo...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  search = value; // Guardalo directo, _normalizar() se encarga en el where
+                });
+              },
+            ),
+          ),
 
-          body: Column(
-            children: [
-
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Buscar insumo...",
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: filtroCategoria,
+                    decoration: const InputDecoration(
+                      labelText: "Categoría",
+                      border: OutlineInputBorder(),
                     ),
+                    items: const [
+                      DropdownMenuItem(value: "TODAS", child: Text("Todas")),
+                      DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
+                      DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
+                      DropdownMenuItem(value: "Metal", child: Text("Metal")),
+                      DropdownMenuItem(value: "Madera", child: Text("Madera")),
+                      DropdownMenuItem(value: "Papel", child: Text("Papel")),
+                      DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
+                      DropdownMenuItem(value: "Textil", child: Text("Textil")),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        filtroCategoria = value ?? "TODAS";
+                      });
+                    },
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      search = value.toLowerCase();
-                    });
-                  },
                 ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: filtroCategoria,
-                        decoration: const InputDecoration(
-                          labelText: "Categoría",
-                          border: OutlineInputBorder(),
-                        ),
-                        items: const [
-                          DropdownMenuItem(value: "TODAS", child: Text("Todas")),
-                          DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
-                          DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
-                          DropdownMenuItem(value: "Metal", child: Text("Metal")),
-                          DropdownMenuItem(value: "Madera", child: Text("Madera")),
-                          DropdownMenuItem(value: "Papel", child: Text("Papel")),
-                          DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
-                          DropdownMenuItem(value: "Textil", child: Text("Textil")),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            filtroCategoria = value ?? "TODAS";
-                          });
-                        },
-                      ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: filtroStock,
+                    decoration: const InputDecoration(
+                      labelText: "Estado",
+                      border: OutlineInputBorder(),
                     ),
+                    items: const [
+                      DropdownMenuItem(value: "TODOS", child: Text("Todos")),
+                      DropdownMenuItem(value: "OK", child: Text("OK")),
+                      DropdownMenuItem(value: "CRITICO", child: Text("Crítico")),
+                      DropdownMenuItem(value: "URGENTE", child: Text("Urgente")),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        filtroStock = value ?? "TODOS";
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-                    const SizedBox(width: 10),
+          const SizedBox(height: 10),
 
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: filtroStock,
-                        decoration: const InputDecoration(
-                          labelText: "Estado",
-                          border: OutlineInputBorder(),
-                        ),
-                        items: const [
-                          DropdownMenuItem(value: "TODOS", child: Text("Todos")),
-                          DropdownMenuItem(value: "OK", child: Text("OK")),
-                          DropdownMenuItem(value: "CRITICO", child: Text("Crítico")),
-                          DropdownMenuItem(value: "URGENTE", child: Text("Urgente")),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            filtroStock = value ?? "TODOS";
-                          });
+          Expanded(
+            child: TabBarView(
+              children: esAdmin
+                  ? [
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          await context.read<InsumoProvider>().cargarProviderInsumos();
                         },
+                        child: _buildLista(activosOrdenados), // <-- Usamos la lista ordenada final
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Expanded(
-                child: TabBarView(
-                  children: esAdmin
-                      ? [
-                          RefreshIndicator(
-                            onRefresh: () async {
-                              await context.read<InsumoProvider>().cargarProviderInsumos();
-                            },
-                            child: _buildLista(
-                              filtrados.where((i) => i.activo).toList(),
-                            ),
-                          ),
-                          RefreshIndicator(
-                            onRefresh: () async {
-                              await context.read<InsumoProvider>().cargarProviderInsumos();
-                            },
-                            child: _buildLista(
-                              filtrados.where((i) => !i.activo).toList(),
-                            ),
-                          ),
-                        ]
-                      : [
-                          RefreshIndicator(
-                            onRefresh: () async {
-                              await context.read<InsumoProvider>().cargarProviderInsumos();
-                            },
-                            child: _buildLista(
-                              filtrados.where((i) => i.activo).toList(),
-                            ),
-                          ),
-                        ],
-                ),
-              ),
-  ],
-),
-
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          await context.read<InsumoProvider>().cargarProviderInsumos();
+                        },
+                        child: _buildLista(inactivosOrdenados), // <-- Usamos la lista ordenada final
+                      ),
+                    ]
+                  : [
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          await context.read<InsumoProvider>().cargarProviderInsumos();
+                        },
+                        child: _buildLista(activosOrdenados),
+                      ),
+                    ],
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: rol == "ADMIN"
           ? FloatingActionButton(
               onPressed: _mostrarDialogo,
@@ -431,6 +472,7 @@ Widget build(BuildContext context) {
 
   return ListView.separated(
     padding: const EdgeInsets.all(12),
+    //key: const PageStorageKey("insumos_list"),
     itemCount: insumosList.length,
     separatorBuilder: (_, __) => const SizedBox(height: 8),
     itemBuilder: (context, index) {

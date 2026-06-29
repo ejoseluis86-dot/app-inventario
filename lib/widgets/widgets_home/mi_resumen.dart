@@ -65,7 +65,7 @@ class MiResumen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const InsumosScreen(
-                            soloCriticos: true,
+                            abrirCriticos: true,
                           ),
                         ),
                       );
