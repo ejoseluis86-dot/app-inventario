@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/screens/asociar_receta_screen.dart';
 import 'package:mi_app/screens/crear_pedido_screen.dart';
+import 'package:mi_app/screens/usuarios_screen.dart';
 import 'package:mi_app/screens/crear_usuario_screen.dart';
 import 'package:mi_app/screens/home_screen.dart';
 import 'package:mi_app/screens/insumos_screen.dart';
@@ -22,6 +23,7 @@ class AppRutas {
   static const String login = '/login';
   static const String crearUsuario = '/crearUsuario';
   static const perfil = '/perfil';
+  static const String usuarios = '/usuarios';
 
   static Map<String, WidgetBuilder> rutas = {
     home: (context) => const MyHomeScreen(),
@@ -38,5 +40,7 @@ class AppRutas {
     login: (context) => const LoginScreen(),
     crearUsuario: (context) => const CrearUsuarioScreen(),
     perfil: (context) => const PerfilScreen(),
+    usuarios: (context) => const UsuariosScreen(),
+    crearUsuario: (context) => const CrearUsuarioScreen(),
   };
 }

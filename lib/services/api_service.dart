@@ -13,19 +13,20 @@ class ApiService {
   // HEADERS CON TOKEN
   // =========================
   Future<Map<String, String>> _headers() async {
-  final token = await auth.obtenerToken();
+    final token = await auth.obtenerToken();
+    
+    // LOG PARA DEBUG
+    print("DEBUG HEADERS: Token enviado es: ${token?.substring(0, 10)}..."); 
 
-  if (token == null || token.isEmpty) {
-    throw Exception("No hay token guardado");
+    if (token == null || token.isEmpty) {
+      throw Exception("No hay token guardado");
+    }
+
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
   }
-
-  print("TOKEN = $token"); // 👈 DEBUG CLAVE
-
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $token',
-  };
-}
 
   // =========================
   // REQUEST CENTRAL CON REFRESH
@@ -183,6 +184,49 @@ class ApiService {
 
     return response.statusCode == 201;
   }
+
+  Future<List<dynamic>> obtenerUsuariosAdmin() async {
+    final response = await _requestWithAuth(
+      (h) => http.get(Uri.parse('$baseUrl/usuarios/admin/listado/'), headers: h),
+    );
+    
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Error al cargar usuarios");
+    }
+  }
+
+// Toggle estado de usuario
+  Future<bool> toggleUsuario(int idUsuario) async {
+    final response = await _requestWithAuth(
+      (h) => http.put(Uri.parse('$baseUrl/usuarios/admin/toggle/$idUsuario/'), headers: h),
+    );
+    
+    return response.statusCode == 200;
+  }
+
+  Future<bool> editarUsuarioAdmin({
+    required int idUsuario,
+    required String nombre,
+    required String apellido,
+    required String rol,
+  }) async {
+    final response = await _requestWithAuth(
+      (h) => http.put(
+        Uri.parse('$baseUrl/usuarios/admin/editar/$idUsuario/'),
+        headers: h,
+        body: jsonEncode({
+          'nombre': nombre,
+          'apellido': apellido,
+          'rol': rol,
+        }),
+      ),
+    );
+
+    return response.statusCode == 200;
+  }
+
 
   Future<Map<String, dynamic>> obtenerMiPerfil() async {
     final response = await _requestWithAuth(

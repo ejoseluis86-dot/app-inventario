@@ -57,9 +57,9 @@ class MyBotonera extends StatelessWidget {
     if (rol == "ADMIN") {
       items.add(_card(
         context,
-        icono: Icons.person,
+        icono: Icons.people, // 👈 Cambiamos a Icons.people que queda mejor para gestión
         texto: "Usuarios",
-        onTap: () => Navigator.pushNamed(context, AppRutas.crearUsuario),
+        onTap: () => Navigator.pushNamed(context, AppRutas.usuarios), // 👈 Cambiamos a tu nueva ruta
       ));
     }
 
