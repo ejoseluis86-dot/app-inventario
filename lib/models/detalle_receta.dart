@@ -15,17 +15,18 @@ class DetalleReceta {
 
   factory DetalleReceta.fromJson(Map<String, dynamic> json) {
     return DetalleReceta(
-      id: json['id'], // Puede ser null
-      // 1. Buscamos 'cantidadTeorica' (camelCase) y usamos tryParse por seguridad
-      cantidadTeorica: int.tryParse(json['cantidadTeorica'].toString()) ?? 0,
+      id: json['id'],
       
-      // 2. Buscamos 'insumoId' (camelCase) y si no existe le ponemos 0 para que no sea Null
-      insumoId: json['insumoId'] ?? 0,
+      // Busca cantidadTeorica o cantidad_teorica. Si no encuentra ninguna, pone 0
+      cantidadTeorica: int.tryParse((json['cantidadTeorica'] ?? json['cantidad_teorica']).toString()) ?? 0,
       
-      // 3. Buscamos 'nombreInsumo' (camelCase)
-      nombreInsumo: json["nombreInsumo"],
+      // Busca insumoId o insumo_id. Si no encuentra, pone 0
+      insumoId: json['insumoId'] ?? json['insumo_id'] ?? 0,
       
-      // 4. El productoId no viene en el listado general, mapea lo que venga o null
+      // Busca nombreInsumo o nombre_insumo. Si no encuentra, pone "Insumo sin nombre"
+      nombreInsumo: json["nombreInsumo"] ?? json["nombre_insumo"] ?? "Insumo sin nombre",
+      
+      // Busca productoId o producto_id
       productoId: json['productoId'] ?? json['producto_id'],
     );
   }

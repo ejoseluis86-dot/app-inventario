@@ -141,10 +141,22 @@ Widget build(BuildContext context) {
               itemBuilder: (context, index) {
                 final d = producto!.detalles![index];
 
+                // 🛡️ Buscamos de forma segura el nombre del insumo
+                // (Prueba con camelCase, si es null intenta snake_case, y si no pone un genérico)
+                final String nombreInsumo = d.nombreInsumo ?? "Insumo sin nombre";
+                
+                // 🛡️ Hacemos lo mismo con la cantidad
+                final int cantidad = d.cantidadTeorica;
+
                 return ListTile(
-                  title: Text(d.nombreInsumo ?? "Insumo"),
+                  leading: const Icon(Icons.extension, color: Colors.blueGrey),
+                  title: Text(
+                    nombreInsumo,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(
-                    "Cantidad: ${d.cantidadTeorica}",
+                    "Cantidad necesaria: $cantidad",
+                    style: const TextStyle(fontSize: 15),
                   ),
                 );
               },
