@@ -10,7 +10,7 @@ class UsuariosScreen extends StatefulWidget {
 
 class _UsuariosScreenState extends State<UsuariosScreen> {
   final ApiService api = ApiService();
-  
+
   bool loading = true;
   List<dynamic> todosLosUsuarios = [];
 
@@ -61,18 +61,33 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     }
   }
 
-  Future<void> _handleToggleUsuario(int id, String username, bool estadoActual) async {
+  Future<void> _handleToggleUsuario(
+    int id,
+    String username,
+    bool estadoActual,
+  ) async {
     final accion = estadoActual ? "desactivar" : "activar";
-    
+
     // Confirmación visual rápida antes de impactar los históricos
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text("${accion.toUpperCase()} usuario"),
-        content: Text("¿Estás seguro de que querés $accion al usuario '$username'?"),
+        content: Text(
+          "¿Estás seguro de que querés $accion al usuario '$username'?",
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancelar")),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text("Confirmar", style: TextStyle(color: colorVioletaCorporativo))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              "Confirmar",
+              style: TextStyle(color: colorVioletaCorporativo),
+            ),
+          ),
         ],
       ),
     );
@@ -92,66 +107,89 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: No podés realizar esta acción"), backgroundColor: Colors.red),
-      );
-    }
-  }
-  // Diálogo para EDITAR usuario existente
-    void _mostrarDialogoEditarUsuario(Map<String, dynamic> user) {
-      final nombreController = TextEditingController(text: user['nombre'] ?? '');
-      final apellidoController = TextEditingController(text: user['apellido'] ?? '');
-      String rolActual = user['rol'] ?? 'EMPLEADO';
-
-      showDialog(
-        context: context,
-        builder: (context) => StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text("Editar Usuario"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(controller: nombreController, decoration: const InputDecoration(labelText: "Nombre")),
-                  TextField(controller: apellidoController, decoration: const InputDecoration(labelText: "Apellido")),
-                  const SizedBox(height: 15),
-                  // En _mostrarDialogoEditarUsuario
-                  DropdownButtonFormField<String>(
-                    value: rolActual,
-                    onChanged: (val) {
-                      setDialogState(() { // <--- ESTE setDialogState es vital
-                        rolActual = val!;
-                      });
-                    },
-                    items: const [
-                      DropdownMenuItem(value: 'EMPLEADO', child: Text('Empleado')),
-                      DropdownMenuItem(value: 'ADMIN', child: Text('Administrador')),
-                    ],
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
-                ElevatedButton(
-                  onPressed: () async {
-                    await api.editarUsuarioAdmin(
-                      idUsuario: user['id'],
-                      nombre: nombreController.text,
-                      apellido: apellidoController.text,
-                      rol: rolActual,
-                    );
-                    if (mounted) {
-                      Navigator.pop(context);
-                      cargarUsuarios();
-                    }
-                  },
-                  child: const Text("Guardar"),
-                ),
-              ],
-            );
-          }
+        SnackBar(
+          content: Text("Error: No podés realizar esta acción"),
+          backgroundColor: Colors.red,
         ),
       );
     }
+  }
+
+  // Diálogo para EDITAR usuario existente
+  void _mostrarDialogoEditarUsuario(Map<String, dynamic> user) {
+    final nombreController = TextEditingController(text: user['nombre'] ?? '');
+    final apellidoController = TextEditingController(
+      text: user['apellido'] ?? '',
+    );
+    String rolActual = user['rol'] ?? 'EMPLEADO';
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text("Editar Usuario"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nombreController,
+                  decoration: const InputDecoration(labelText: "Nombre"),
+                ),
+                TextField(
+                  controller: apellidoController,
+                  decoration: const InputDecoration(labelText: "Apellido"),
+                ),
+                const SizedBox(height: 15),
+                // En _mostrarDialogoEditarUsuario
+                DropdownButtonFormField<String>(
+                  value: rolActual,
+                  onChanged: (val) {
+                    setDialogState(() {
+                      // <--- ESTE setDialogState es vital
+                      rolActual = val!;
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'EMPLEADO',
+                      child: Text('Empleado'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'ADMIN',
+                      child: Text('Administrador'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancelar"),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await api.editarUsuarioAdmin(
+                    idUsuario: user['id'],
+                    nombre: nombreController.text,
+                    apellido: apellidoController.text,
+                    rol: rolActual,
+                  );
+                  if (mounted) {
+                    Navigator.pop(context);
+                    cargarUsuarios();
+                  }
+                },
+                child: const Text("Guardar"),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   // Diálogo para crear un nuevo usuario/empleado
   void _mostrarDialogoCrearUsuario() {
     usernameController.clear();
@@ -164,10 +202,13 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return StatefulBuilder( // Permite refrescar el Dropdown dentro del diálogo
+        return StatefulBuilder(
+          // Permite refrescar el Dropdown dentro del diálogo
           builder: (context, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               title: Row(
                 children: [
                   Icon(Icons.person_add, color: colorVioletaCorporativo),
@@ -184,36 +225,65 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     children: [
                       TextFormField(
                         controller: usernameController,
-                        decoration: const InputDecoration(labelText: "Nombre de Usuario (Login)", prefixIcon: Icon(Icons.account_circle)),
-                        validator: (value) => value == null || value.isEmpty ? "Ingresá el username" : null,
+                        decoration: const InputDecoration(
+                          labelText: "Nombre de Usuario (Login)",
+                          prefixIcon: Icon(Icons.account_circle),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Ingresá el username"
+                            : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: nombreController,
-                        decoration: const InputDecoration(labelText: "Nombre Real", prefixIcon: Icon(Icons.badge_outlined)),
-                        validator: (value) => value == null || value.isEmpty ? "Ingresá el nombre" : null,
+                        decoration: const InputDecoration(
+                          labelText: "Nombre Real",
+                          prefixIcon: Icon(Icons.badge_outlined),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Ingresá el nombre"
+                            : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: apellidoController,
-                        decoration: const InputDecoration(labelText: "Apellido", prefixIcon: Icon(Icons.badge_sharp)),
-                        validator: (value) => value == null || value.isEmpty ? "Ingresá el apellido" : null,
+                        decoration: const InputDecoration(
+                          labelText: "Apellido",
+                          prefixIcon: Icon(Icons.badge_sharp),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Ingresá el apellido"
+                            : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: passwordController,
                         obscureText: true,
-                        decoration: const InputDecoration(labelText: "Contraseña Inicial", prefixIcon: Icon(Icons.lock_outline)),
-                        validator: (value) => value == null || value.length < 6 ? "Mínimo 6 caracteres" : null,
+                        decoration: const InputDecoration(
+                          labelText: "Contraseña Inicial",
+                          prefixIcon: Icon(Icons.lock_outline),
+                        ),
+                        validator: (value) => value == null || value.length < 6
+                            ? "Mínimo 6 caracteres"
+                            : null,
                       ),
                       const SizedBox(height: 15),
                       // Selector de Rol Estilizado
                       DropdownButtonFormField<String>(
                         value: rolSeleccionado,
-                        decoration: const InputDecoration(labelText: "Rol en el Sistema", prefixIcon: Icon(Icons.admin_panel_settings)),
+                        decoration: const InputDecoration(
+                          labelText: "Rol en el Sistema",
+                          prefixIcon: Icon(Icons.admin_panel_settings),
+                        ),
                         items: const [
-                          DropdownMenuItem(value: 'EMPLEADO', child: Text('Empleado (Ventas/Fábrica)')),
-                          DropdownMenuItem(value: 'ADMIN', child: Text('Administrador Total')),
+                          DropdownMenuItem(
+                            value: 'EMPLEADO',
+                            child: Text('Empleado (Ventas/Fábrica)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ADMIN',
+                            child: Text('Administrador Total'),
+                          ),
                         ],
                         onChanged: (value) {
                           if (value != null) {
@@ -231,17 +301,35 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                   child: const Text("Cancelar"),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: colorVioletaCorporativo, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorVioletaCorporativo,
+                    foregroundColor: Colors.white,
+                  ),
                   onPressed: () async {
                     if (!_formKey.currentState!.validate()) return;
 
-                    // Implementación futura al后端 (POST):
-                    // await api.crearUsuario(username: usernameController.text, ...);
-                    
                     if (mounted) {
+                      //aca creo el nuevo usuario con todos los campos requeridos
+                      final ok = await api.crearUsuario(
+                        username: usernameController.text,
+                        password: passwordController.text,
+                        rol: rolSeleccionado,
+                        nombre: nombreController.text,
+                        apellido: apellidoController.text,
+                      );
+
+                      if (ok) {
+                        print("Usuario creado");
+                      } else {
+                        print("Error al crear usuario");
+                      }
+                      //hasta aca
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: const Text("Usuario creado con éxito"), backgroundColor: colorVioletaCorporativo),
+                        SnackBar(
+                          content: const Text("Usuario creado con éxito"),
+                          backgroundColor: colorVioletaCorporativo,
+                        ),
                       );
                       cargarUsuarios();
                     }
@@ -260,8 +348,9 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   Widget _buildUsuarioCard(Map<String, dynamic> user) {
     final int id = user['id'] ?? 0;
     final String username = user['username'] ?? '';
-    final String nombreCompleto = "${user['nombre'] ?? ''} ${user['apellido'] ?? ''}".trim();
-    
+    final String nombreCompleto =
+        "${user['nombre'] ?? ''} ${user['apellido'] ?? ''}".trim();
+
     final bool activo = user['activo'] ?? true;
     //MOSTRAR ROL COMPLETO
     // 1. Obtenemos el código original
@@ -277,21 +366,23 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
       textoRol = codigoRol; // Por si viene con otro nombre
     }
 
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-      title: Text("${user['nombre']} ${user['apellido']}"),
-      subtitle: Text("Rol: $textoRol"), // 3. Mostramos la variable traducida
+        title: Text("${user['nombre']} ${user['apellido']}"),
+        subtitle: Text("Rol: $textoRol"), // 3. Mostramos la variable traducida
         trailing: Row(
-          mainAxisSize: MainAxisSize.min, // Esto es clave para que los iconos no se desplacen
+          mainAxisSize: MainAxisSize
+              .min, // Esto es clave para que los iconos no se desplacen
           children: [
             // BOTÓN DE EDICIÓN
             IconButton(
               icon: const Icon(Icons.edit, color: Colors.blueAccent),
-              onPressed: () => _mostrarDialogoEditarUsuario(user), // Llamamos a la función del diálogo
+              onPressed: () => _mostrarDialogoEditarUsuario(
+                user,
+              ), // Llamamos a la función del diálogo
             ),
             // BOTÓN DE TOGGLE (ACTIVO/INACTIVO)
             IconButton(
@@ -301,9 +392,9 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
               ),
               // Pasamos los 3 argumentos que la función espera:
               onPressed: () => _handleToggleUsuario(
-                user['id'], 
-                user['username'], 
-                user['activo']
+                user['id'],
+                user['username'],
+                user['activo'],
               ),
             ),
           ],
@@ -317,27 +408,44 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     if (loading) {
       return Scaffold(
         appBar: AppBar(title: const Text("Gestión de Usuarios")),
-        body: Center(child: CircularProgressIndicator(color: colorVioletaCorporativo)),
+        body: Center(
+          child: CircularProgressIndicator(color: colorVioletaCorporativo),
+        ),
       );
     }
 
     // Filtrado dinámico por pestañas utilizando el flag activo/inactivo (Soft delete seguro para históricos)
     final activos = todosLosUsuarios.where((u) => u['activo'] == true).toList();
-    final inactivos = todosLosUsuarios.where((u) => u['activo'] == false).toList();
+    final inactivos = todosLosUsuarios
+        .where((u) => u['activo'] == false)
+        .toList();
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Gestión de Usuarios", style: TextStyle(fontWeight: FontWeight.bold)),
+          title: const Text(
+            "Gestión de Usuarios",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           centerTitle: true,
           bottom: TabBar(
             indicatorColor: colorVioletaCorporativo,
             labelColor: colorVioletaCorporativo,
             unselectedLabelColor: Colors.grey,
             tabs: [
-              Tab(child: Text("Activos (${activos.length})", style: const TextStyle(fontWeight: FontWeight.bold))),
-              Tab(child: Text("Inactivos (${inactivos.length})", style: const TextStyle(fontWeight: FontWeight.bold))),
+              Tab(
+                child: Text(
+                  "Activos (${activos.length})",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Tab(
+                child: Text(
+                  "Inactivos (${inactivos.length})",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
           ),
         ),
@@ -349,7 +457,8 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                 : ListView.builder(
                     padding: const EdgeInsets.only(top: 10, bottom: 80),
                     itemCount: activos.length,
-                    itemBuilder: (context, index) => _buildUsuarioCard(activos[index]),
+                    itemBuilder: (context, index) =>
+                        _buildUsuarioCard(activos[index]),
                   ),
             // Pestaña Inactivos
             inactivos.isEmpty
@@ -357,7 +466,8 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                 : ListView.builder(
                     padding: const EdgeInsets.only(top: 10, bottom: 80),
                     itemCount: inactivos.length,
-                    itemBuilder: (context, index) => _buildUsuarioCard(inactivos[index]),
+                    itemBuilder: (context, index) =>
+                        _buildUsuarioCard(inactivos[index]),
                   ),
           ],
         ),

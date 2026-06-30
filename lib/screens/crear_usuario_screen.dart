@@ -17,6 +17,8 @@ class _CrearUsuarioScreenState extends State<CrearUsuarioScreen> {
 
   final ApiService api = ApiService();
 
+  /*
+ESTA PANTALLA NO SE ESTA UTILIZANDO EN NINGUN LADO
   Future<void> crearUsuario() async {
     setState(() => loading = true);
 
@@ -43,6 +45,7 @@ class _CrearUsuarioScreenState extends State<CrearUsuarioScreen> {
     }
   }
 
+ */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +101,9 @@ class _CrearUsuarioScreenState extends State<CrearUsuarioScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: loading ? null : crearUsuario,
+                onPressed: () {
+                  //loading ? null : crearUsuario
+                },
                 child: loading
                     ? const CircularProgressIndicator()
                     : const Text("Crear usuario"),

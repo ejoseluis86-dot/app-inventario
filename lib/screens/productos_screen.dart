@@ -48,7 +48,8 @@ class _ProductosScreenState extends State<ProductosScreen> {
       final nombre = _normalizar(p.nombre);
       final busqueda = _normalizar(search);
       final matchSearch = nombre.contains(busqueda);
-      final matchCategoria = filtroCategoria == "TODAS" || p.categoria == filtroCategoria;
+      final matchCategoria =
+          filtroCategoria == "TODAS" || p.categoria == filtroCategoria;
 
       return matchSearch && matchCategoria;
     }).toList();
@@ -71,7 +72,9 @@ class _ProductosScreenState extends State<ProductosScreen> {
               decoration: InputDecoration(
                 hintText: "Buscar producto...",
                 prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onChanged: (value) => setState(() => search = value),
             ),
@@ -81,9 +84,15 @@ class _ProductosScreenState extends State<ProductosScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: DropdownButtonFormField<String>(
               value: filtroCategoria,
-              decoration: const InputDecoration(labelText: "Categoría", border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: "Categoría",
+                border: OutlineInputBorder(),
+              ),
               items: const [
-                DropdownMenuItem(value: "TODAS", child: Text("Todas las categorías")),
+                DropdownMenuItem(
+                  value: "TODAS",
+                  child: Text("Todas las categorías"),
+                ),
                 DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
                 DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
                 DropdownMenuItem(value: "Metal", child: Text("Metal")),
@@ -92,7 +101,8 @@ class _ProductosScreenState extends State<ProductosScreen> {
                 DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
                 DropdownMenuItem(value: "Textil", child: Text("Textil")),
               ],
-              onChanged: (value) => setState(() => filtroCategoria = value ?? "TODAS"),
+              onChanged: (value) =>
+                  setState(() => filtroCategoria = value ?? "TODAS"),
             ),
           ),
           const SizedBox(height: 10),
@@ -102,17 +112,23 @@ class _ProductosScreenState extends State<ProductosScreen> {
                 ? TabBarView(
                     children: [
                       RefreshIndicator(
-                        onRefresh: () async => await context.read<ProductoLiteProvider>().cargarProviderProductos(esAdmin),
+                        onRefresh: () async => await context
+                            .read<ProductoLiteProvider>()
+                            .cargarProviderProductos(esAdmin),
                         child: _buildLista(activosOrdenados),
                       ),
                       RefreshIndicator(
-                        onRefresh: () async => await context.read<ProductoLiteProvider>().cargarProviderProductos(esAdmin),
+                        onRefresh: () async => await context
+                            .read<ProductoLiteProvider>()
+                            .cargarProviderProductos(esAdmin),
                         child: _buildLista(inactivosOrdenados),
                       ),
                     ],
                   )
                 : RefreshIndicator(
-                    onRefresh: () async => await context.read<ProductoLiteProvider>().cargarProviderProductos(esAdmin),
+                    onRefresh: () async => await context
+                        .read<ProductoLiteProvider>()
+                        .cargarProviderProductos(esAdmin),
                     child: _buildLista(activosOrdenados),
                   ),
           ),
@@ -126,7 +142,10 @@ class _ProductosScreenState extends State<ProductosScreen> {
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text("PRODUCTOS", style: TextStyle(fontWeight: FontWeight.bold)),
+            title: const Text(
+              "PRODUCTOS",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             bottom: const TabBar(
               tabs: [
                 Tab(text: "Activos"),
@@ -136,7 +155,8 @@ class _ProductosScreenState extends State<ProductosScreen> {
           ),
           body: cuerpoPantalla(),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.pushNamed(context, AppRutas.nuevoProducto),
+            onPressed: () =>
+                Navigator.pushNamed(context, AppRutas.nuevoProducto),
             child: const Icon(Icons.add),
           ),
         ),
@@ -146,7 +166,10 @@ class _ProductosScreenState extends State<ProductosScreen> {
     // INTERFAZ DE EMPLEADO: Limpia y sin pestañas arriba
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PRODUCTOS", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "PRODUCTOS",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: cuerpoPantalla(),
     );
@@ -155,7 +178,9 @@ class _ProductosScreenState extends State<ProductosScreen> {
   // Constructor de listas optimizado
   Widget _buildLista(List productosList) {
     if (productosList.isEmpty) {
-      return const Center(child: Text("No hay productos", style: TextStyle(fontSize: 18)));
+      return const Center(
+        child: Text("No hay productos", style: TextStyle(fontSize: 18)),
+      );
     }
     return ListView.separated(
       padding: const EdgeInsets.all(12),
@@ -166,21 +191,73 @@ class _ProductosScreenState extends State<ProductosScreen> {
         final id = p.id;
         return Card(
           elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            title: Text(p.nombre, style: const TextStyle(fontWeight: FontWeight.bold)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 10,
+            ),
+            title: Text(
+              p.nombre,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Text("Categoría: ${p.categoria} \nPrecio: \$${p.precio}"),
-            trailing: const Icon(Icons.chevron_right),
+
+            //esto modifico para switch
+            trailing: (context.read<UserProvider>().rol == "ADMIN")
+                ? Switch(
+                    value: p.activo ?? true,
+                    onChanged: (bool nuevoEstado) async {
+                      if (id == null) return;
+
+                      final ok = await context
+                          .read<ProductoLiteProvider>()
+                          .api
+                          .toggleProducto(id);
+
+                      if (ok && mounted) {
+                        await context
+                            .read<ProductoLiteProvider>()
+                            .cargarProviderProductos(
+                              context.read<UserProvider>().rol == "ADMIN",
+                            );
+
+                        if (!mounted) return;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              nuevoEstado
+                                  ? "Producto activado"
+                                  : "Producto desactivado",
+                            ),
+                            backgroundColor: nuevoEstado
+                                ? Colors.green
+                                : Colors.orange,
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    },
+                  )
+                : const Icon(Icons.chevron_right),
+
+            //hasta aca
             onTap: () async {
               if (id == null) return;
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => ProductoDetalleScreen(productoId: id)),
+                MaterialPageRoute(
+                  builder: (_) => ProductoDetalleScreen(productoId: id),
+                ),
               );
               if (mounted) {
                 final esAdmin = context.read<UserProvider>().rol == "ADMIN";
-                await context.read<ProductoLiteProvider>().cargarProviderProductos(esAdmin);
+                await context
+                    .read<ProductoLiteProvider>()
+                    .cargarProviderProductos(esAdmin);
               }
             },
           ),

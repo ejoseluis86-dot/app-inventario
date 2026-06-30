@@ -14,9 +14,9 @@ class ApiService {
   // =========================
   Future<Map<String, String>> _headers() async {
     final token = await auth.obtenerToken();
-    
+
     // LOG PARA DEBUG
-    print("DEBUG HEADERS: Token enviado es: ${token?.substring(0, 10)}..."); 
+    print("DEBUG HEADERS: Token enviado es: ${token?.substring(0, 10)}...");
 
     if (token == null || token.isEmpty) {
       throw Exception("No hay token guardado");
@@ -71,10 +71,7 @@ class ApiService {
 
   Future<List<dynamic>> obtenerInsumosAdmin() async {
     final response = await _requestWithAuth(
-      (h) => http.get(
-        Uri.parse('$baseUrl/insumos/admin/'),
-        headers: h,
-      ),
+      (h) => http.get(Uri.parse('$baseUrl/insumos/admin/'), headers: h),
     );
 
     if (response.statusCode == 200) {
@@ -83,7 +80,6 @@ class ApiService {
 
     throw Exception('Error al obtener insumos admin');
   }
-
 
   Future<String?> crearInsumo({
     required String nombre,
@@ -112,51 +108,46 @@ class ApiService {
   }
 
   Future<String?> actualizarInsumo({
-  required int id,
-  required String nombre,
-  required String categoria,
-  required int stock,
-  required String ubicacion,
-}) async {
-  final response = await _requestWithAuth(
-    (h) => http.put(
-      Uri.parse('$baseUrl/insumos/modificar/$id/'),
-      headers: h,
-      body: jsonEncode({
-        'nombre': nombre,
-        'categoria': categoria,
-        'stock': stock,
-        'ubicacion': ubicacion,
-      }),
-    ),
-  );
+    required int id,
+    required String nombre,
+    required String categoria,
+    required int stock,
+    required String ubicacion,
+  }) async {
+    final response = await _requestWithAuth(
+      (h) => http.put(
+        Uri.parse('$baseUrl/insumos/modificar/$id/'),
+        headers: h,
+        body: jsonEncode({
+          'nombre': nombre,
+          'categoria': categoria,
+          'stock': stock,
+          'ubicacion': ubicacion,
+        }),
+      ),
+    );
 
-  print(response.statusCode);
-  print(response.body);
+    print(response.statusCode);
+    print(response.body);
 
-  if (response.statusCode == 200) return null;
+    if (response.statusCode == 200) return null;
 
-  final data = jsonDecode(response.body);
-  return data['error'] ?? "Error desconocido";
-}
+    final data = jsonDecode(response.body);
+    return data['error'] ?? "Error desconocido";
+  }
 
   Future<bool> eliminarInsumo(int id) async {
     final response = await _requestWithAuth(
-      (h) => http.delete(
-        Uri.parse('$baseUrl/insumos/eliminar/$id/'),
-        headers: h,
-      ),
+      (h) =>
+          http.delete(Uri.parse('$baseUrl/insumos/eliminar/$id/'), headers: h),
     );
 
     return response.statusCode == 200;
   }
 
-   Future<bool> toggleInsumo(int id) async {
+  Future<bool> toggleInsumo(int id) async {
     final response = await _requestWithAuth(
-      (h) => http.put(
-        Uri.parse('$baseUrl/insumos/toggle/$id/'),
-        headers: h,
-      ),
+      (h) => http.put(Uri.parse('$baseUrl/insumos/toggle/$id/'), headers: h),
     );
 
     return response.statusCode == 200;
@@ -165,10 +156,13 @@ class ApiService {
   // =========================
   // USUARIOS
   // =========================
+  //esta es la nueva funcion para crear usuario
   Future<bool> crearUsuario({
     required String username,
     required String password,
-    String rol = "EMPL",
+    required String rol,
+    required String nombre,
+    required String apellido,
   }) async {
     final response = await _requestWithAuth(
       (h) => http.post(
@@ -178,18 +172,27 @@ class ApiService {
           'username': username,
           'password': password,
           'rol': rol,
+          'nombre': nombre,
+          'apellido': apellido,
         }),
       ),
     );
 
-    return response.statusCode == 201;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      print(response.body);
+      return false;
+    }
   }
 
+  //hasta aca
   Future<List<dynamic>> obtenerUsuariosAdmin() async {
     final response = await _requestWithAuth(
-      (h) => http.get(Uri.parse('$baseUrl/usuarios/admin/listado/'), headers: h),
+      (h) =>
+          http.get(Uri.parse('$baseUrl/usuarios/admin/listado/'), headers: h),
     );
-    
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -197,12 +200,15 @@ class ApiService {
     }
   }
 
-// Toggle estado de usuario
+  // Toggle estado de usuario
   Future<bool> toggleUsuario(int idUsuario) async {
     final response = await _requestWithAuth(
-      (h) => http.put(Uri.parse('$baseUrl/usuarios/admin/toggle/$idUsuario/'), headers: h),
+      (h) => http.put(
+        Uri.parse('$baseUrl/usuarios/admin/toggle/$idUsuario/'),
+        headers: h,
+      ),
     );
-    
+
     return response.statusCode == 200;
   }
 
@@ -216,24 +222,16 @@ class ApiService {
       (h) => http.put(
         Uri.parse('$baseUrl/usuarios/admin/editar/$idUsuario/'),
         headers: h,
-        body: jsonEncode({
-          'nombre': nombre,
-          'apellido': apellido,
-          'rol': rol,
-        }),
+        body: jsonEncode({'nombre': nombre, 'apellido': apellido, 'rol': rol}),
       ),
     );
 
     return response.statusCode == 200;
   }
 
-
   Future<Map<String, dynamic>> obtenerMiPerfil() async {
     final response = await _requestWithAuth(
-      (h) => http.get(
-        Uri.parse('$baseUrl/usuarios/miPerfil/'),
-        headers: h,
-      ),
+      (h) => http.get(Uri.parse('$baseUrl/usuarios/miPerfil/'), headers: h),
     );
 
     if (response.statusCode == 200) {
@@ -268,16 +266,15 @@ class ApiService {
   // =========================
   Future<Producto> obtenerProducto(int id) async {
     final response = await _requestWithAuth(
-      (h) => http.get(
-        Uri.parse('$baseUrl/productos/$id/'),
-        headers: h,
-      ),
+      (h) => http.get(Uri.parse('$baseUrl/productos/$id/'), headers: h),
     );
     print(response.statusCode);
     print(response.body);
 
     if (response.statusCode == 200) {
-      print(response.body); //para ver que devuelve al tocar el primer producto de la lista
+      print(
+        response.body,
+      ); //para ver que devuelve al tocar el primer producto de la lista
       return Producto.fromJson(jsonDecode(response.body));
     }
 
@@ -300,19 +297,19 @@ class ApiService {
   }
 
   Future<List<Producto>> obtenerProductosAdmin() async {
-  final response = await _requestWithAuth(
-    (h) => http.get(Uri.parse('$baseUrl/productos/admin/'), headers: h),
-  );
-  print(response.statusCode);
-  print(response.body);
+    final response = await _requestWithAuth(
+      (h) => http.get(Uri.parse('$baseUrl/productos/admin/'), headers: h),
+    );
+    print(response.statusCode);
+    print(response.body);
 
-  if (response.statusCode == 200) {
-    final List data = jsonDecode(response.body);
-    return data.map((e) => Producto.fromJson(e)).toList();
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      return data.map((e) => Producto.fromJson(e)).toList();
+    }
+
+    throw Exception("Error al obtener productos admin");
   }
-
-  throw Exception("Error al obtener productos admin");
-}
 
   Future<List<dynamic>> obtenerRecetaProducto(int idProducto) async {
     final response = await _requestWithAuth(
@@ -331,10 +328,8 @@ class ApiService {
 
   Future<bool> existeProducto(String nombre) async {
     final response = await _requestWithAuth(
-      (h) => http.get(
-        Uri.parse('$baseUrl/productos/existe/$nombre/'),
-        headers: h,
-      ),
+      (h) =>
+          http.get(Uri.parse('$baseUrl/productos/existe/$nombre/'), headers: h),
     );
 
     if (response.statusCode == 200) {
@@ -344,7 +339,6 @@ class ApiService {
 
     return false;
   }
-
 
   Future<bool> crearProducto(Producto producto) async {
     final response = await _requestWithAuth(
@@ -389,7 +383,7 @@ class ApiService {
 
     if (response.statusCode != 200) return false;
 
-    // 
+    //
     return true;
   }
 
@@ -404,19 +398,13 @@ class ApiService {
     return response.statusCode == 200;
   }
 
- Future<bool> toggleProducto(int id) async {
-  final response = await _requestWithAuth(
-    (h) => http.put(
-      Uri.parse('$baseUrl/productos/toggle/$id/'),
-      headers: h,
-    ),
-  );
+  Future<bool> toggleProducto(int id) async {
+    final response = await _requestWithAuth(
+      (h) => http.put(Uri.parse('$baseUrl/productos/toggle/$id/'), headers: h),
+    );
 
-  return response.statusCode == 200;
-}
-
- 
-
+    return response.statusCode == 200;
+  }
 
   // =========================
   // PEDIDOS
@@ -424,10 +412,7 @@ class ApiService {
 
   Future<List<dynamic>> obtenerPedidosLite() async {
     final response = await _requestWithAuth(
-      (h) => http.get(
-        Uri.parse('$baseUrl/pedidos/sin-terminar/'),
-        headers: h,
-      ),
+      (h) => http.get(Uri.parse('$baseUrl/pedidos/sin-terminar/'), headers: h),
     );
 
     if (response.statusCode == 200) {
@@ -466,8 +451,10 @@ class ApiService {
         return true; // Todo salió bien
       } else {
         // Si el servidor responde con error (ej. 400 o 500), lo logueamos
-        print("Error al finalizar pedido ${response.statusCode}: ${response.body}");
-        return false; 
+        print(
+          "Error al finalizar pedido ${response.statusCode}: ${response.body}",
+        );
+        return false;
       }
     } catch (e) {
       // 3. Manejo de excepciones de conexión (ej. internet caído)
@@ -476,24 +463,23 @@ class ApiService {
     }
   }
 
+  Future<List<dynamic>> obtenerDetallesPedido(int idPedido) async {
+    final response = await _requestWithAuth(
+      (h) => http.get(
+        Uri.parse('$baseUrl/pedidos/$idPedido/detalles/'),
+        headers: h,
+      ),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    return [];
+  }
 
-Future<List<dynamic>> obtenerDetallesPedido(int idPedido) async {
-  final response = await _requestWithAuth((h) => http.get(
-    Uri.parse('$baseUrl/pedidos/$idPedido/detalles/'),
-    headers: h,
-  ));
-  if (response.statusCode == 200) return jsonDecode(response.body);
-  return [];
-}
-
-// Asegúrate de que este exista para PedidosGeneralesScreen
-Future<List<dynamic>> obtenerPedidosTerminados() async {
-  final response = await _requestWithAuth((h) => http.get(
-    Uri.parse('$baseUrl/pedidos/terminados/'), 
-    headers: h,
-  ));
-  if (response.statusCode == 200) return jsonDecode(response.body);
-  return [];
-}
-
+  // Asegúrate de que este exista para PedidosGeneralesScreen
+  Future<List<dynamic>> obtenerPedidosTerminados() async {
+    final response = await _requestWithAuth(
+      (h) => http.get(Uri.parse('$baseUrl/pedidos/terminados/'), headers: h),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    return [];
+  }
 }

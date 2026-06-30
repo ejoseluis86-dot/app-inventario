@@ -8,10 +8,7 @@ import 'package:mi_app/screens/insumo_detalle_screen.dart';
 class InsumosScreen extends StatefulWidget {
   final bool abrirCriticos;
 
-  const InsumosScreen({
-    super.key,
-    this.abrirCriticos = false,
-  });
+  const InsumosScreen({super.key, this.abrirCriticos = false});
 
   @override
   State<InsumosScreen> createState() => _InsumosScreenState();
@@ -66,7 +63,15 @@ class _InsumosScreenState extends State<InsumosScreen> {
   }
 
   void _mostrarDialogo() {
-    final categorias = ['Cerámica', 'Plástico', 'Metal', 'Madera', 'Papel', 'Vidrio', 'Textil'];
+    final categorias = [
+      'Cerámica',
+      'Plástico',
+      'Metal',
+      'Madera',
+      'Papel',
+      'Vidrio',
+      'Textil',
+    ];
     String? categoria;
     bool loading = false;
     String? errorMensaje;
@@ -80,7 +85,9 @@ class _InsumosScreenState extends State<InsumosScreen> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(22),
+              ),
               title: const Text("Nuevo Insumo"),
               content: Form(
                 key: formKey,
@@ -91,7 +98,13 @@ class _InsumosScreenState extends State<InsumosScreen> {
                       if (errorMensaje != null)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: Text(errorMensaje!, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                          child: Text(
+                            errorMensaje!,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       TextFormField(
                         controller: nombreController,
@@ -101,9 +114,13 @@ class _InsumosScreenState extends State<InsumosScreen> {
                           border: const OutlineInputBorder(),
                           errorText: errorNombre,
                         ),
-                        validator: (value) => value == null || value.trim().isEmpty ? 'El nombre es obligatorio' : null,
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
+                            ? 'El nombre es obligatorio'
+                            : null,
                         onChanged: (_) {
-                          if (errorNombre != null) setStateDialog(() => errorNombre = null);
+                          if (errorNombre != null)
+                            setStateDialog(() => errorNombre = null);
                         },
                       ),
                       const SizedBox(height: 12),
@@ -116,8 +133,10 @@ class _InsumosScreenState extends State<InsumosScreen> {
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) return 'El stock es obligatorio';
-                          if (int.tryParse(value.trim()) == null) return 'Debe ser un número válido';
+                          if (value == null || value.trim().isEmpty)
+                            return 'El stock es obligatorio';
+                          if (int.tryParse(value.trim()) == null)
+                            return 'Debe ser un número válido';
                           return null;
                         },
                       ),
@@ -129,9 +148,15 @@ class _InsumosScreenState extends State<InsumosScreen> {
                           prefixIcon: Icon(Icons.category),
                           border: OutlineInputBorder(),
                         ),
-                        items: categorias.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        validator: (value) => value == null ? 'Selecciona una categoría' : null,
-                        onChanged: (value) => setStateDialog(() => categoria = value),
+                        items: categorias
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                        validator: (value) =>
+                            value == null ? 'Selecciona una categoría' : null,
+                        onChanged: (value) =>
+                            setStateDialog(() => categoria = value),
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
@@ -141,51 +166,65 @@ class _InsumosScreenState extends State<InsumosScreen> {
                           prefixIcon: Icon(Icons.place),
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => value == null || value.trim().isEmpty ? 'La ubicación es obligatoria' : null,
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
+                            ? 'La ubicación es obligatoria'
+                            : null,
                       ),
-                      if (loading) const Padding(padding: EdgeInsets.only(top: 10), child: CircularProgressIndicator()),
+                      if (loading)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: CircularProgressIndicator(),
+                        ),
                     ],
                   ),
                 ),
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancelar"),
+                ),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.save),
                   label: const Text("Guardar"),
-                  onPressed: loading ? null : () async {
-                    setStateDialog(() => errorMensaje = null);
-                    if (!formKey.currentState!.validate()) return;
+                  onPressed: loading
+                      ? null
+                      : () async {
+                          setStateDialog(() => errorMensaje = null);
+                          if (!formKey.currentState!.validate()) return;
 
-                    final stock = int.parse(stockController.text.trim());
-                    setStateDialog(() => loading = true);
+                          final stock = int.parse(stockController.text.trim());
+                          setStateDialog(() => loading = true);
 
-                    final error = await api.crearInsumo(
-                      nombre: nombreController.text.trim(),
-                      categoria: categoria!,
-                      stock: stock,
-                      ubicacion: ubicacionController.text.trim(),
-                    );
+                          final error = await api.crearInsumo(
+                            nombre: nombreController.text.trim(),
+                            categoria: categoria!,
+                            stock: stock,
+                            ubicacion: ubicacionController.text.trim(),
+                          );
 
-                    setStateDialog(() => loading = false);
+                          setStateDialog(() => loading = false);
 
-                    if (error != null) {
-                      setStateDialog(() {
-                        if (error.toLowerCase().contains("nombre")) {
-                          errorNombre = error;
-                        } else {
-                          errorMensaje = error;
-                        }
-                      });
-                      return;
-                    }
-                    await context.read<InsumoProvider>().cargarProviderInsumos();
-                    if (mounted) Navigator.pop(context);
+                          if (error != null) {
+                            setStateDialog(() {
+                              if (error.toLowerCase().contains("nombre")) {
+                                errorNombre = error;
+                              } else {
+                                errorMensaje = error;
+                              }
+                            });
+                            return;
+                          }
+                          await context
+                              .read<InsumoProvider>()
+                              .cargarProviderInsumos();
+                          if (mounted) Navigator.pop(context);
 
-                    nombreController.clear();
-                    stockController.clear();
-                    ubicacionController.clear();
-                  },
+                          nombreController.clear();
+                          stockController.clear();
+                          ubicacionController.clear();
+                        },
                 ),
               ],
             );
@@ -201,14 +240,16 @@ class _InsumosScreenState extends State<InsumosScreen> {
     final rol = context.watch<UserProvider>().rol;
     final esAdmin = rol == "ADMIN";
     //aca actualizo el provider
-                          
+
     // Filtrado base
     final filtradosBase = insumosRaw.where((i) {
       final nombre = _normalizar(i.nombre);
       final busqueda = _normalizar(search);
       final matchSearch = nombre.contains(busqueda);
-      final matchCategoria = filtroCategoria == "TODAS" || i.categoria == filtroCategoria;
-      final matchStock = filtroStock == "TODOS" ||
+      final matchCategoria =
+          filtroCategoria == "TODAS" || i.categoria == filtroCategoria;
+      final matchStock =
+          filtroStock == "TODOS" ||
           (filtroStock == "OK" && i.stock > 5) ||
           (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
           (filtroStock == "URGENTE" && i.stock <= 2) ||
@@ -235,7 +276,9 @@ class _InsumosScreenState extends State<InsumosScreen> {
               decoration: InputDecoration(
                 hintText: "Buscar insumo...",
                 prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onChanged: (value) => setState(() => search = value),
             ),
@@ -248,33 +291,56 @@ class _InsumosScreenState extends State<InsumosScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: filtroCategoria,
-                    decoration: const InputDecoration(labelText: "Categoría", border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: "Categoría",
+                      border: OutlineInputBorder(),
+                    ),
                     items: const [
                       DropdownMenuItem(value: "TODAS", child: Text("Todas")),
-                      DropdownMenuItem(value: "Cerámica", child: Text("Cerámica")),
-                      DropdownMenuItem(value: "Plástico", child: Text("Plástico")),
+                      DropdownMenuItem(
+                        value: "Cerámica",
+                        child: Text("Cerámica"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Plástico",
+                        child: Text("Plástico"),
+                      ),
                       DropdownMenuItem(value: "Metal", child: Text("Metal")),
                       DropdownMenuItem(value: "Madera", child: Text("Madera")),
                       DropdownMenuItem(value: "Papel", child: Text("Papel")),
                       DropdownMenuItem(value: "Vidrio", child: Text("Vidrio")),
                       DropdownMenuItem(value: "Textil", child: Text("Textil")),
                     ],
-                    onChanged: (value) => setState(() => filtroCategoria = value ?? "TODAS"),
+                    onChanged: (value) =>
+                        setState(() => filtroCategoria = value ?? "TODAS"),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: filtroStock,
-                    decoration: const InputDecoration(labelText: "Estado", border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: "Estado",
+                      border: OutlineInputBorder(),
+                    ),
                     items: const [
                       DropdownMenuItem(value: "TODOS", child: Text("Todos")),
-                      DropdownMenuItem(value: "ALERTADOS", child: Text("Bajo Stock")),
+                      DropdownMenuItem(
+                        value: "ALERTADOS",
+                        child: Text("Bajo Stock"),
+                      ),
                       DropdownMenuItem(value: "OK", child: Text("OK")),
-                      DropdownMenuItem(value: "CRITICO", child: Text("Crítico")),
-                      DropdownMenuItem(value: "URGENTE", child: Text("Urgente")),
+                      DropdownMenuItem(
+                        value: "CRITICO",
+                        child: Text("Crítico"),
+                      ),
+                      DropdownMenuItem(
+                        value: "URGENTE",
+                        child: Text("Urgente"),
+                      ),
                     ],
-                    onChanged: (value) => setState(() => filtroStock = value ?? "TODOS"),
+                    onChanged: (value) =>
+                        setState(() => filtroStock = value ?? "TODOS"),
                   ),
                 ),
               ],
@@ -287,17 +353,23 @@ class _InsumosScreenState extends State<InsumosScreen> {
                 ? TabBarView(
                     children: [
                       RefreshIndicator(
-                        onRefresh: () async => await context.read<InsumoProvider>().cargarProviderInsumos(),
+                        onRefresh: () async => await context
+                            .read<InsumoProvider>()
+                            .cargarProviderInsumos(),
                         child: _buildLista(activosOrdenados),
                       ),
                       RefreshIndicator(
-                        onRefresh: () async => await context.read<InsumoProvider>().cargarProviderInsumos(),
+                        onRefresh: () async => await context
+                            .read<InsumoProvider>()
+                            .cargarProviderInsumos(),
                         child: _buildLista(inactivosOrdenados),
                       ),
                     ],
                   )
                 : RefreshIndicator(
-                    onRefresh: () async => await context.read<InsumoProvider>().cargarProviderInsumos(),
+                    onRefresh: () async => await context
+                        .read<InsumoProvider>()
+                        .cargarProviderInsumos(),
                     child: _buildLista(activosOrdenados),
                   ),
           ),
@@ -330,16 +402,16 @@ class _InsumosScreenState extends State<InsumosScreen> {
 
     // SI ES EMPLEADO: Scaffold liso sin pestañas arriba, súper limpio
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("INSUMOS"),
-      ),
+      appBar: AppBar(title: const Text("INSUMOS")),
       body: cuerpoPantalla(),
     );
   }
 
   Widget _buildLista(List insumosList) {
     if (insumosList.isEmpty) {
-      return const Center(child: Text("No hay insumos", style: TextStyle(fontSize: 18)));
+      return const Center(
+        child: Text("No hay insumos", style: TextStyle(fontSize: 18)),
+      );
     }
     return ListView.separated(
       padding: const EdgeInsets.all(12),
@@ -349,25 +421,81 @@ class _InsumosScreenState extends State<InsumosScreen> {
         final insumo = insumosList[index];
         return Card(
           elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            leading: CircleAvatar(radius: 10, backgroundColor: colorStock(insumo.stock)),
-            title: Text(insumo.nombre, style: const TextStyle(fontWeight: FontWeight.bold)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 10,
+            ),
+            leading: CircleAvatar(
+              radius: 10,
+              backgroundColor: colorStock(insumo.stock),
+            ),
+            title: Text(
+              insumo.nombre,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Categoría: ${insumo.categoria}"),
                 Text("Stock: ${insumo.stock}"),
                 Text("Ubicación: ${insumo.ubicacion}"),
-                Text(estadoStock(insumo.stock), style: TextStyle(color: colorStock(insumo.stock), fontWeight: FontWeight.bold)),
+                Text(
+                  estadoStock(insumo.stock),
+                  style: TextStyle(
+                    color: colorStock(insumo.stock),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
-            trailing: const Icon(Icons.chevron_right),
+
+            //esto es lo que cambie para agregar el
+            trailing: context.watch<UserProvider>().rol == "ADMIN"
+                ? Switch(
+                    value: insumo.activo,
+                    onChanged: (bool nuevoEstado) async {
+                      if (insumo.id == null) return;
+
+                      final ok = await context
+                          .read<InsumoProvider>()
+                          .api
+                          .toggleInsumo(insumo.id!);
+
+                      if (ok && mounted) {
+                        await context
+                            .read<InsumoProvider>()
+                            .cargarProviderInsumos();
+
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              nuevoEstado
+                                  ? "Insumo activado"
+                                  : "Insumo desactivado",
+                            ),
+                            backgroundColor: nuevoEstado
+                                ? Colors.green
+                                : Colors.orange,
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    },
+                  )
+                : const Icon(Icons.chevron_right),
+
+            //hasta aca
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => InsumoDetalleScreen(insumo: insumo)),
+                MaterialPageRoute(
+                  builder: (_) => InsumoDetalleScreen(insumo: insumo),
+                ),
               );
             },
           ),
