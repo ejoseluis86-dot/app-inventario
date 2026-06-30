@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:mi_app/screens/pedido_detalle_screen.dart';
 import 'package:mi_app/screens/crear_pedido_screen.dart';
 
-// En pedidos_generales_screen.dart
+
 class PedidosGeneralScreen extends StatelessWidget {
   const PedidosGeneralScreen({super.key});
 
@@ -29,7 +29,7 @@ Widget build(BuildContext context) {
           ListaPedidosGenerica(esTerminado: true),
         ],
       ),
-      // BOTÓN FLOTANTE: Asegúrate de que esté aquí, como propiedad del Scaffold
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Navegación directa
@@ -105,7 +105,7 @@ class ListaPedidosGenericaState extends State<ListaPedidosGenerica> {
                   ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(p['fecha']))
                   : "Sin fecha";
 
-              // Eliminamos el SizedBox.shrink() fantasma para que la UI se dibuje real
+              
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 clipBehavior: Clip.antiAlias,
@@ -125,7 +125,7 @@ class ListaPedidosGenericaState extends State<ListaPedidosGenerica> {
                       p['id'], 
                       p['cliente'] ?? "Cliente Anónimo", 
                       widget.esTerminado,
-                      p['fecha']?.toString() ?? "Sin fecha" // <-- Aquí usamos la clave correcta
+                      p['fecha']?.toString() ?? "Sin fecha" //Aquí usamos la clave correcta
                     );
                   },
                 ),

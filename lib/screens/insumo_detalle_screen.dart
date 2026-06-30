@@ -23,8 +23,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
   final _formKey = GlobalKey<FormState>();
 
   String? categoria;
-  bool _esEditando = false; // 👈 El interruptor mágico para el modo de la pantalla
-
+  bool _esEditando = false; // Variable para controlar el modo de edición
   final categorias = [
     'Cerámica',
     'Plástico',
@@ -85,7 +84,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
       appBar: AppBar(
         title: Text(_esEditando ? "Editar Insumo" : "Detalle de Insumo"),
         actions: [
-          // 🛡️ Si es Admin, le mostramos el botón de alternar Modo Lectura / Modo Edición
+          // Si es Admin, le mostramos el botón de alternar Modo Lectura / Modo Edición
           if (esAdmin)
             IconButton(
               icon: Icon(_esEditando ? Icons.cancel : Icons.edit),
@@ -216,7 +215,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
                   ),
                   const SizedBox(height: 12),
                   
-                  // Botón Activar / Desactivar (Mantenido intacto de tu código)
+                  // Botón Activar / Desactivar
                   OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -262,7 +261,7 @@ class _InsumoDetalleScreenState extends State<InsumoDetalleScreen> {
               ),
             )
           : Column(
-              // 📖 MODO LECTURA: Vista limpia y corporativa libre de errores accidentales
+              
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Card(

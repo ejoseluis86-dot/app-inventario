@@ -30,7 +30,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
 
   Insumo? insumoSeleccionado;
 
-  //esta es un alista de detalles que se usa para mostrar y crear la receta
+  //esta es una lista de detalles que se usa para mostrar y crear la receta
   final List<DetalleReceta> detalles = [];
 
   @override
@@ -53,10 +53,10 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
       );
 
       if (index != -1) {
-        // Ya existe ese insumo → sumar cantidad
+        // Ya existe ese insumo => sumar cantidad
         detalles[index].cantidadTeorica += cantidad;
       } else {
-        // No existe → agregarlo
+        // No existe => agregarlo
         detalles.add(
           DetalleReceta(
             cantidadTeorica: cantidad,
@@ -110,7 +110,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
     );
   }
 
-  //metodo para guardar la receta
+  //método para guardar la receta de producto
   Future<void> guardarReceta() async {
     final apiService = ApiService();
 
@@ -180,7 +180,7 @@ class _AsociarRecetaScreenState extends State<AsociarRecetaScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    //aca estoy trayendo una lista de insumos desde el provider
+    //Trae una lista de insumos desde el provider
     final insumosBD = context.watch<InsumoProvider>().insumos;
 
     return Scaffold(

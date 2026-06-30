@@ -99,7 +99,7 @@ class MyHomeScreen extends StatelessWidget {
 
                 const SizedBox(width: 10),
 
-                // 🔮 BOTÓN PERFIL CON AVATAR DINÁMICO
+                // BOTÓN PERFIL CON AVATAR DINÁMICO
                 InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
@@ -107,7 +107,7 @@ class MyHomeScreen extends StatelessWidget {
                   },
                   child: CircleAvatar(
                     radius: 17,
-                    backgroundColor: const Color(0xFF6A1B9A), // Tu violeta institucional
+                    backgroundColor: const Color(0xFF6A1B9A), 
                     child: Text(
                       (user.nombre != null && user.nombre!.isNotEmpty)
                           ? user.nombre![0].toUpperCase()
@@ -151,7 +151,7 @@ class MyHomeScreen extends StatelessWidget {
           return Stack(
             children: [
 
-              // FONDO SOLO EN modo claro
+              // FONDO SOLO EN MODO CLARO
 
               if (!isDark)
                 Container(
@@ -164,7 +164,7 @@ class MyHomeScreen extends StatelessWidget {
                   ),
                 )
               else
-                // 🌑 FONDO DARK NORMAL DEL THEME
+                // FONDO DARK NORMAL DEL THEME
                 Container(color: Theme.of(context).scaffoldBackgroundColor),
 
               const SingleChildScrollView(

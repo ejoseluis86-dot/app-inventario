@@ -99,7 +99,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
       actions: [
         IconButton(
           icon: const Icon(Icons.analytics_outlined, color: Colors.white),
-          onPressed: () { /* Aquí iría tu pantalla de reportes */ },
+          onPressed: () { /* Aquí iría pantalla de reportes */ },
         ),
       ],
     );
@@ -217,7 +217,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
   // --- DIÁLOGOS Y ESTADOS ---
 
   void _confirmarFinalizar(int idPedido) {
-    // ... mismo diálogo que antes, pero puedes estilizarlo también
+    // falta lógica de cierre del pedido
   }
 
   Widget _buildEmptyState() {

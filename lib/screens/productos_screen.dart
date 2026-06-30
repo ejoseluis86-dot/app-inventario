@@ -65,7 +65,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
     Widget cuerpoPantalla() {
       return Column(
         children: [
-          // Buscador elegante
+          // Buscador
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
@@ -205,7 +205,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
             ),
             subtitle: Text("Categoría: ${p.categoria} \nPrecio: \$${p.precio}"),
 
-            //esto modifico para switch
+            //esto se modificó para switch
             trailing: (context.read<UserProvider>().rol == "ADMIN")
                 ? Switch(
                     value: p.activo ?? true,
@@ -244,7 +244,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
                   )
                 : const Icon(Icons.chevron_right),
 
-            //hasta aca
+            //hasta acá
             onTap: () async {
               if (id == null) return;
               await Navigator.push(

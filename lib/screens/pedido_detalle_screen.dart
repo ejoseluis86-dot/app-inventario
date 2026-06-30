@@ -43,8 +43,7 @@ class _PedidoDetalleScreenState extends State<PedidoDetalleScreen> {
     }
   }
 
-  // En _PedidoDetalleScreenState
-// En _PedidoDetalleScreenState
+
 Future<void> _finalizarPedido(BuildContext context) async {
   try {
     await ApiService().finalizarPedido(widget.idPedido);

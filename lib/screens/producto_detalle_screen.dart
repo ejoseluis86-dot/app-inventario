@@ -4,7 +4,7 @@ import 'package:mi_app/services/api_service.dart';
 import 'package:mi_app/screens/editar_producto_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mi_app/providers/user_provider.dart';
-import 'package:mi_app/services/auth_service.dart';
+
 
 class ProductoDetalleScreen extends StatefulWidget {
   final int productoId;
@@ -141,7 +141,7 @@ Widget build(BuildContext context) {
               itemBuilder: (context, index) {
                 final d = producto!.detalles![index];
 
-                // 🛡️ Buscamos de forma segura el nombre del insumo
+                // Buscamos de forma segura el nombre del insumo
                 // (Prueba con camelCase, si es null intenta snake_case, y si no pone un genérico)
                 final String nombreInsumo = d.nombreInsumo ?? "Insumo sin nombre";
                 
