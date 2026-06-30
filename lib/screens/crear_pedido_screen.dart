@@ -6,9 +6,11 @@ import 'package:mi_app/providers/pedido_lite_provider.dart';
 import 'package:mi_app/providers/producto_lite_provider.dart';
 import 'package:mi_app/services/api_service.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class CrearPedidoScreen extends StatefulWidget {
   const CrearPedidoScreen({super.key});
+  
 
   @override
   State<CrearPedidoScreen> createState() => _CrearPedidoScreenState();
@@ -22,6 +24,7 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
   late List<ProductoLite> productos;
   ProductoLite? productoSeleccionado;
   final List<DetallePedido> detallesPedido = [];
+  String fechaFormateada = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
   @override
   void dispose() {
@@ -57,26 +60,32 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
     });
   }
 
-  Future<void> guardarPedido() async {
-    if (nombreController.text.isEmpty || detallesPedido.isEmpty) return;
+  // En crear_pedido_screen.dart, dentro de guardarPedido()
+Future<void> guardarPedido() async {
+  if (nombreController.text.isEmpty || detallesPedido.isEmpty) return;
 
-    final Pedido nuevoPedido = Pedido(
-      fecha: DateTime.now(),
-      cliente: nombreController.text,
-      usuario: 1,
-      detalles: detallesPedido,
-      terminado: false,
-    );
+  // 1. Crea la fecha en formato solo YYYY-MM-DD
+  String fechaString = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  DateTime fechaSoloFecha = DateTime.parse(fechaString);
 
-    bool ok = await ApiService().crearPedido(nuevoPedido);
+  // 2. Crea el objeto Pedido con esa fecha "limpia"
+  final Pedido nuevoPedido = Pedido(
+    fecha: fechaSoloFecha, // <-- Fecha sin horas ni milisegundos
+    cliente: nombreController.text,
+    usuario: 1,
+    detalles: detallesPedido,
+    terminado: false,
+  );
 
-    if (ok) {
-      await context.read<PedidoLiteProvider>().cargarProviderPedidos();
-      if (mounted) {
-        Navigator.pop(context);
-      }
+  bool ok = await ApiService().crearPedido(nuevoPedido);
+
+  if (ok) {
+    await context.read<PedidoLiteProvider>().cargarProviderPedidos();
+    if (mounted) {
+      Navigator.pop(context);
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

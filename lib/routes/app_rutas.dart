@@ -10,7 +10,7 @@ import 'package:mi_app/screens/nuevo_producto_screen.dart';
 import 'package:mi_app/screens/trabajo_pedidos_screen.dart';
 import 'package:mi_app/screens/perfil_screen.dart';
 import 'package:mi_app/screens/productos_screen.dart';
-import 'package:mi_app/screens/pedidos_screen.dart';
+import 'package:mi_app/screens/pedidos_generales_screen.dart';
 
 
 class AppRutas {
@@ -43,6 +43,6 @@ class AppRutas {
     crearUsuario: (context) => const CrearUsuarioScreen(),
     perfil: (context) => const PerfilScreen(),
     usuarios: (context) => const UsuariosScreen(),
-    pedidos: (context) => PedidosScreen(),
+    pedidos: (context) => PedidosGeneralScreen(),
   };
 }

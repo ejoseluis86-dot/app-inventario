@@ -1,4 +1,5 @@
 import 'package:mi_app/models/detalle_pedido.dart';
+import 'package:intl/intl.dart';
 
 class Pedido {
   final int? id;
@@ -34,10 +35,12 @@ class Pedido {
 
   Map<String, dynamic> toJson() {
     return {
-      'fecha': fecha.toIso8601String(),
+      // AQUÍ ESTÁ EL CAMBIO: usamos DateFormat para forzar el formato YYYY-MM-DD
+      'fecha': DateFormat('yyyy-MM-dd').format(fecha), 
       'cliente': cliente,
       'usuario': usuario,
       'detalles': detalles.map((detalle) => detalle.toJson()).toList(),
+      'terminado': terminado,
     };
   }
 }

@@ -421,6 +421,7 @@ class ApiService {
   // =========================
   // PEDIDOS
   // =========================
+
   Future<List<dynamic>> obtenerPedidosLite() async {
     final response = await _requestWithAuth(
       (h) => http.get(
@@ -475,5 +476,24 @@ class ApiService {
     }
   }
 
+
+Future<List<dynamic>> obtenerDetallesPedido(int idPedido) async {
+  final response = await _requestWithAuth((h) => http.get(
+    Uri.parse('$baseUrl/pedidos/$idPedido/detalles/'),
+    headers: h,
+  ));
+  if (response.statusCode == 200) return jsonDecode(response.body);
+  return [];
+}
+
+// Asegúrate de que este exista para PedidosGeneralesScreen
+Future<List<dynamic>> obtenerPedidosTerminados() async {
+  final response = await _requestWithAuth((h) => http.get(
+    Uri.parse('$baseUrl/pedidos/terminados/'), 
+    headers: h,
+  ));
+  if (response.statusCode == 200) return jsonDecode(response.body);
+  return [];
+}
 
 }

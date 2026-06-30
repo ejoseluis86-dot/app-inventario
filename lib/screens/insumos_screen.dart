@@ -200,7 +200,8 @@ class _InsumosScreenState extends State<InsumosScreen> {
     final insumosRaw = context.watch<InsumoProvider>().insumos;
     final rol = context.watch<UserProvider>().rol;
     final esAdmin = rol == "ADMIN";
-
+    //aca actualizo el provider
+                          
     // Filtrado base
     final filtradosBase = insumosRaw.where((i) {
       final nombre = _normalizar(i.nombre);

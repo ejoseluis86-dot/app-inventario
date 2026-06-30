@@ -5,6 +5,7 @@ import 'package:mi_app/routes/app_rutas.dart';
 import 'package:mi_app/widgets/widgets_home/my_button_resumen.dart';
 import 'package:provider/provider.dart';
 import 'package:mi_app/screens/insumos_screen.dart';
+import 'package:mi_app/screens/pedidos_generales_screen.dart';
 
 class MiResumen extends StatelessWidget {
   const MiResumen({super.key});
@@ -83,7 +84,17 @@ class MiResumen extends StatelessWidget {
                     texto2: "Activos",
                     cantidad: pedidos.length,
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, AppRutas.trabajo);
+                      // 1. Navegamos a una nueva pantalla (sin reemplazar la actual)
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Scaffold(
+                            appBar: AppBar(title: const Text("Pedidos Activos")),
+                            // 2. Usamos la clase pública que preparamos en pedidos_generales_screen.dart
+                            body: const ListaPedidosGenerica(esTerminado: false), 
+                          ),
+                        ),
+                      );
                     },
                     color: Colors.green,
                   ),
