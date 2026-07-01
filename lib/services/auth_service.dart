@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   //direccion de mi api
 
-  //final String baseUrl = 'http://10.0.2.2:8000';
-  final String baseUrl = 'http://10.12.255.108:8000'; //conectar backend con wifi
+  final String baseUrl = 'http://10.0.2.2:8000';
+  //final String baseUrl = 'http://10.12.255.108:8000'; //conectar backend con wifi
 
   Future<dynamic> login(String username, String password) async {
     //hacemos la consulta a la API en el body mandamos usuario y contraseña

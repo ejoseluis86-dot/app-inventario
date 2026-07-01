@@ -6,8 +6,8 @@ import 'package:mi_app/services/auth_service.dart';
 import 'package:mi_app/models/detalle_receta.dart';
 
 class ApiService {
-  //final String baseUrl = "http://10.0.2.2:8000";
-  final String baseUrl = "http://10.12.255.108:8000"; //conectar backend con wifi
+  final String baseUrl = "http://10.0.2.2:8000";
+  //final String baseUrl = "http://10.12.255.108:8000"; //conectar backend con wifi
   final AuthService auth = AuthService();
 
   // =========================
