@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/services/api_service.dart';
-import 'package:provider/provider.dart';
-import 'package:mi_app/providers/user_provider.dart';
 
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
