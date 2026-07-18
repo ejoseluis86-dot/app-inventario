@@ -8,7 +8,6 @@ class PedidosGeneralScreen extends StatelessWidget {
   const PedidosGeneralScreen({super.key});
 
   @override
-  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
@@ -32,45 +31,6 @@ class PedidosGeneralScreen extends StatelessWidget {
           ],
         ),
         // BOTÓN FLOTANTE: Asegúrate de que esté aquí, como propiedad del Scaffold
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Navegación directa
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CrearPedidoScreen(),
-              ),
-            );
-          },
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
-  }
-
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "GESTIÓN DE PEDIDOS",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          bottom: const TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.pending_actions), text: "Activos"),
-              Tab(icon: Icon(Icons.history), text: "Historial"),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            ListaPedidosGenerica(esTerminado: false),
-            ListaPedidosGenerica(esTerminado: true),
-          ],
-        ),
-
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Navegación directa
