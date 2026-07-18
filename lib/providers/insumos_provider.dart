@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/models/insumo.dart';
 import 'package:mi_app/services/api_service.dart';
-import 'package:mi_app/providers/user_provider.dart';
-import 'package:provider/provider.dart';
+
 class InsumoProvider extends ChangeNotifier {
   final ApiService api = ApiService();
 

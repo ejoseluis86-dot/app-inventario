@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:mi_app/screens/pedido_detalle_screen.dart';
 import 'package:mi_app/screens/crear_pedido_screen.dart';
 
-// En pedidos_generales_screen.dart
 class PedidosGeneralScreen extends StatelessWidget {
   const PedidosGeneralScreen({super.key});
 
@@ -33,6 +32,45 @@ class PedidosGeneralScreen extends StatelessWidget {
           ],
         ),
         // BOTÓN FLOTANTE: Asegúrate de que esté aquí, como propiedad del Scaffold
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Navegación directa
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CrearPedidoScreen(),
+              ),
+            );
+          },
+          child: const Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            "GESTIÓN DE PEDIDOS",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.pending_actions), text: "Activos"),
+              Tab(icon: Icon(Icons.history), text: "Historial"),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            ListaPedidosGenerica(esTerminado: false),
+            ListaPedidosGenerica(esTerminado: true),
+          ],
+        ),
+
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Navegación directa
@@ -124,7 +162,6 @@ class ListaPedidosGenericaState extends State<ListaPedidosGenerica> {
                     ).format(DateTime.parse(p['fecha']))
                   : "Sin fecha";
 
-              // Eliminamos el SizedBox.shrink() fantasma para que la UI se dibuje real
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 clipBehavior: Clip.antiAlias,

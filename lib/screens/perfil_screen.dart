@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app/services/api_service.dart';
-import 'package:provider/provider.dart';
-import 'package:mi_app/providers/user_provider.dart';
 
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
@@ -22,7 +20,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   bool loading = true;
   Map<String, dynamic>? usuario;
 
-  // 🔮 Color institucional de tu Login y Botones
+  // Color idem Login y Botones
   final Color colorVioletaCorporativo = const Color(0xFF6A1B9A);
 
   @override
@@ -54,7 +52,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
     }
   }
 
-  // 🔐 Diálogo Seguro para cambiar la contraseña
+  // Diálogo Seguro para cambiar la contraseña
   void _mostrarDialogoCambiarPassword() {
     actualController.clear();
     nuevaController.clear();
@@ -137,7 +135,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               onPressed: () async {
                 if (!_formKey.currentState!.validate()) return;
 
-                // Cuando implementes el endpoint en Django acoplás tu llamada acá:
+                // falta implementar el endpoint en Django 
                 String? error; 
 
                 if (error != null) {
@@ -152,7 +150,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text("Contraseña actualizada correctamente"),
-                      backgroundColor: colorVioletaCorporativo, // 🌟 ¡Alineado al violeta de la app!
+                      backgroundColor: colorVioletaCorporativo, //
                     ),
                   );
                 }
@@ -209,13 +207,13 @@ class _PerfilScreenState extends State<PerfilScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Avatar superior con la inicial del usuario
+            // Avatar con la inicial del usuario
             Center(
               child: Column(
                 children: [
                   CircleAvatar(
                     radius: 45,
-                    backgroundColor: colorVioletaCorporativo, // 🌟 Integrado al color dominante
+                    backgroundColor: colorVioletaCorporativo, // Integrado al color dominante
                     child: Text(
                       usuario?['nombre']?.toString().isNotEmpty == true
                           ? usuario!['nombre'].toString().substring(0, 1).toUpperCase()
@@ -241,7 +239,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
             const SizedBox(height: 25),
 
-            // Tarjeta de Datos de Solo Lectura (Segura e Inalterable)
+            // Tarjeta de Datos de Solo Lectura
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -266,7 +264,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               height: 50,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorVioletaCorporativo, // 🌟 Violeta coordinado
+                  backgroundColor: colorVioletaCorporativo, //
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),

@@ -239,24 +239,24 @@ class _InsumosScreenState extends State<InsumosScreen> {
     final insumosRaw = context.watch<InsumoProvider>().insumos;
     final rol = context.watch<UserProvider>().rol;
     final esAdmin = rol == "ADMIN";
-    //aca actualizo el provider
 
-    // Filtrado base
-    final filtradosBase = insumosRaw.where((i) {
-      final nombre = _normalizar(i.nombre);
-      final busqueda = _normalizar(search);
-      final matchSearch = nombre.contains(busqueda);
-      final matchCategoria =
-          filtroCategoria == "TODAS" || i.categoria == filtroCategoria;
-      final matchStock =
-          filtroStock == "TODOS" ||
-          (filtroStock == "OK" && i.stock > 5) ||
-          (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
-          (filtroStock == "URGENTE" && i.stock <= 2) ||
-          (filtroStock == "ALERTADOS" && i.stock <= 5);
+    // 1. Filtrado Base por buscador y dropdown de categoría
 
-      return matchSearch && matchCategoria && matchStock;
-    }).toList();
+      final filtradosBase = insumosRaw.where((i) {
+        final nombre = _normalizar(i.nombre);
+        final busqueda = _normalizar(search);
+        final matchSearch = nombre.contains(busqueda);
+        final matchCategoria =
+        filtroCategoria == "TODAS" || i.categoria == filtroCategoria;
+        final matchStock =
+            filtroStock == "TODOS" ||
+            (filtroStock == "OK" && i.stock > 5) ||
+            (filtroStock == "CRITICO" && i.stock > 2 && i.stock <= 5) ||
+            (filtroStock == "URGENTE" && i.stock <= 2) ||
+            (filtroStock == "ALERTADOS" && i.stock <= 5);
+
+        return matchSearch && matchCategoria && matchStock;
+       }).toList();
 
     // Listas ordenadas
     final activosOrdenados = filtradosBase.where((i) => i.activo).toList()
@@ -400,7 +400,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
       );
     }
 
-    // SI ES EMPLEADO: Scaffold liso sin pestañas arriba, súper limpio
+    // SI ES EMPLEADO: Scaffold liso sin pestañas arriba
     return Scaffold(
       appBar: AppBar(title: const Text("INSUMOS")),
       body: cuerpoPantalla(),
@@ -453,7 +453,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
               ],
             ),
 
-            //esto es lo que cambie para agregar el
+            //Para agregar el switch
             trailing: context.watch<UserProvider>().rol == "ADMIN"
                 ? Switch(
                     value: insumo.activo,
@@ -489,7 +489,7 @@ class _InsumosScreenState extends State<InsumosScreen> {
                   )
                 : const Icon(Icons.chevron_right),
 
-            //hasta aca
+            //Para ir a la pantalla de detalle de insumo
             onTap: () {
               Navigator.push(
                 context,

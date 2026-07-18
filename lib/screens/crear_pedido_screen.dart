@@ -44,7 +44,7 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
           cantidad: int.parse(cantidadController.text),
           descuento: double.tryParse(descuentoController.text) ?? 0.0,
           precioUnitario: productoSeleccionado!.precio,
-          // 🛡️ PROTECCIÓN 1: Si el id es null, le ponemos 0 por defecto para que no falle
+          // PROTECCIÓN 1: Si el id es null, le ponemos 0 por defecto para que no falle
           productoId: productoSeleccionado!.id ?? 0, 
           pedidoId: null,
         ),
@@ -60,7 +60,7 @@ class _CrearPedidoScreenState extends State<CrearPedidoScreen> {
     });
   }
 
-  // En crear_pedido_screen.dart, dentro de guardarPedido()
+  
 Future<void> guardarPedido() async {
   if (nombreController.text.isEmpty || detallesPedido.isEmpty) return;
 
@@ -70,7 +70,7 @@ Future<void> guardarPedido() async {
 
   // 2. Crea el objeto Pedido con esa fecha "limpia"
   final Pedido nuevoPedido = Pedido(
-    fecha: fechaSoloFecha, // <-- Fecha sin horas ni milisegundos
+    fecha: fechaSoloFecha, // Fecha sin horas ni milisegundos
     cliente: nombreController.text,
     usuario: 1,
     detalles: detallesPedido,
@@ -143,7 +143,7 @@ Future<void> guardarPedido() async {
               controller: descuentoController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
-                labelText: 'Descuento (%)',
+                labelText: 'Descuento (opcional)',
                 border: OutlineInputBorder(),
               ),
             ),

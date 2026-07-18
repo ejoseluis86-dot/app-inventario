@@ -22,7 +22,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   final passwordController = TextEditingController();
   String rolSeleccionado = 'EMPLEADO';
 
-  // 🔮 Color institucional violeta de tu Login y Home
+  // Violeta del Login y Home
   final Color colorVioletaCorporativo = const Color(0xFF6A1B9A);
 
   @override
@@ -43,7 +43,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   Future<void> cargarUsuarios() async {
     setState(() => loading = true);
     try {
-      // Llamada a tu ApiService (mapeado para el endpoint de Django)
+      // Llamada a ApiService (mapeado para el endpoint de Django)
       final data = await api.obtenerUsuariosAdmin();
       setState(() {
         todosLosUsuarios = data;
@@ -146,7 +146,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                   value: rolActual,
                   onChanged: (val) {
                     setDialogState(() {
-                      // <--- ESTE setDialogState es vital
+                      // Este setDialogState es vital
                       rolActual = val!;
                     });
                   },
@@ -309,7 +309,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     if (!_formKey.currentState!.validate()) return;
 
                     if (mounted) {
-                      //aca creo el nuevo usuario con todos los campos requeridos
+                      //Acá creamos el nuevo usuario con todos los campos requeridos
                       final ok = await api.crearUsuario(
                         username: usernameController.text,
                         password: passwordController.text,

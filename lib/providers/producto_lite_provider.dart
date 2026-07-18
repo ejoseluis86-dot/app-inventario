@@ -37,7 +37,7 @@ class ProductoLiteProvider extends ChangeNotifier {
     } catch (e) {
       loading = false;
       error = e.toString();
-      print("❌ ERROR EN PRODUCTO_LITE_PROVIDER: $e");
+      print("ERROR EN PRODUCTO_LITE_PROVIDER: $e");
       notifyListeners();
     }
   }

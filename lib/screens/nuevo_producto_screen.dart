@@ -12,7 +12,6 @@ class NuevoProductoScreen extends StatefulWidget {
 class _NuevoProductoScreenState extends State<NuevoProductoScreen> {
   final _nombreController = TextEditingController();
   final _precioController = TextEditingController();
-  //esta sera estatica para siempre
   final List<String> categorias = [
       'Cerámica',
       'Plástico',

@@ -4,7 +4,6 @@ import 'package:mi_app/models/detalle_receta.dart';
 import 'package:mi_app/providers/insumos_provider.dart';
 import 'package:mi_app/services/api_service.dart';
 import 'package:provider/provider.dart';
-import 'package:mi_app/services/auth_service.dart';
 import 'package:mi_app/providers/user_provider.dart';
 
 class EditarProductoScreen extends StatefulWidget {

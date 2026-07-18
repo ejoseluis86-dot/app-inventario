@@ -7,8 +7,7 @@ class Pedido {
   final String cliente;
   final int usuario;
   final bool terminado;
-  List<DetallePedido> detalles =
-      []; //se crea al momento de crear el pedido con todo y sus detalles no pude ser nulo
+  List<DetallePedido> detalles = []; 
   //por el momento sacamos sucursalId porque no lo vamos a usar, pero si lo necesitamos despues lo agregamos
 
   Pedido({

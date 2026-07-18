@@ -20,7 +20,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 💡 Se eliminó el color hardcodeado para que tome el scaffoldBackgroundColor del AppTheme
+      // 💡Toma el scaffoldBackgroundColor del AppTheme
       body: CustomScrollView(
         slivers: [
           // 1. App Bar limpia y unificada con Insumos/Productos
@@ -130,7 +130,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
     );
   }
 
-  // 🔄 CORREGIDO: Mantiene tu firma limpia original recibiendo el objeto dynamic 'pedido'
+  // Mantiene la firma limpia original recibiendo el objeto dynamic 'pedido'
   Widget _buildOrderCard(BuildContext context, dynamic pedido) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -205,7 +205,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Lógica de cierre...
+              // Lógica de cierre del pedido
             }, 
             child: const Text("Confirmar", style: TextStyle(color: Colors.green)),
           ),

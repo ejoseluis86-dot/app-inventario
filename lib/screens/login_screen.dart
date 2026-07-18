@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
           apellido: data['apellido'],
         );
 
-        // 👇 ESPERAR un frame
+        // Esperar un poco
         await Future.delayed(const Duration(milliseconds: 100));
 
         final esAdmin = userProvider.rol == "ADMIN";
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 17),
                     const Text(
-                      "Bienvenido, por favor inicie sesión",
+                      "Bienvenido, por favor inicie sesión.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 21,
@@ -185,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// 👁️ PASSWORD FIELD
+//PASSWORD FIELD
 class _PasswordField extends StatefulWidget {
   final TextEditingController controller;
 

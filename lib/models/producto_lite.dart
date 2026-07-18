@@ -19,7 +19,7 @@ class ProductoLite {
       nombre: json['nombre'],
       precio: double.parse(json['precio'].toString()),
       categoria: json['categoria'],
-      activo: json['activo'] ?? true, // 🔥 IMPORTANTE
+      activo: json['activo'] ?? true, // IMPORTANTE
     );
   }
 }
