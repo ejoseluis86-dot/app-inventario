@@ -6,7 +6,9 @@ import 'package:mi_app/services/auth_service.dart';
 import 'package:mi_app/models/detalle_receta.dart';
 
 class ApiService {
-  final String baseUrl = "http://10.0.2.2:8000";
+  final String baseUrl = "http://192.168.100.36:8000";
+  //ip para el emulador http://10.0.2.2:8000 http://192.168.100.36
+
   final AuthService auth = AuthService();
 
   // =========================

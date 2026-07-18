@@ -6,7 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   //direccion de mi api
 
-  final String baseUrl = 'http://10.0.2.2:8000';
+  final String baseUrl = 'http://192.168.100.36:8000';
+  //http://192.168.100.36:8000 para el emulador http://10.0.2.2:8000
 
   Future<dynamic> login(String username, String password) async {
     //hacemos la consulta a la API en el body mandamos usuario y contraseña

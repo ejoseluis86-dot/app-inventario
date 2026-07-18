@@ -10,45 +10,50 @@ class PedidosGeneralScreen extends StatelessWidget {
 
   @override
   @override
-Widget build(BuildContext context) {
-  return DefaultTabController(
-    length: 2,
-    child: Scaffold(
-      appBar: AppBar(
-        title: const Text("GESTIÓN DE PEDIDOS", style: TextStyle(fontWeight: FontWeight.bold)),
-        bottom: const TabBar(
-          tabs: [
-            Tab(icon: Icon(Icons.pending_actions), text: "Activos"),
-            Tab(icon: Icon(Icons.history), text: "Historial"),
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            "GESTIÓN DE PEDIDOS",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.pending_actions), text: "Activos"),
+              Tab(icon: Icon(Icons.history), text: "Historial"),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            ListaPedidosGenerica(esTerminado: false),
+            ListaPedidosGenerica(esTerminado: true),
           ],
         ),
+        // BOTÓN FLOTANTE: Asegúrate de que esté aquí, como propiedad del Scaffold
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Navegación directa
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CrearPedidoScreen(),
+              ),
+            );
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
-      body: const TabBarView(
-        children: [
-          ListaPedidosGenerica(esTerminado: false),
-          ListaPedidosGenerica(esTerminado: true),
-        ],
-      ),
-      // BOTÓN FLOTANTE: Asegúrate de que esté aquí, como propiedad del Scaffold
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navegación directa
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const CrearPedidoScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-    ),
-  );
-}
+    );
+  }
 }
 
 class ListaPedidosGenerica extends StatefulWidget {
   final bool esTerminado;
   const ListaPedidosGenerica({required this.esTerminado});
-
+  //
   @override
   State<ListaPedidosGenerica> createState() => ListaPedidosGenericaState();
 }
@@ -78,15 +83,27 @@ class ListaPedidosGenericaState extends State<ListaPedidosGenerica> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.red)));
+          return Center(
+            child: Text(
+              "Error: ${snapshot.error}",
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.assignment_outlined, size: 60, color: Colors.grey.shade400),
+                Icon(
+                  Icons.assignment_outlined,
+                  size: 60,
+                  color: Colors.grey.shade400,
+                ),
                 const SizedBox(height: 8),
-                Text("No hay registros", style: TextStyle(color: Colors.grey.shade500, fontSize: 16)),
+                Text(
+                  "No hay registros",
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+                ),
               ],
             ),
           );
@@ -101,8 +118,10 @@ class ListaPedidosGenericaState extends State<ListaPedidosGenerica> {
             itemBuilder: (context, index) {
               final p = pedidos[index];
               print("DEBUG: campos disponibles en pedido: ${p.keys.toList()}");
-              final fechaFormateada = p['fecha'] != null 
-                  ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(p['fecha']))
+              final fechaFormateada = p['fecha'] != null
+                  ? DateFormat(
+                      'dd/MM/yyyy HH:mm',
+                    ).format(DateTime.parse(p['fecha']))
                   : "Sin fecha";
 
               // Eliminamos el SizedBox.shrink() fantasma para que la UI se dibuje real
@@ -111,21 +130,27 @@ class ListaPedidosGenericaState extends State<ListaPedidosGenerica> {
                 clipBehavior: Clip.antiAlias,
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: widget.esTerminado ? Colors.green.shade50 : Colors.orange.shade50,
+                    backgroundColor: widget.esTerminado
+                        ? Colors.green.shade50
+                        : Colors.orange.shade50,
                     child: Icon(
                       widget.esTerminado ? Icons.check_circle : Icons.schedule,
                       color: widget.esTerminado ? Colors.green : Colors.orange,
                     ),
                   ),
-                  title: Text(p['cliente'] ?? "Cliente Anónimo", style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    p['cliente'] ?? "Cliente Anónimo",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text("Orden #${p['id']} • $fechaFormateada"),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     _abrirDetallePedido(
-                      p['id'], 
-                      p['cliente'] ?? "Cliente Anónimo", 
+                      p['id'],
+                      p['cliente'] ?? "Cliente Anónimo",
                       widget.esTerminado,
-                      p['fecha']?.toString() ?? "Sin fecha" // <-- Aquí usamos la clave correcta
+                      p['fecha']?.toString() ??
+                          "Sin fecha", // <-- Aquí usamos la clave correcta
                     );
                   },
                 ),
@@ -137,23 +162,28 @@ class ListaPedidosGenericaState extends State<ListaPedidosGenerica> {
     );
   }
 
-  void _abrirDetallePedido(int idPedido, String cliente, bool esTerminado, String fecha) async {
-  // Capturamos el resultado del pop
-  final realizoCambio = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => PedidoDetalleScreen(
-        idPedido: idPedido,
-        cliente: cliente,
-        esTerminado: esTerminado,
-        fecha: fecha,
+  void _abrirDetallePedido(
+    int idPedido,
+    String cliente,
+    bool esTerminado,
+    String fecha,
+  ) async {
+    // Capturamos el resultado del pop
+    final realizoCambio = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PedidoDetalleScreen(
+          idPedido: idPedido,
+          cliente: cliente,
+          esTerminado: esTerminado,
+          fecha: fecha,
+        ),
       ),
-    ),
-  );
+    );
 
-  // Si recibimos 'true', significa que el stock fue afectado y debemos recargar la lista
-  if (realizoCambio == true && mounted) {
-    _cargarDatos(); // Esto refresca el FutureBuilder llamando a la API nuevamente
+    // Si recibimos 'true', significa que el stock fue afectado y debemos recargar la lista
+    if (realizoCambio == true && mounted) {
+      _cargarDatos(); // Esto refresca el FutureBuilder llamando a la API nuevamente
+    }
   }
-}
 }

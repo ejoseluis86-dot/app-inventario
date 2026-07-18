@@ -8,11 +8,11 @@ class PedidoDetalleScreen extends StatefulWidget {
   final String? fecha;
 
   const PedidoDetalleScreen({
-    super.key, 
-    required this.idPedido, 
-    required this.cliente, 
-    required this.esTerminado, 
-    this.fecha
+    super.key,
+    required this.idPedido,
+    required this.cliente,
+    required this.esTerminado,
+    this.fecha,
   });
 
   @override
@@ -44,18 +44,18 @@ class _PedidoDetalleScreenState extends State<PedidoDetalleScreen> {
   }
 
   // En _PedidoDetalleScreenState
-// En _PedidoDetalleScreenState
-Future<void> _finalizarPedido(BuildContext context) async {
-  try {
-    await ApiService().finalizarPedido(widget.idPedido);
-    if (mounted) {
-      // Enviamos 'true' para avisar que hubo cambios
-      Navigator.pop(context, true); 
+  // En _PedidoDetalleScreenState
+  Future<void> _finalizarPedido(BuildContext context) async {
+    try {
+      await ApiService().finalizarPedido(widget.idPedido);
+      if (mounted) {
+        // Enviamos 'true' para avisar que hubo cambios
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      print("Error: $e");
     }
-  } catch (e) {
-    print("Error: $e");
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,10 @@ Future<void> _finalizarPedido(BuildContext context) async {
                         subtitle: Text("Cant: ${item['cantidad']}"),
                       ),
                       if (!widget.esTerminado)
-                        _WidgetInsumos(idDetalle: item['id'] ?? 0, idProducto: item['producto_id'] ?? 0),
+                        _WidgetInsumos(
+                          idDetalle: item['id'] ?? 0,
+                          idProducto: item['producto_id'] ?? 0,
+                        ),
                     ],
                   ),
                 );
@@ -96,7 +99,7 @@ class _WidgetInsumos extends StatefulWidget {
 class _WidgetInsumosState extends State<_WidgetInsumos> {
   List<dynamic> receta = [];
   Map<int, double> cambiosLocales = {};
-
+  Map<int, double> stockActual = {};
   @override
   void initState() {
     super.initState();
@@ -105,14 +108,38 @@ class _WidgetInsumosState extends State<_WidgetInsumos> {
 
   Future<void> _cargarReceta() async {
     final data = await ApiService().obtenerRecetaProducto(widget.idProducto);
-    if (mounted) setState(() => receta = data);
+
+    for (var insumo in data) {
+      stockActual[(insumo['id'] as num).toInt()] = (insumo['stock'] as num)
+          .toDouble();
+    }
+
+    if (mounted) {
+      setState(() {
+        receta = data;
+      });
+    }
   }
 
   void _ajustar(int idInsumo, double delta) {
     setState(() {
-      // Obtenemos el valor actual (iniciando en 0.0)
-      double valorActual = cambiosLocales[idInsumo] ?? 0.0;
-      cambiosLocales[idInsumo] = (valorActual + delta).clamp(0.0, double.infinity);
+      double usado = cambiosLocales[idInsumo] ?? 0.0;
+      double stock = stockActual[idInsumo] ?? 0.0;
+
+      // Botón +
+      if (delta > 0) {
+        if (stock > 0) {
+          cambiosLocales[idInsumo] = usado + 1;
+          stockActual[idInsumo] = stock - 1;
+        }
+      }
+      // Botón -
+      else {
+        if (usado > 0) {
+          cambiosLocales[idInsumo] = usado - 1;
+          stockActual[idInsumo] = stock + 1;
+        }
+      }
     });
   }
 
@@ -128,16 +155,37 @@ class _WidgetInsumosState extends State<_WidgetInsumos> {
 
         return ListTile(
           title: Text(i['insumo']?.toString() ?? "Insumo"),
-          subtitle: Text("Teórico: ${i['cantidadTeorica'] ?? 0}"),
+
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Teórico: ${i['cantidadTeorica'] ?? 0}"),
+              Text(
+                "Stock: ${(stockActual[idInsumo] ?? 0).toStringAsFixed(1)}",
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
                 icon: const Icon(Icons.remove_circle, color: Colors.red),
-                onPressed: valorMostrado > 0 ? () => _ajustar(idInsumo, -1.0) : null,
+                onPressed: valorMostrado > 0
+                    ? () => _ajustar(idInsumo, -1.0)
+                    : null,
               ),
-              Text(valorMostrado.toStringAsFixed(1), 
-                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(
+                valorMostrado.toStringAsFixed(1),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.add_circle, color: Colors.green),
                 onPressed: () => _ajustar(idInsumo, 1.0),
